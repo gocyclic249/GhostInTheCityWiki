@@ -1,0 +1,474 @@
+/* ============================================================
+   Ghost in the City Wiki — Cyberpunk / Neocities Aesthetic
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&display=swap');
+
+:root {
+  --bg:          #0a0010;
+  --surface:     #110020;
+  --surface-2:   #1a0035;
+  --accent-cyan: #00ffe5;
+  --accent-pink: #ff2d78;
+  --accent-gold: #ffd700;
+  --accent-purple: #b44aff;
+  --text:        #c8c8e8;
+  --text-dim:    #7070a0;
+  --border:      #2a0050;
+  --glow-cyan: 0 0 8px #00ffe5, 0 0 20px #00ffe566;
+  --glow-pink: 0 0 8px #ff2d78, 0 0 20px #ff2d7866;
+  --glow-gold: 0 0 8px #ffd700, 0 0 20px #ffd70066;
+  --glow-purple: 0 0 8px #b44aff, 0 0 20px #b44aff66;
+}
+
+/* ── Reset ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ── Scanline overlay ── */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none;
+  z-index: 9999;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.15) 2px,
+    rgba(0, 0, 0, 0.15) 4px
+  );
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: 'VT323', 'Courier New', monospace;
+  font-size: 18px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* ── Typography ── */
+h1, h2, h3, h4, h5, h6,
+.site-title, nav, .stat-label, .tag {
+  font-family: 'Share Tech Mono', 'Courier New', monospace;
+}
+
+h1 { font-size: 2.4rem; color: var(--accent-cyan); text-shadow: var(--glow-cyan); }
+h2 { font-size: 1.8rem; color: var(--accent-cyan); border-bottom: 1px solid var(--border); padding-bottom: 0.3em; margin-bottom: 0.8em; }
+h3 { font-size: 1.4rem; color: var(--accent-purple); }
+
+a { color: var(--accent-cyan); text-decoration: none; }
+a:hover { text-shadow: var(--glow-cyan); text-decoration: underline; }
+
+p { margin-bottom: 1em; }
+
+/* ── Layout ── */
+.site-wrapper {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+/* ── Header / Nav ── */
+.site-header {
+  border-bottom: 2px solid var(--accent-cyan);
+  padding: 1rem 0;
+  margin-bottom: 2rem;
+  box-shadow: var(--glow-cyan);
+}
+
+.site-title {
+  font-size: 1.1rem;
+  color: var(--text-dim);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: 0.3rem;
+}
+
+.site-title a { color: inherit; }
+
+nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem 1.5rem;
+  font-size: 0.9rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+nav a {
+  color: var(--text-dim);
+  padding: 0.1em 0;
+  border-bottom: 1px solid transparent;
+}
+
+nav a:hover, nav a.active {
+  color: var(--accent-cyan);
+  border-bottom-color: var(--accent-cyan);
+  text-shadow: var(--glow-cyan);
+  text-decoration: none;
+}
+
+/* ── Kill Counter ── */
+.kill-counter-block {
+  border: 2px solid var(--accent-pink);
+  background: var(--surface);
+  padding: 1.5rem 2rem;
+  margin: 2rem 0;
+  display: inline-block;
+  box-shadow: var(--glow-pink), inset 0 0 30px rgba(255,45,120,0.05);
+}
+
+.kill-counter-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.85rem;
+  color: var(--accent-pink);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 0.3rem;
+}
+
+.kill-counter-number {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 4rem;
+  color: var(--accent-pink);
+  text-shadow: var(--glow-pink);
+  display: block;
+  line-height: 1;
+  animation: flicker 6s infinite;
+}
+
+@keyframes flicker {
+  0%,  19%,  21%,  23%,  25%,  54%,  56%,  100% { opacity: 1; }
+  20%,  24%,  55% { opacity: 0.6; }
+  22% { opacity: 0.8; }
+}
+
+/* ── Info / stat cards ── */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 1rem;
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.stat-value {
+  font-size: 1.4rem;
+  color: var(--accent-gold);
+  text-shadow: var(--glow-gold);
+}
+
+/* ── Story summary block ── */
+.story-summary {
+  background: var(--surface);
+  border-left: 4px solid var(--accent-cyan);
+  padding: 1.5rem;
+  margin: 2rem 0;
+  box-shadow: var(--glow-cyan);
+}
+
+/* ── Chapter list ── */
+.chapter-list {
+  list-style: none;
+  margin: 1rem 0;
+}
+
+.chapter-list details {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  margin-bottom: 4px;
+}
+
+.chapter-list details[open] {
+  border-color: var(--accent-cyan);
+  box-shadow: var(--glow-cyan);
+}
+
+.chapter-list summary {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  padding: 0.6rem 1rem;
+  cursor: pointer;
+  list-style: none;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.9rem;
+}
+
+.chapter-list summary::-webkit-details-marker { display: none; }
+
+.chapter-list summary::before {
+  content: '▶';
+  color: var(--accent-cyan);
+  font-size: 0.7rem;
+  flex-shrink: 0;
+  transition: transform 0.15s;
+}
+
+.chapter-list details[open] summary::before { transform: rotate(90deg); }
+
+.chapter-list summary:hover { background: var(--surface-2); }
+
+.ch-num {
+  color: var(--text-dim);
+  min-width: 3rem;
+  flex-shrink: 0;
+}
+
+.ch-title { color: var(--text); flex: 1; }
+
+.ch-kills {
+  color: var(--accent-pink);
+  font-size: 0.8rem;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.ch-kills[data-kills="0"] { color: var(--text-dim); }
+
+.chapter-summary-body {
+  padding: 0.8rem 1rem 1rem 2.5rem;
+  border-top: 1px solid var(--border);
+  color: var(--text);
+  font-size: 0.95rem;
+}
+
+.chapter-summary-body p { margin-bottom: 0.5em; }
+
+.chapter-meta {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  margin-top: 0.8rem;
+}
+
+.chapter-meta a { color: var(--text-dim); }
+.chapter-meta a:hover { color: var(--accent-cyan); }
+
+/* ── BD Catalog ── */
+.bd-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin: 2rem 0;
+}
+
+.bd-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.bd-card:hover {
+  border-color: var(--accent-purple);
+  box-shadow: var(--glow-purple);
+}
+
+.bd-id {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  letter-spacing: 0.15em;
+}
+
+.bd-title {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 1.1rem;
+  color: var(--accent-gold);
+  text-shadow: var(--glow-gold);
+}
+
+.bd-status {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.bd-status.released { color: var(--accent-cyan); }
+.bd-status.unreleased { color: var(--text-dim); }
+.bd-status.leaked { color: var(--accent-pink); }
+
+.bd-desc { font-size: 0.95rem; color: var(--text); line-height: 1.5; }
+
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.tag {
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.15em 0.5em;
+  border: 1px solid var(--accent-purple);
+  color: var(--accent-purple);
+}
+
+/* ── Character grid ── */
+.char-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1.25rem;
+  margin: 2rem 0;
+}
+
+.char-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 1.25rem;
+  text-decoration: none;
+  display: block;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.char-card:hover {
+  border-color: var(--accent-cyan);
+  box-shadow: var(--glow-cyan);
+  text-decoration: none;
+}
+
+.char-icon {
+  font-size: 2rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.char-name {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 1rem;
+  color: var(--accent-cyan);
+  display: block;
+  margin-bottom: 0.2rem;
+}
+
+.char-role {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.char-affil {
+  font-size: 0.75rem;
+  color: var(--accent-gold);
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.char-bio-excerpt {
+  font-size: 0.9rem;
+  color: var(--text-dim);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ── Character profile page ── */
+.char-profile {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 2rem;
+  margin: 2rem 0;
+}
+
+@media (max-width: 640px) {
+  .char-profile { grid-template-columns: 1fr; }
+}
+
+.char-sidebar {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 1.25rem;
+}
+
+.char-sidebar .char-icon { font-size: 3rem; }
+
+.char-stat-row {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  padding: 0.4rem 0;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.85rem;
+}
+
+.char-stat-row:last-child { border-bottom: none; }
+
+.char-stat-key { color: var(--text-dim); }
+.char-stat-val { color: var(--text); }
+
+.char-bio { font-size: 1rem; line-height: 1.7; }
+.char-bio p { margin-bottom: 1em; }
+
+/* ── Footer ── */
+.site-footer {
+  margin-top: 4rem;
+  padding: 1.5rem 0;
+  border-top: 1px solid var(--border);
+  color: var(--text-dim);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.75rem;
+  text-align: center;
+  letter-spacing: 0.1em;
+}
+
+.site-footer a { color: var(--text-dim); }
+.site-footer a:hover { color: var(--accent-cyan); }
+
+/* ── Utility ── */
+.page-title {
+  margin: 1.5rem 0 2rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--accent-cyan);
+  box-shadow: 0 2px 0 0 #00ffe566;
+}
+
+.placeholder-note {
+  color: var(--text-dim);
+  font-style: italic;
+  border: 1px dashed var(--border);
+  padding: 0.5rem 1rem;
+  margin: 1rem 0;
+  font-size: 0.9rem;
+}
+
+.status-badge {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.1em 0.5em;
+  border: 1px solid currentColor;
+}
+
+.status-active  { color: var(--accent-cyan); }
+.status-deceased { color: var(--accent-pink); }
+.status-unknown  { color: var(--text-dim); }
