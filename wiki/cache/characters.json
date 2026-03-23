@@ -21,7 +21,7 @@
         "Body":              9,
         "Reflexes":          9,
         "Technical Ability": 10,
-        "Intelligence":      14,
+        "Intelligence":      16,
         "Cool":              10
       },
       "skills": [
@@ -158,6 +158,51 @@
     "bio": [
       "Granddaughter of fixer Wakako and daughter of Shinobu Nakagawa, head of the Tyger Claws — though neither connection was public knowledge when she walked into the TC gym looking for a fight. She was introduced as a spoiled corpo girl with a Kerenzikov and extensive biomods, coasting on talent she hadn't really earned. She lost to Motoko, lost her temper about it, and then formally bowed. That moment set the tone for everything that followed.",
       "What started as a sparring rivalry became a genuine, unlikely friendship built on the dojo floor over dozens of sessions. Hayato eventually hired Motoko to quietly assassinate one of her arranged fiancés — 'he did something unforgivable' — and delivered the contract with the same composed formality as a Wakako intel packet. She remains one of the few people in Night City who can claim Motoko as a peer rather than a subordinate, an asset, or a threat."
+    ]
+  },
+  "akari": {
+    "name": "Akari",
+    "role": "Kamikaze Borg",
+    "faction": "Tyger Claws",
+    "affiliation": "Tyger Claws / Kamikaze",
+    "status": "Active",
+    "first_chapter": 28,
+    "icon": "&#x2726;",
+    "description": "Kamikaze cyberpsycho-squad borg with mantis-blade legs and a Sandevistan. Teaches Motoko how to kill borgs, bickers with her constantly, and was once one knife-twitch from dying at her hands.",
+    "physical_description": "Heavily chromed — mantis-blade legs are the most prominent feature, giving her a distinctive forward-balance stance and explosive close-quarters speed. Her Sandevistan lets her move fast enough to disable fortified HMG turrets mid-firefight. She goes half-feral during spars, which is apparently how she relaxes. The overall impression is someone who stopped being fully human a long time ago and doesn't particularly miss it.",
+    "bio": [
+      "A Kamikaze borg — one of the Tyger Claws' cyberpsycho-adjacent heavy assault operatives under Fujimura's command. Motoko meets her at the Deravaja Dojo shortly after receiving her Militech Condor arms. Akari teaches her the trick to killing borgs (stab them with a thermal blade and cook them from the inside), spars with her at half-feral intensity, and laughs at Jun trying to carry Motoko out of combat zones. She disables HMG turrets at Sandevistan speed during Kamikaze raids and treats Motoko's existence as equal parts entertainment and annoyance.",
+      "Her role shifts as the story progresses. She manages a 10 million eddy Glitter shipment for Fujimura — when it's stolen, both she and Jun face Yubitsume until Motoko's crew recovers it. Later, when Yuto's assassination attempts on TC Lieutenant Kisaru threaten Jun, Fujimura assigns Akari as Jun's watchdog — and, if evidence of Jun's involvement surfaces, his executioner. Motoko's Sandy activates on pure instinct the moment this threat registers; she has Akari pinned with a knife at her eye before Jun can intervene. Akari finds this hilarious. She tips Jun off rather than following the kill order, and stays close as the Yuto crisis plays out — loyal to Jun above the chain of command."
+    ]
+  },
+  "alice": {
+    "name": "Alice Novak",
+    "role": "Rockerboy / Guitarist",
+    "faction": "Stand Alone Complex",
+    "affiliation": "Independent",
+    "status": "Active",
+    "first_chapter": 149,
+    "icon": "&#x266A;",
+    "description": "Fujimura's niece, Jun's neighbor, and the guitarist who turned Motoko's solo act into a band. Uses voice chrome to compensate for a natural weakness — and it shows if you know what to listen for.",
+    "physical_description": "The summaries don't linger on Alice's appearance beyond the impression of a working musician — someone who carries herself with stage presence even off it. She drives a beat-up Mahir Supron van. Her voice has an electronic edge that Motoko's Rockerboy skill identifies as chrome-assisted autotune masking a naturally poor singing voice. She presents as confident and direct, but the confidence cracks when things get personal — particularly around Jun.",
+    "bio": [
+      "Fujimura's niece, living on the same floor as Motoko and Jun while her band Violent Hemorrhage gets established. She first appears knocking on the apartment door hoping to jam with Jun — and flirting, which Jun completely misses. Motoko offers to play instead, replicates Alice's songs from memory after hearing them once, and files the encounter as the start of a private music rivalry. Alice's band plays NeoRock Electrosmash at TC-affiliated clubs; Motoko attends a show and notes that Alice's singing uses throat chrome to autotune a naturally poor voice.",
+      "When Violent Hemorrhage's guitarist Carmen quits and smashes his DeLuze Orphean on the way out, Alice recruits Motoko as a temp fill-in. What starts as a single gig becomes permanent: Alice makes a direct personal appeal ('This is as serious as it gets for us'), Motoko accepts her and her bandmates Klein and Jared as her backup, and Stand Alone Complex is born. Alice handles main guitar while Motoko takes vocals, synth, and lead; together they play the Electric Orgasm, the 7th Hell, and the MSM skybar. Alice pushes for harder rock in the setlists, handles the electronic vocal sections of Faint, and is enthusiastic about MSM's sponsored chrome upgrades where Motoko flatly refuses. She's here for Jun, for the music, and for the shot at something real — in roughly that order."
+    ]
+  },
+  "yuto": {
+    "name": "Yuto Gonzales",
+    "role": "Ex-Convict",
+    "faction": "Tyger Claws (former)",
+    "affiliation": "Independent",
+    "status": "Deceased",
+    "first_chapter": 173,
+    "icon": "&#x2736;",
+    "description": "Jun's childhood best friend, fresh out of prison with a grudge that got him killed. Motoko pulled the trigger.",
+    "physical_description": "The story never pauses long enough to describe Yuto's appearance. He exists in motion — drunk at a TC bar, jumping out a second-floor window, crashing through a strip mall in a modded Archer Quartz. By the time anyone gets a good look at him, he's already running.",
+    "bio": [
+      "Jun's childhood best friend — released from prison and immediately fixated on murdering TC Lieutenant Kisaru, who allegedly framed him for drugs. He shows up at Jun's apartment with eddies and drugs on the table, trying to call in a favor to recruit Jun for the hit. Motoko puts a knife to his throat and shuts it down: if Jun murders a TC Lieutenant, the retaliation kills him. Yuto backs off. Jun tries to talk him down at a TC bar, offers him legitimate work through Wakako and Fujimura. It doesn't take.",
+      "Yuto makes a first attempt on Kisaru and fails. Then a second attempt, this time injuring him. The Oyabun call a full meeting — Moritaka demands Yuto's head and punishment for Jun. Fujimura defends Jun and then hires Section 9 to find and kill Yuto. What follows is a multi-chapter manhunt: Motoko breaches a safehouse in Rancho Coronado, hacks Yuto's NCTV subscription to track his location in real time, chases him by car through Japantown into 6th Street territory, and finally catches him at a second safehouse. Copperhead to the head, then three more shots. 250 XP. Jun adds Yuto to the apartment shrine afterward — a quiet moment of grief for a friend who couldn't be saved."
     ]
   }
 }
