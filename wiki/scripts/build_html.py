@@ -76,6 +76,7 @@ def page_shell(title, body, css_path="assets/style.css", active_nav=""):
         ("braindances.html",        "Braindances"),
         ("rockerboy.html",          "Rockerboy"),
         ("characters/index.html",   "Characters"),
+        ("charsheet.html",          "Character Sheet"),
     ]
 
     def nav_href(target):
@@ -176,6 +177,7 @@ def build_index(summaries, characters, braindances, ch_total):
         <li><a href="braindances.html">Braindance Catalog</a> — every BD Motoko produces or sells</li>
         <li><a href="rockerboy.html">Rockerboy</a> — every performance and studio session in chapter order</li>
         <li><a href="characters/index.html">Character Profiles</a> — bios and stats</li>
+        <li><a href="charsheet.html">Character Sheet</a> — Motoko's CP2077 stats, skills, perks, and cyberware</li>
       </ul>
 """
     out = page_shell("Home", body, active_nav="index.html")
@@ -458,9 +460,6 @@ def build_char_page(slug, char):
 
     desc_html = f'<p class="char-description">{e(description)}</p>' if description else ""
 
-    cp        = char.get("cp_stats")
-    cp_html   = build_cp_stats_block(cp) if cp else ""
-
     body = f"""
       <h1 class="page-title">{e(name)}</h1>
       {desc_html}
@@ -474,12 +473,38 @@ def build_char_page(slug, char):
           {bio_html}
         </div>
       </div>
-      {cp_html}
       <p><a href="index.html">&#x2190; All Characters</a></p>
 """
     out = page_shell(name, body, css_path="../assets/style.css",
                      active_nav="characters/index.html")
     dest = os.path.join(CHARS_DIR, f"{slug}.html")
+    with open(dest, "w", encoding="utf-8") as f:
+        f.write(out)
+    print(f"  Wrote {dest}")
+
+
+# ── charsheet.html ─────────────────────────────────────────────────────────
+
+def build_charsheet(characters):
+    motoko = characters.get("motoko", {})
+    cp = motoko.get("cp_stats")
+
+    if cp:
+        cp_html = build_cp_stats_block(cp)
+    else:
+        cp_html = '<p class="placeholder-note">[Character sheet pending — no cp_stats in Motoko\'s cache entry]</p>'
+
+    body = f"""
+      <h1 class="page-title">Character Sheet</h1>
+      <p>
+        Motoko Kusanagi's stats under the
+        <em>Cyberpunk 2077</em> pre-Update 2.0 system.
+        Attributes cap at 20. Skill levels are independent of attributes.
+      </p>
+      {cp_html}
+"""
+    out = page_shell("Character Sheet", body, active_nav="charsheet.html")
+    dest = os.path.join(BUILD_DIR, "charsheet.html")
     with open(dest, "w", encoding="utf-8") as f:
         f.write(out)
     print(f"  Wrote {dest}")
@@ -603,6 +628,7 @@ def main():
     build_braindances(braindances)
     build_rockerboy(rockerboy)
     build_char_index(characters)
+    build_charsheet(characters)
 
     for slug, char in characters.items():
         build_char_page(slug, char)
