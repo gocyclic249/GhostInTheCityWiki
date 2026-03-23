@@ -124,9 +124,8 @@ def total_kills(summaries):
 
 # ── index.html ─────────────────────────────────────────────────────────────
 
-def build_index(summaries, characters, braindances):
+def build_index(summaries, characters, braindances, ch_total):
     kill_count    = total_kills(summaries)
-    ch_total      = 240
     ch_summarized = sum(1 for ch in summaries.values() if ch.get("summary"))
     bd_count      = len(braindances)
     char_count    = len(characters)
@@ -137,7 +136,7 @@ def build_index(summaries, characters, braindances):
         A <em>Cyberpunk 2077 / Ghost in the Shell</em> crossover SI (Self-Insert) by
         <strong>Seras</strong>. A gamer wakes up in Night City as Motoko Kusanagi —
         without memories, without allies, and with a body that was purpose-built to be
-        the best netrunner in the world. 240 chapters of corpo-politics, heists, street
+        the best netrunner in the world. {e(str(ch_total))} chapters of corpo-politics, heists, street
         violence, and one woman clawing her way from coma patient to legend.
       </p>
 
@@ -167,7 +166,7 @@ def build_index(summaries, characters, braindances):
 
       <h2>Navigation</h2>
       <ul>
-        <li><a href="chapters.html">Chapter Summaries</a> — two-paragraph recaps for all 240 chapters</li>
+        <li><a href="chapters.html">Chapter Summaries</a> — two-paragraph recaps for all {e(str(ch_total))} chapters</li>
         <li><a href="braindances.html">Braindance Catalog</a> — every BD Motoko produces or sells</li>
         <li><a href="characters/index.html">Character Profiles</a> — bios and stats</li>
       </ul>
@@ -423,8 +422,15 @@ def main():
     braindances = load_braindances()
     characters  = load_characters()
 
+    threadmarks_path = os.path.join(os.path.dirname(WIKI_DIR), "threadmarks_index.json")
+    if os.path.exists(threadmarks_path):
+        with open(threadmarks_path, encoding="utf-8") as f:
+            ch_total = len(json.load(f))
+    else:
+        ch_total = len(summaries)
+
     print("Building HTML...")
-    build_index(summaries, characters, braindances)
+    build_index(summaries, characters, braindances, ch_total)
     build_chapters(summaries)
     build_braindances(braindances)
     build_char_index(characters)
