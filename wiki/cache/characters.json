@@ -7,11 +7,11 @@
     "status": "Active",
     "first_chapter": 1,
     "icon": "&#x2620;",
-    "description": "A gamer from our world reborn in Night City's deadliest body. Founder of Section 9. Kensei-titled netrunner and swordswoman with a kill count that keeps climbing.",
+    "description": "A gamer from our world reborn in Night City's deadliest body. Founder of Section 9. Kensei swordswoman, master netrunner, and assassin with a kill count that keeps climbing.",
     "physical_description": "Petite and deceptively slight — the body she woke up in was fourteen years old and fresh out of a coma, stripped of cyberware by Scavs. She rebuilt it into something else entirely through obsessive physical grinding. Her hair is dyed purple and cut short: cropped at the nape with long front bangs swept to the side, modelled after the Major from Ghost in the Shell and worn as a deliberate statement. Her eyes are yellow Kiroshi optics — installed early on — capable of seeing in near-darkness, reading net code at a glance, and registering her face as a blur on surveillance. Both arms are chrome, a constant presence in how she moves and fights. By the story's midpoint she carries visible muscle that has no business being on a frame that small.",
     "bio": [
       "A gamer from our world who woke up in Night City, 2075, inside the fourteen-year-old body of Kusanagi Motoko — stripped of cyberware by Scavs and coma-bound for a year. Recognising the Cyberpunk setting, she immediately began treating her life as a game, grinding stats through the Gamer System HUD that activated when she slotted a shard labelled 'Gema / Gamer.' Starting from near-zero attributes, she rebuilt herself from the ground up through obsessive training, street gigs, and sheer stubbornness.",
-      "Over 240 chapters she clawed her way from coma patient to one of the most feared operators in Night City — master netrunner, swordswoman, and assassin. Founder and leader of Section 9, holder of the Kensei title granted by the Tyger Claws, and the woman behind a confirmed kill count that keeps climbing. She operates at the intersection of street survival, corpo intrigue, and ghost-in-the-shell-level cyberware mastery."
+      "Over 240 chapters she clawed her way from coma patient to one of the most feared operators in Night City — master netrunner, swordswoman, and assassin. Founder and leader of Section 9, holder of the Kensei title as the youngest ever recognized by the elders of the Chram Denya Jinja — the Shrine of Chrome, Night, and Electricity — and the woman behind a confirmed kill count that keeps climbing. She operates at the intersection of street survival, corpo intrigue, and ghost-in-the-shell-level cyberware mastery."
     ],
     "cp_stats": {
       "game": "Cyberpunk 2077 (pre-Update 2.0)",
@@ -72,7 +72,7 @@
   },
   "hiromi": {
     "name": "Hiromi",
-    "role": "Street Fixer / Crew",
+    "role": "Manager / Fixer",
     "faction": "Section 9",
     "affiliation": "Independent",
     "status": "Active",
@@ -82,7 +82,7 @@
     "physical_description": "The mohawk is the first thing anyone notices — a signature riot of color she never lets go of, though she occasionally wears it laid down on rare vulnerable moments. Her cheeks carry neon whisker markings, face tattoos or cyberware that light up and are as much a part of her look as the hair. Her cheeks themselves have some chrome. By the story's midpoint she has Biotechnica bioware enhancing her muscles — a corpo perk from her Arasaka family she quietly accepted. Her overall aesthetic sits at the collision point between expensive corpo money and deliberate street-kid styling.",
     "bio": [
       "Motoko's best friend — all mohawk and no brakes. Hiromi is the secret daughter of Arasaka executives but runs hard with the Kabuki street crowd, keeping her family connections buried. She crashed into Motoko's life without knocking and dragged her to Ho-Oh, the Tyger Claw youth bar in Kabuki, on the night Motoko met the rest of the crew. Her first 'gig' with the crew was a botched car-theft job against a fake-Valentino drug pusher that ended in Motoko's first gunfight.",
-      "Despite her reckless energy, Hiromi's Arasaka bloodline occasionally surfaces in unsettling ways — her mother met Motoko after the Gonzales incident, coldly approved of her willingness to kill to protect her daughter, and transferred 5,000 eddies without a word. Hiromi is among the first to join Section 9 and remains one of Motoko's most constant companions throughout the story."
+      "Despite her reckless energy, Hiromi's Arasaka bloodline occasionally surfaces in unsettling ways — her mother met Motoko after the Gonzales incident, coldly approved of her willingness to kill to protect her daughter, and transferred 5,000 eddies without a word. Hiromi is among the first to join Section 9 and evolves into its operational backbone: she builds a BD distribution empire through Nox, David Martinez, and the Straight Lane Shooters, manages Stand Alone Complex's music career, handles all negotiations with MSM Records, and closes the deal that gets the band signed — all while never losing the mohawk or the street energy."
     ]
   },
   "malcolm": {
@@ -96,7 +96,7 @@
     "description": "The loudmouth of the original crew who never stopped showing up. Blunt, opinionated, and usually right — the one who'll tell Motoko what she doesn't want to hear.",
     "physical_description": "The chapters don't linger on Malcolm's appearance the way they do others', but the impression is consistent: loud presence, wide grin, quick to take up space. He drives a Caliburn and chose yellow and silver as his Section 9 ECM holo colors — which says something. Has a Smartlink implant. The kind of person who looks like trouble before he opens his mouth and confirms it.",
     "bio": [
-      "The loudmouth of the original Kabuki crew Motoko met at Ho-Oh. Where Ichi plans, Malcolm talks — blunt, opinionated, and often right. He won the crew vote for the first Smartlink implant and had it installed on the spot. An early run where he watched someone die in the back seat of the getaway car sent him home for a long stretch, one of the few moments the crew's casual violence actually landed on him.",
+      "The loudmouth of the original Kabuki crew Motoko met at Ho-Oh. Where Ichi plans, Malcolm talks — blunt, opinionated, and often right. He won the crew vote for the first Smartlink implant and had it installed on the spot. Watching crewmate Sam bleed out in the back seat during a Maelstrom drive-by ambush sent him home for a long stretch — he didn't leave his apartment until Motoko came to get him. One of the few moments the crew's casual violence actually landed on someone.",
       "He bounced back and stayed the course. By the story's end Malcolm is a Section 9 regular and one of Motoko's more grounded sounding boards — willing to tell her things the others won't, like when the MSM situation is worth tolerating for the perks rather than walking away from."
     ]
   },
