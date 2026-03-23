@@ -20,6 +20,7 @@ CHARS_DIR   = os.path.join(BUILD_DIR, "characters")
 SUMMARIES_JSON   = os.path.join(CACHE_DIR, "chapter_summaries.json")
 BRAINDANCES_JSON = os.path.join(CACHE_DIR, "braindances.json")
 CHARACTERS_JSON  = os.path.join(CACHE_DIR, "characters.json")
+ROCKERBOY_JSON   = os.path.join(CACHE_DIR, "rockerboy.json")
 
 os.makedirs(BUILD_DIR, exist_ok=True)
 os.makedirs(CHARS_DIR, exist_ok=True)
@@ -46,6 +47,10 @@ def load_characters():
     return load_json(CHARACTERS_JSON, {})
 
 
+def load_rockerboy():
+    return load_json(ROCKERBOY_JSON, [])
+
+
 # ── HTML helpers ───────────────────────────────────────────────────────────
 
 def e(text):
@@ -69,6 +74,7 @@ def page_shell(title, body, css_path="assets/style.css", active_nav=""):
         ("index.html",              "Home"),
         ("chapters.html",           "Chapters"),
         ("braindances.html",        "Braindances"),
+        ("rockerboy.html",          "Rockerboy"),
         ("characters/index.html",   "Characters"),
     ]
 
@@ -168,6 +174,7 @@ def build_index(summaries, characters, braindances, ch_total):
       <ul>
         <li><a href="chapters.html">Chapter Summaries</a> — two-paragraph recaps for all {e(str(ch_total))} chapters</li>
         <li><a href="braindances.html">Braindance Catalog</a> — every BD Motoko produces or sells</li>
+        <li><a href="rockerboy.html">Rockerboy</a> — every performance and studio session in chapter order</li>
         <li><a href="characters/index.html">Character Profiles</a> — bios and stats</li>
       </ul>
 """
@@ -343,6 +350,66 @@ def build_char_index(characters):
     print(f"  Wrote {dest}")
 
 
+# ── CP RED stat block ──────────────────────────────────────────────────────
+
+def build_cp_stats_block(cp):
+    game      = cp.get("game", "Cyberpunk 2077")
+    as_of     = cp.get("as_of", "")
+    level     = cp.get("level", "?")
+    attrs     = cp.get("attributes", {})
+    skills    = cp.get("skills", [])
+    perks     = cp.get("perks", [])
+    cyberware = cp.get("cyberware", [])
+
+    ATTR_ORDER = ["Body", "Reflexes", "Technical Ability", "Intelligence", "Cool"]
+    MAX_ATTR   = 20
+
+    attr_rows = "".join(
+        f'<div class="cp-attr-row">'
+        f'<span class="cp-attr-name">{e(a)}</span>'
+        f'<div class="cp-attr-bar">'
+        f'<div class="cp-attr-fill" style="width:{int(attrs.get(a, 0) / MAX_ATTR * 100)}%"></div>'
+        f'</div>'
+        f'<span class="cp-attr-val">{e(str(attrs.get(a, "—")))}</span>'
+        f'</div>'
+        for a in ATTR_ORDER
+    )
+
+    skill_rows = "".join(
+        f'<div class="cp-skill-row">'
+        f'<span class="cp-skill-name">{e(sk.get("name", ""))}</span>'
+        f'<span class="cp-skill-attr">{e(sk.get("attribute", ""))}</span>'
+        f'<div class="cp-skill-bar">'
+        f'<div class="cp-skill-fill" style="width:{int(sk.get("level", 0) / 20 * 100)}%"></div>'
+        f'</div>'
+        f'<span class="cp-skill-level">{e(str(sk.get("level", "—")))}</span>'
+        f'</div>'
+        for sk in skills
+    )
+
+    perk_chips = "".join(f'<span class="cp-perk-chip">{e(p)}</span>' for p in perks)
+
+    cw_items = "".join(f'<li>{e(item)}</li>' for item in cyberware)
+    cw_html  = f'<ul class="cp-cyberware-list">{cw_items}</ul>' if cw_items else ""
+
+    header_note = e(game) + (f' \u2014 as of {e(as_of)}' if as_of else "")
+
+    return (
+        f'<div class="cp-stats-block">'
+        f'<h3 class="char-section-label">// Character Sheet ({header_note})</h3>'
+        f'<div class="cp-level-badge">// Character Level &nbsp; {e(str(level))}</div>'
+        f'<h4 class="cp-subsection">// Attributes</h4>'
+        f'<div class="cp-attr-list">{attr_rows}</div>'
+        f'<h4 class="cp-subsection">// Skills</h4>'
+        f'<div class="cp-skill-list">{skill_rows}</div>'
+        f'<h4 class="cp-subsection">// Perks</h4>'
+        f'<div class="cp-perk-list">{perk_chips}</div>'
+        f'<h4 class="cp-subsection">// Cyberware</h4>'
+        f'{cw_html}'
+        f'</div>'
+    )
+
+
 # ── characters/<slug>.html ─────────────────────────────────────────────────
 
 def build_char_page(slug, char):
@@ -391,6 +458,9 @@ def build_char_page(slug, char):
 
     desc_html = f'<p class="char-description">{e(description)}</p>' if description else ""
 
+    cp        = char.get("cp_stats")
+    cp_html   = build_cp_stats_block(cp) if cp else ""
+
     body = f"""
       <h1 class="page-title">{e(name)}</h1>
       {desc_html}
@@ -404,11 +474,108 @@ def build_char_page(slug, char):
           {bio_html}
         </div>
       </div>
+      {cp_html}
       <p><a href="index.html">&#x2190; All Characters</a></p>
 """
     out = page_shell(name, body, css_path="../assets/style.css",
                      active_nav="characters/index.html")
     dest = os.path.join(CHARS_DIR, f"{slug}.html")
+    with open(dest, "w", encoding="utf-8") as f:
+        f.write(out)
+    print(f"  Wrote {dest}")
+
+
+# ── rockerboy.html ─────────────────────────────────────────────────────────
+
+def build_rockerboy(events):
+    TYPE_CLASS = {
+        "Public Gig":         "rb-type-gig",
+        "Impromptu":          "rb-type-improv",
+        "Impromptu Solo":     "rb-type-improv",
+        "Private Performance":"rb-type-private",
+        "Studio Session":     "rb-type-studio",
+        "Radio / Media":      "rb-type-radio",
+        "Corporate Event":    "rb-type-corp",
+        "Rehearsal":          "rb-type-studio",
+    }
+
+    if not events:
+        body_content = '<p class="placeholder-note">[Rockerboy timeline pending]</p>'
+    else:
+        cards = []
+        for ev in events:
+            ev_id      = ev.get("event_id", "???")
+            chapter    = ev.get("chapter_number", "?")
+            venue      = ev.get("venue", "Unknown Venue")
+            location   = ev.get("location", "")
+            ev_type    = ev.get("type", "")
+            band       = ev.get("band")
+            context    = ev.get("context", "")
+            setlist    = ev.get("setlist", [])
+            notes      = ev.get("notes", "")
+
+            type_cls   = TYPE_CLASS.get(ev_type, "rb-type-private")
+            chapter_link = f'<a href="chapters.html">Ch.{e(str(chapter))}</a>'
+            venue_line = e(venue) + (f" — {e(location)}" if location else "")
+            band_html  = (
+                f'<div class="rb-band">// {e(band)}</div>' if band else ""
+            )
+
+            songs_html = ""
+            for song in setlist:
+                title_  = song.get("song", "")
+                artist_ = song.get("artist", "")
+                yt_url  = song.get("youtube_url")
+                if yt_url:
+                    song_label = (
+                        f'<a class="rb-song-link" href="{e(yt_url)}" '
+                        f'rel="noopener" target="_blank">{e(title_)} &#x2197;</a>'
+                    )
+                else:
+                    song_label = f'<span class="rb-song-title">{e(title_)}</span>'
+                songs_html += (
+                    f'<li class="rb-song-row">'
+                    f'{song_label}'
+                    f'<span class="rb-song-artist">{e(artist_)}</span>'
+                    f'</li>'
+                )
+            setlist_html = (
+                f'<ol class="rb-setlist">{songs_html}</ol>'
+                if songs_html else ""
+            )
+
+            notes_html = (
+                f'<div class="rb-notes">{e(notes)}</div>' if notes else ""
+            )
+
+            cards.append(
+                f'<div class="rb-card">'
+                f'<div class="rb-header">'
+                f'<span class="rb-id">{e(ev_id)}</span>'
+                f'<span class="rb-chapter">{chapter_link}</span>'
+                f'<span class="rb-type {e(type_cls)}">[{e(ev_type.upper())}]</span>'
+                f'</div>'
+                f'<div class="rb-venue">{venue_line}</div>'
+                f'{band_html}'
+                f'<div class="rb-context">{e(context)}</div>'
+                f'<h4 class="rb-setlist-label">// Setlist</h4>'
+                f'{setlist_html}'
+                f'{notes_html}'
+                f'</div>'
+            )
+
+        body_content = '<div class="rb-timeline">\n' + "\n".join(cards) + "\n</div>"
+
+    body = f"""
+      <h1 class="page-title">Rockerboy</h1>
+      <p>
+        Every performance, studio session, and public appearance in chapter order.
+        Motoko's music career — from a single campfire song to a corpo record deal.
+      </p>
+      {body_content}
+"""
+    out = page_shell("Rockerboy", body, active_nav="rockerboy.html")
+    dest = os.path.join(BUILD_DIR, "rockerboy.html")
     with open(dest, "w", encoding="utf-8") as f:
         f.write(out)
     print(f"  Wrote {dest}")
@@ -421,6 +588,7 @@ def main():
     summaries   = load_summaries()
     braindances = load_braindances()
     characters  = load_characters()
+    rockerboy   = load_rockerboy()
 
     threadmarks_path = os.path.join(os.path.dirname(WIKI_DIR), "threadmarks_index.json")
     if os.path.exists(threadmarks_path):
@@ -433,6 +601,7 @@ def main():
     build_index(summaries, characters, braindances, ch_total)
     build_chapters(summaries)
     build_braindances(braindances)
+    build_rockerboy(rockerboy)
     build_char_index(characters)
 
     for slug, char in characters.items():

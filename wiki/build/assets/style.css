@@ -310,6 +310,7 @@ nav a:hover, nav a.active {
 .bd-status.released { color: var(--accent-cyan); }
 .bd-status.unreleased { color: var(--text-dim); }
 .bd-status.leaked { color: var(--accent-pink); }
+.bd-status.personal { color: var(--accent-gold); }
 
 .bd-desc { font-size: 0.95rem; color: var(--text); line-height: 1.5; }
 
@@ -496,3 +497,320 @@ nav a:hover, nav a.active {
 .status-active  { color: var(--accent-cyan); }
 .status-deceased { color: var(--accent-pink); }
 .status-unknown  { color: var(--text-dim); }
+
+/* ── CP2077 character sheet block ── */
+.cp-stats-block {
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+}
+
+.cp-level-badge {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.85rem;
+  color: var(--accent-gold);
+  text-shadow: var(--glow-gold);
+  letter-spacing: 0.15em;
+  margin-bottom: 0.25rem;
+}
+
+.cp-subsection {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin: 1.25rem 0 0.5rem;
+  border: none;
+  padding: 0;
+}
+
+/* Attributes */
+.cp-attr-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin: 0.5rem 0 0.5rem;
+}
+
+.cp-attr-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-family: 'Share Tech Mono', monospace;
+}
+
+.cp-attr-name {
+  width: 11rem;
+  flex-shrink: 0;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.72rem;
+}
+
+.cp-attr-bar {
+  flex: 1;
+  height: 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+}
+
+.cp-attr-fill {
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  background: var(--accent-cyan);
+  box-shadow: var(--glow-cyan);
+}
+
+.cp-attr-val {
+  width: 2rem;
+  text-align: right;
+  color: var(--accent-cyan);
+  text-shadow: var(--glow-cyan);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+/* Skills */
+.cp-skill-list {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin: 0.5rem 0 0.5rem;
+}
+
+.cp-skill-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.8rem;
+  padding: 0.2rem 0.5rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.cp-skill-name { flex: 1; color: var(--text); }
+
+.cp-skill-attr {
+  color: var(--text-dim);
+  font-size: 0.68rem;
+  width: 10rem;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.cp-skill-bar {
+  width: 6rem;
+  height: 6px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.cp-skill-fill {
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  background: var(--accent-purple);
+  box-shadow: var(--glow-purple);
+}
+
+.cp-skill-level {
+  width: 1.5rem;
+  text-align: right;
+  color: var(--accent-gold);
+  text-shadow: var(--glow-gold);
+  font-family: 'Share Tech Mono', monospace;
+  flex-shrink: 0;
+}
+
+/* Perks */
+.cp-perk-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0.5rem 0 0.5rem;
+}
+
+.cp-perk-chip {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.15em 0.5em;
+  border: 1px solid var(--accent-purple);
+  color: var(--accent-purple);
+}
+
+/* Cyberware */
+.cp-cyberware-list {
+  list-style: none;
+  padding: 0;
+  margin: 0.5rem 0 0;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.85rem;
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.cp-cyberware-list li {
+  padding: 0.25rem 0.5rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent-cyan);
+}
+
+/* ── Rockerboy timeline ─────────────────────────────────────────── */
+.rb-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.rb-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent-purple);
+  padding: 1rem 1.25rem 1rem;
+}
+
+.rb-card:hover {
+  border-color: var(--accent-purple);
+  box-shadow: 0 0 12px #b44aff33;
+}
+
+.rb-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.rb-id {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.8rem;
+  color: var(--text-dim);
+}
+
+.rb-chapter {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.8rem;
+  color: var(--text-dim);
+}
+
+.rb-chapter a {
+  color: var(--accent-cyan);
+  text-decoration: none;
+}
+
+.rb-type {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.75rem;
+  padding: 0 0.4rem;
+  border: 1px solid currentColor;
+}
+
+.rb-type-gig     { color: var(--accent-pink); }
+.rb-type-improv  { color: var(--accent-gold); }
+.rb-type-private { color: var(--text-dim); }
+.rb-type-studio  { color: var(--accent-cyan); }
+.rb-type-radio   { color: var(--accent-purple); }
+.rb-type-corp    { color: #888; }
+
+.rb-venue {
+  font-size: 1.05rem;
+  color: var(--accent-gold);
+  text-shadow: var(--glow-gold);
+  margin-bottom: 0.2rem;
+}
+
+.rb-band {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.85rem;
+  color: var(--accent-purple);
+  margin-bottom: 0.4rem;
+}
+
+.rb-context {
+  color: var(--text);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin-bottom: 0.75rem;
+}
+
+.rb-setlist-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  margin-bottom: 0.3rem;
+}
+
+.rb-setlist {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.rb-song-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  padding: 0.15rem 0.5rem;
+  background: var(--surface-2);
+  font-size: 0.88rem;
+}
+
+.rb-song-row::before {
+  content: counter(list-item) ".";
+  counter-increment: list-item;
+  color: var(--text-dim);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.75rem;
+  min-width: 1.2rem;
+}
+
+.rb-setlist { counter-reset: list-item; }
+
+.rb-song-title {
+  color: var(--text);
+  flex: 1;
+}
+
+.rb-song-link {
+  color: var(--accent-cyan);
+  text-decoration: none;
+  flex: 1;
+}
+
+.rb-song-link:hover {
+  text-shadow: var(--glow-cyan);
+}
+
+.rb-song-artist {
+  color: var(--text-dim);
+  font-size: 0.8rem;
+  font-family: 'Share Tech Mono', monospace;
+  text-align: right;
+}
+
+.rb-notes {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  border-top: 1px solid var(--border);
+  padding-top: 0.4rem;
+  margin-top: 0.5rem;
+}

@@ -12,7 +12,48 @@
     "bio": [
       "A gamer from our world who woke up in Night City, 2075, inside the fourteen-year-old body of Kusanagi Motoko — stripped of cyberware by Scavs and coma-bound for a year. Recognising the Cyberpunk setting, she immediately began treating her life as a game, grinding stats through the Gamer System HUD that activated when she slotted a shard labelled 'Gema / Gamer.' Starting from near-zero attributes, she rebuilt herself from the ground up through obsessive training, street gigs, and sheer stubbornness.",
       "Over 240 chapters she clawed her way from coma patient to one of the most feared operators in Night City — master netrunner, swordswoman, and assassin. Founder and leader of Section 9, holder of the Kensei title granted by the Tyger Claws, and the woman behind a confirmed kill count that keeps climbing. She operates at the intersection of street survival, corpo intrigue, and ghost-in-the-shell-level cyberware mastery."
-    ]
+    ],
+    "cp_stats": {
+      "game": "Cyberpunk 2077 (pre-Update 2.0)",
+      "as_of": "Chapter 242",
+      "level": 30,
+      "attributes": {
+        "Body":              9,
+        "Reflexes":          9,
+        "Technical Ability": 10,
+        "Intelligence":      14,
+        "Cool":              10
+      },
+      "skills": [
+        { "name": "Street Brawler",  "attribute": "Body",              "level": 9  },
+        { "name": "Athletics",       "attribute": "Body",              "level": 9  },
+        { "name": "Annihilation",    "attribute": "Body",              "level": 6  },
+        { "name": "Blades",          "attribute": "Reflexes",          "level": 10 },
+        { "name": "Assault",         "attribute": "Reflexes",          "level": 8  },
+        { "name": "Handguns",        "attribute": "Reflexes",          "level": 8  },
+        { "name": "Quick Hacks",     "attribute": "Intelligence",      "level": 12 },
+        { "name": "Breach Protocol", "attribute": "Intelligence",      "level": 9  },
+        { "name": "Programming",     "attribute": "Intelligence",      "level": 15 },
+        { "name": "Engineering",     "attribute": "Technical Ability", "level": 6  },
+        { "name": "Crafting",        "attribute": "Technical Ability", "level": 8  },
+        { "name": "Ninjutsu",        "attribute": "Cool",              "level": 9  },
+        { "name": "Cold Blood",      "attribute": "Cool",              "level": 8  }
+      ],
+      "perks": [
+        "Ambidextrous", "Quick Draw", "Gun Nut", "Cat-like", "Cool Nerves",
+        "Danger Sense", "Cyber Ninja", "Fearless Chill", "Wall Breaking",
+        "Cyber Security", "Robotics Wizard", "Parry", "Improvised Weapons",
+        "Design Wizard", "Rifle Ace", "Drifting", "Rapid Reload"
+      ],
+      "cyberware": [
+        "Militech Eagle MkV Cyberarms \u00d72 (Gorilla Mod)",
+        "Kiroshi Optical Array \u2014 yellow, low-light, biometric blur",
+        "Sandevistan (Sandy)",
+        "Military-grade Cyberdeck",
+        "Neural Interface",
+        "Subdermal Armor Plating"
+      ]
+    }
   },
   "jun": {
     "name": "Junichiro Kusanagi",
@@ -72,6 +113,36 @@
     "bio": [
       "The strategic mind of the original crew — calm and methodical where Malcolm is loud. Ichi was running gigs in Kabuki before Motoko arrived and provided structure to what would otherwise have been a chaotic group of street kids. He was already leading jobs by the time Motoko joined, and his tactical instincts made him a natural fit as Section 9 scaled up.",
       "Present from the earliest gigs through the final chapter, Ichi is one of the crew's most reliable constants. He's not flashy about it — by Chapter 240 he's secretly been using the Minotaur combat bot for practice in his own time and broke its ankle joint without telling anyone."
+    ]
+  },
+  "omaeda": {
+    "name": "Omaeda",
+    "role": "Netrunner",
+    "faction": "Kabuki Crew",
+    "affiliation": "Independent",
+    "status": "Unknown",
+    "first_chapter": 3,
+    "icon": "&#x25C6;",
+    "description": "The netrunner of Hiromi's original Kabuki crew. Present for the early gigs and the H2 loot run, then quietly faded from the story as the crew evolved into something else entirely.",
+    "physical_description": "The story introduces him in one word: chunky. That is the only physical descriptor he ever gets. He is a netrunner, so presumably some basic chrome — a cyberdeck port, maybe cheap optics — but nothing in the narrative ever pauses long enough to describe him properly. He fades before the prose ever gets around to it.",
+    "bio": [
+      "The netrunner of Hiromi's original Ho-Oh club crew — the fourth member of the small Kabuki gang Motoko met on her first night out. Introduced alongside Ichi and Malcolm as part of the regular set that ran low-level gigs in Kabuki and Japantown. He was present for the early Gonzales incident and arrived with the rest of the crew to haul crates from the H2 Megabuilding scav den after Motoko cleared it.",
+      "After that point the story stops mentioning him. He was never written out, never killed on-page — the narrative simply moved on as the crew shifted toward higher-risk operations and Section 9 began to take shape. Somewhere in Night City, presumably, a slightly chunky netrunner is still running gigs and not entirely sure what became of the people he used to work with."
+    ]
+  },
+  "sam": {
+    "name": "Sam",
+    "role": "Crew Member",
+    "faction": "Kabuki Crew",
+    "affiliation": "Independent",
+    "status": "Deceased",
+    "first_chapter": "?",
+    "icon": "&#x25A1;",
+    "description": "A crew member who died in a Maelstrom drive-by ambush while Malcolm watched. Present somewhere in the early chapters, gone before the story names the loss.",
+    "physical_description": "The story never describes Sam's appearance. He exists only as an absence — the reason Malcolm went home and didn't leave for a long time.",
+    "bio": [
+      "A member of the original Kabuki crew who died in a Maelstrom drive-by ambush sometime during the gang war arc. Malcolm witnessed it — watched him bleed out in the back of a car — and the trauma sent him home for an extended period. He didn't leave his apartment until Motoko came to get him.",
+      "Sam never gets a scene of his own in the story. He is referenced once, in past tense, as the specific weight behind Malcolm's silence. The name is all the story gives him."
     ]
   },
   "hayato": {

@@ -17,6 +17,14 @@
   },
   {
     "bd_id": "BD-003",
+    "title": "Unnamed (Mr. Studd Recon)",
+    "chapter_number": 57,
+    "status": "Personal Only",
+    "description": "A one-minute personal edit — not for commercial release. Ichi walked into a Kabuki ripper's clinic asking about penile enhancement (a 'Mr. Studd' implant) while Motoko posed as his pimp and recorded the layout and exit points for a planned raid. Judy cut the edit at Motoko's request. Shown to Malcolm at Lizzie's Bar (he cackled immediately). Ichi demanded a copy and was refused. Primary function: tactical documentation of the Kabuki ripper reconnaissance. Secondary function: the best leverage Motoko has ever held over Ichi.",
+    "content_tags": ["reconnaissance", "comedy", "personal", "non-combat"]
+  },
+  {
+    "bd_id": "BD-004",
     "title": "Scav Den",
     "chapter_number": 60,
     "status": "Released",
@@ -24,15 +32,23 @@
     "content_tags": ["combat", "scavengers", "indoor", "solo"]
   },
   {
-    "bd_id": "BD-004",
-    "title": "The Only Thing They Fear Is You",
+    "bd_id": "BD-005",
+    "title": "Unnamed",
     "chapter_number": 86,
     "status": "Released",
-    "description": "The yacht heist. Motoko's most intense BD to date — she boards a privately-owned yacht at 3 AM, choke-holds the marina guard, plants a virus in the security system, and proceeds to work through the whole vessel. Nox experienced it at Judy's workshop and ended up on the floor gasping. Judy needed caffeine just to finish the edit. They agreed it was the most intense virtu either of them had experienced. Named after the DOOM Eternal track Motoko trains to. Known on the street as the DOOM BD.",
-    "content_tags": ["combat", "heist", "boat", "water", "night op"]
+    "description": "A 3 AM operation against the GEIshhhhA yacht at Gold Beach Marina, owned by independent BD dealer Bartolomeo Mordellini — a repository for scav-sourced chrome. Motoko leaps from an office walkway, choke-holds the marina security guard unconscious, plants a virus in the security computer, and cuts the yacht loose. The moment the alarms fire she mass-deploys Reboot Optics across the entire camera network — every guard, worker, and guest on the marina goes blind simultaneously. Their vision doesn't go dark: it resolves to a single image, a blue Laughing Man symbol. Her calling card, used for the first time. Zero kills. The yacht sails south. Known on the street as the DOOM BD.",
+    "content_tags": ["stealth", "heist", "boat", "water", "night op", "zero kills"]
   },
   {
-    "bd_id": "BD-005",
+    "bd_id": "BD-006",
+    "title": "The Only Thing They Fear Is You",
+    "chapter_number": 93,
+    "status": "Released",
+    "description": "The Megabuilding H11 scav den run — eighteen Scavs, seven minutes, set to 'The Only Thing They Fear Is You.' Motoko deploys a looping Weapon Glitch that locks every gun on the network, then moves room to room with the Carnage used as both weapon and bludgeon, a looted Cut-o-Matic chainsword mid-fight, and a Sandy-equipped Scav taken down the instant his Sandevistan dropped — Burya into the mouth, 'head separated in two.' Edited with the Maelstrom encounter at the end cut out before delivery to Judy. The only BD in the catalog with a confirmed kill count of eighteen.",
+    "content_tags": ["combat", "scavengers", "solo", "indoor", "melee-heavy", "weapon glitch"]
+  },
+  {
+    "bd_id": "BD-007",
     "title": "Inner Universe",
     "chapter_number": 115,
     "status": "Released",
@@ -40,11 +56,35 @@
     "content_tags": ["parkour", "rooftop", "non-combat", "night city", "music"]
   },
   {
-    "bd_id": "BD-006",
+    "bd_id": "BD-008",
     "title": "Section 9 Scav Raid",
     "chapter_number": 157,
     "status": "Released",
     "description": "The XBD operation — Section 9's raid on the North Arroyo scav den used as an XBD harvest site, clearing the killing rooms floor by floor. A full crew op, the first BD to show Section 9 working as a unit rather than Motoko running solo. The Maelstrom encounter mid-raid was edited out of the release cut. Hiromi walked off with the raw footage for a separate project. Rebecca watched the finished BD and glimpsed herself as a motion blur in one shot; she was impressed by the professional-grade editing.",
     "content_tags": ["combat", "scavengers", "team op", "indoor", "edited"]
+  },
+  {
+    "bd_id": "BD-009",
+    "title": "Red Dirt Gig",
+    "chapter_number": 180,
+    "status": "Released",
+    "description": "The recording of Motoko's first live performance, at the Red Dirt Bar in Arroyo — the location of Samurai's original first gig — arranged by Hiromi as a birthday surprise. Five songs with full instrumentation: Smells Like Teen Spirit, Rise, This Fffire, The Pretender, Let You Down. Section 9 watched from the floor. Judy asked Motoko to sign the shard afterward and kept a personal copy herself. Rebecca braindanced it at Lizzie's and awarded Motoko the nickname 'Strings.' The only BD in the catalog with no kills and no weapons drawn.",
+    "content_tags": ["music", "live performance", "non-combat", "first gig"]
+  },
+  {
+    "bd_id": "BD-010",
+    "title": "Don't Steal My Car",
+    "chapter_number": 222,
+    "status": "Released",
+    "description": "Delivered to Judy for editing and distributed through the standard pipeline. Both Judy and Nox experienced it independently. David Martinez encountered a copy and was so blown away he immediately found Motoko and asked to join Section 9. Judy noted that multiple witnesses saw the original event, making full anonymisation impossible. The title is self-explanatory.",
+    "content_tags": ["combat", "vehicle", "street"]
+  },
+  {
+    "bd_id": "BD-011",
+    "title": "Unnamed",
+    "chapter_number": 239,
+    "status": "Released",
+    "description": "Recorded at a spontaneous rooftop fight club after a frustrating MSM studio session. Motoko paid entry and challenged the reigning champion — 'American Devil,' a 6th Street boxer with armored skull and chrome fists — after he threw beer in her face. She won by wall-running up a poolside divider and aerial-punching him unconscious. When the gang drew weapons, she deployed Mass Weapon Glitch and worked through five of them: double-donkey-kick off the roof, knife to the jugular, thrown knife to the chest, one shot with a confiscated pistol, and the gang leader surfed off the building edge with her feet planted on his chest. Judy cleaned the XBD of identifying markers before distribution. Judy's POV watching it: the fight was joy, not survival. The BD ends with the leader crying as he realizes they are both falling.",
+    "content_tags": ["combat", "fight club", "rooftop", "solo", "XBD", "street gang"]
   }
 ]
