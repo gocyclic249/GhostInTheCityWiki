@@ -1,1 +1,92 @@
-{}
+{
+  "motoko": {
+    "name": "Motoko Kusanagi",
+    "role": "Netrunner / Assassin",
+    "faction": "Section 9",
+    "affiliation": "Independent",
+    "status": "Active",
+    "first_chapter": 1,
+    "icon": "&#x2620;",
+    "description": "A gamer from our world reborn in Night City's deadliest body. Founder of Section 9. Kensei-titled netrunner and swordswoman with a kill count that keeps climbing.",
+    "physical_description": "Petite and deceptively slight — the body she woke up in was fourteen years old and fresh out of a coma, stripped of cyberware by Scavs. She rebuilt it into something else entirely through obsessive physical grinding. Her hair is dyed purple and cut short: cropped at the nape with long front bangs swept to the side, modelled after the Major from Ghost in the Shell and worn as a deliberate statement. Her eyes are yellow Kiroshi optics — installed early on — capable of seeing in near-darkness, reading net code at a glance, and registering her face as a blur on surveillance. Both arms are chrome, a constant presence in how she moves and fights. By the story's midpoint she carries visible muscle that has no business being on a frame that small.",
+    "bio": [
+      "A gamer from our world who woke up in Night City, 2075, inside the fourteen-year-old body of Kusanagi Motoko — stripped of cyberware by Scavs and coma-bound for a year. Recognising the Cyberpunk setting, she immediately began treating her life as a game, grinding stats through the Gamer System HUD that activated when she slotted a shard labelled 'Gema / Gamer.' Starting from near-zero attributes, she rebuilt herself from the ground up through obsessive training, street gigs, and sheer stubbornness.",
+      "Over 240 chapters she clawed her way from coma patient to one of the most feared operators in Night City — master netrunner, swordswoman, and assassin. Founder and leader of Section 9, holder of the Kensei title granted by the Tyger Claws, and the woman behind a confirmed kill count that keeps climbing. She operates at the intersection of street survival, corpo intrigue, and ghost-in-the-shell-level cyberware mastery."
+    ]
+  },
+  "jun": {
+    "name": "Junichiro Kusanagi",
+    "role": "Enforcer",
+    "faction": "Tyger Claws",
+    "affiliation": "Tyger Claws",
+    "status": "Active",
+    "first_chapter": 1,
+    "icon": "&#x2694;",
+    "description": "Hot-headed Tyger Claw enforcer and Motoko's self-appointed older brother. Gave her first weapons, first connections, and first cover story — and is usually the last to know what she's actually doing.",
+    "physical_description": "Tall and lanky with the kind of reach that wins fights before they start — Motoko calls them his 'stupid long teenage boy arms' more than once. His hair is a vivid red-orange, worn in a swoopy style that collapses into a mess after a nap. He has progressively replaced most of his body with cyberware across the story: both arms went first after the Maelstrom retribution raid, then chrome legs and subdermal armor plating, until there is more machine than flesh left. He carries an Arasaka katana on his back. The accumulating chrome is a running source of tension — it is also what is slowly pulling him toward cyberpsychosis.",
+    "bio": [
+      "Hot-headed Tyger Claw enforcer who took Motoko in after her rescue, presenting himself as her older brother. Brought her to a cramped Japantown apartment, supplied her first weapons — a Unity handgun and a combat knife — and introduced her to the TC underground shooting range. His connections inside the Tyger Claws gave Motoko her earliest foothold in Night City.",
+      "Fiercely protective and often the last to find out about Motoko's more dangerous operations, Jun occupies an awkward position: loyal to the TCs by career but loyal to Motoko above everything else. The sibling dynamic is genuine even if the blood relation is not, and it creates ongoing tension as Motoko's reputation grows far beyond anything he can quietly cover for."
+    ]
+  },
+  "hiromi": {
+    "name": "Hiromi",
+    "role": "Street Fixer / Crew",
+    "faction": "Section 9",
+    "affiliation": "Independent",
+    "status": "Active",
+    "first_chapter": 3,
+    "icon": "&#x2605;",
+    "description": "Motoko's best friend — all mohawk and no brakes. Secret daughter of Arasaka executives who runs hard with the Kabuki street crowd and drags everyone else into trouble first.",
+    "physical_description": "The mohawk is the first thing anyone notices — a signature riot of color she never lets go of, though she occasionally wears it laid down on rare vulnerable moments. Her cheeks carry neon whisker markings, face tattoos or cyberware that light up and are as much a part of her look as the hair. Her cheeks themselves have some chrome. By the story's midpoint she has Biotechnica bioware enhancing her muscles — a corpo perk from her Arasaka family she quietly accepted. Her overall aesthetic sits at the collision point between expensive corpo money and deliberate street-kid styling.",
+    "bio": [
+      "Motoko's best friend — all mohawk and no brakes. Hiromi is the secret daughter of Arasaka executives but runs hard with the Kabuki street crowd, keeping her family connections buried. She crashed into Motoko's life without knocking and dragged her to Ho-Oh, the Tyger Claw youth bar in Kabuki, on the night Motoko met the rest of the crew. Her first 'gig' with the crew was a botched car-theft job against a fake-Valentino drug pusher that ended in Motoko's first gunfight.",
+      "Despite her reckless energy, Hiromi's Arasaka bloodline occasionally surfaces in unsettling ways — her mother met Motoko after the Gonzales incident, coldly approved of her willingness to kill to protect her daughter, and transferred 5,000 eddies without a word. Hiromi is among the first to join Section 9 and remains one of Motoko's most constant companions throughout the story."
+    ]
+  },
+  "malcolm": {
+    "name": "Malcolm",
+    "role": "Gunner / Crew",
+    "faction": "Section 9",
+    "affiliation": "Independent",
+    "status": "Active",
+    "first_chapter": 3,
+    "icon": "&#x25BA;",
+    "description": "The loudmouth of the original crew who never stopped showing up. Blunt, opinionated, and usually right — the one who'll tell Motoko what she doesn't want to hear.",
+    "physical_description": "The chapters don't linger on Malcolm's appearance the way they do others', but the impression is consistent: loud presence, wide grin, quick to take up space. He drives a Caliburn and chose yellow and silver as his Section 9 ECM holo colors — which says something. Has a Smartlink implant. The kind of person who looks like trouble before he opens his mouth and confirms it.",
+    "bio": [
+      "The loudmouth of the original Kabuki crew Motoko met at Ho-Oh. Where Ichi plans, Malcolm talks — blunt, opinionated, and often right. He won the crew vote for the first Smartlink implant and had it installed on the spot. An early run where he watched someone die in the back seat of the getaway car sent him home for a long stretch, one of the few moments the crew's casual violence actually landed on him.",
+      "He bounced back and stayed the course. By the story's end Malcolm is a Section 9 regular and one of Motoko's more grounded sounding boards — willing to tell her things the others won't, like when the MSM situation is worth tolerating for the perks rather than walking away from."
+    ]
+  },
+  "ichi": {
+    "name": "Ichi",
+    "role": "Tactician / Crew",
+    "faction": "Section 9",
+    "affiliation": "Independent",
+    "status": "Active",
+    "first_chapter": 3,
+    "icon": "&#x25A0;",
+    "description": "The strategic mind behind the original crew. Calm and methodical where Malcolm is loud. Has been running gigs since before Motoko arrived and never stopped.",
+    "physical_description": "Ichi gets less physical description than almost anyone in the story — the narrative tends to focus on what he does rather than how he looks. What comes through is someone who reads as steady and unremarkable on purpose: the kind of person who fades into a room until the moment he needs not to. Has a big truck. By Chapter 240 he's been secretly practicing with the Minotaur combat bot in his own time. The details accumulate quietly, same as he does.",
+    "bio": [
+      "The strategic mind of the original crew — calm and methodical where Malcolm is loud. Ichi was running gigs in Kabuki before Motoko arrived and provided structure to what would otherwise have been a chaotic group of street kids. He was already leading jobs by the time Motoko joined, and his tactical instincts made him a natural fit as Section 9 scaled up.",
+      "Present from the earliest gigs through the final chapter, Ichi is one of the crew's most reliable constants. He's not flashy about it — by Chapter 240 he's secretly been using the Minotaur combat bot for practice in his own time and broke its ankle joint without telling anyone."
+    ]
+  },
+  "hayato": {
+    "name": "Hayato Nakagawa",
+    "role": "Martial Artist / TC Heir",
+    "faction": "Tyger Claws",
+    "affiliation": "Tyger Claws",
+    "status": "Active",
+    "first_chapter": 119,
+    "icon": "&#x2715;",
+    "description": "Granddaughter of fixer Wakako. Daughter of the Tyger Claws' head. Introduced as a spoiled corpo girl with a Kerenzikov — until she lost, bowed, and came back for more.",
+    "physical_description": "Athletic and precise — the body of someone who has trained seriously and had the best biomods money can buy layered on top of it. Her Kerenzikov reflex booster makes her movement fast enough that Motoko has to work to keep up for most of their sparring history. She presents in two modes: formal kimono when in TC social settings, gi and sparring pads on the dojo floor. Both are immaculate. A character at the party compliments her as 'looking as beautiful as ever.' She wears a hair piece that Motoko mentions suits her. The overall impression is composed, traditional, and expensive — until she's frustrated, at which point the mask cracks just enough.",
+    "bio": [
+      "Granddaughter of fixer Wakako and daughter of Shinobu Nakagawa, head of the Tyger Claws — though neither connection was public knowledge when she walked into the TC gym looking for a fight. She was introduced as a spoiled corpo girl with a Kerenzikov and extensive biomods, coasting on talent she hadn't really earned. She lost to Motoko, lost her temper about it, and then formally bowed. That moment set the tone for everything that followed.",
+      "What started as a sparring rivalry became a genuine, unlikely friendship built on the dojo floor over dozens of sessions. Hayato eventually hired Motoko to quietly assassinate one of her arranged fiancés — 'he did something unforgivable' — and delivered the contract with the same composed formality as a Wakako intel packet. She remains one of the few people in Night City who can claim Motoko as a peer rather than a subordinate, an asset, or a threat."
+    ]
+  }
+}

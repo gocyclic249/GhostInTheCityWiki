@@ -391,6 +391,17 @@ nav a:hover, nav a.active {
   overflow: hidden;
 }
 
+/* ── Character description tagline ── */
+.char-description {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 1rem;
+  color: var(--accent-gold);
+  text-shadow: var(--glow-gold);
+  border-left: 3px solid var(--accent-gold);
+  padding: 0.5rem 1rem;
+  margin: 0 0 1.5rem;
+}
+
 /* ── Character profile page ── */
 .char-profile {
   display: grid;
@@ -427,6 +438,19 @@ nav a:hover, nav a.active {
 
 .char-bio { font-size: 1rem; line-height: 1.7; }
 .char-bio p { margin-bottom: 1em; }
+
+.char-section-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin: 1.5rem 0 0.4rem;
+  border: none;
+  padding: 0;
+}
+
+.char-section-label:first-child { margin-top: 0; }
 
 /* ── Footer ── */
 .site-footer {

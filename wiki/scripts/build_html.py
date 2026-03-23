@@ -318,8 +318,7 @@ def build_char_index(characters):
             name        = char.get("name", slug)
             role        = char.get("role", "")
             affil       = char.get("affiliation", "")
-            bio_paras   = char.get("bio", [])
-            bio_excerpt = bio_paras[0] if bio_paras else ""
+            description = char.get("description", "")
             icon        = char.get("icon", "&#x25A0;")
             status      = char.get("status", "Unknown")
 
@@ -328,7 +327,7 @@ def build_char_index(characters):
       <span class="char-name">{e(name)}</span>
       <span class="char-role">{e(role)}</span>
       <span class="char-affil">{e(affil)}</span>
-      <span class="char-bio-excerpt">{e(bio_excerpt)}</span>
+      <span class="char-bio-excerpt">{e(description)}</span>
     </a>""")
 
         grid_html = '<div class="char-grid">\n' + "\n".join(cards) + "\n</div>"
@@ -348,25 +347,36 @@ def build_char_index(characters):
 # ── characters/<slug>.html ─────────────────────────────────────────────────
 
 def build_char_page(slug, char):
-    name     = char.get("name", slug)
-    role     = char.get("role", "")
-    affil    = char.get("affiliation", "")
-    status   = char.get("status", "Unknown")
-    bio_paras = char.get("bio", [])
-    first_ch  = char.get("first_chapter", "?")
-    icon      = char.get("icon", "&#x25A0;")
+    name        = char.get("name", slug)
+    role        = char.get("role", "")
+    affil       = char.get("affiliation", "")
+    faction     = char.get("faction", "")
+    description = char.get("description", "")
+    status      = char.get("status", "Unknown")
+    bio_paras   = char.get("bio", [])
+    first_ch    = char.get("first_chapter", "?")
+    icon        = char.get("icon", "&#x25A0;")
 
     status_cls = {
         "Active": "status-active",
         "Deceased": "status-deceased",
     }.get(status, "status-unknown")
 
-    bio_html = "".join(f"<p>{e(p)}</p>" for p in bio_paras) if bio_paras \
-        else '<p class="placeholder-note">[Bio pending]</p>'
+    phys       = char.get("physical_description", "")
+    phys_html  = (
+        f'<h3 class="char-section-label">// Appearance</h3><p>{e(phys)}</p>'
+        if phys else ""
+    )
+    bio_label  = '<h3 class="char-section-label">// Background</h3>' if phys else ""
+    bio_html   = (
+        bio_label + "".join(f"<p>{e(p)}</p>" for p in bio_paras)
+        if bio_paras else '<p class="placeholder-note">[Bio pending]</p>'
+    )
 
     stat_rows = [
         ("Name",        name),
         ("Role",        role),
+        ("Faction",     faction),
         ("Affiliation", affil),
         ("Status",      status),
         ("First App.",  f"Chapter {first_ch}"),
@@ -380,14 +390,18 @@ def build_char_page(slug, char):
         for k, v in stat_rows
     )
 
+    desc_html = f'<p class="char-description">{e(description)}</p>' if description else ""
+
     body = f"""
       <h1 class="page-title">{e(name)}</h1>
+      {desc_html}
       <div class="char-profile">
         <div class="char-sidebar">
           <div class="char-icon">{icon}</div>
           {rows_html}
         </div>
         <div class="char-bio">
+          {phys_html}
           {bio_html}
         </div>
       </div>

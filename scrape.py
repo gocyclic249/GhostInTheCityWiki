@@ -1,8 +1,15 @@
 #!/usr/bin/env python3
 """
 Scraper for Ghost in the City by Seras.
-Downloads all 240 chapters from AO3 and converts them to markdown.
+Downloads chapters from AO3 and converts them to markdown.
 Uses only Python stdlib. Source: https://archiveofourown.org/works/42385683
+
+Usage:
+  python3 scrape.py                   # download all chapters (skips existing)
+  python3 scrape.py --update          # check AO3 for new chapters, download them
+  python3 scrape.py --from N          # start from chapter N
+  python3 scrape.py --from N --to M   # download chapters N to M
+  python3 scrape.py --redownload      # force re-download of all chapters
 """
 
 import urllib.request
@@ -260,12 +267,8 @@ def extract_author_notes(html_content, position="before"):
     return None
 
 
-def get_chapter_index():
-    """Load or build chapter index."""
-    if os.path.exists(INDEX_PATH):
-        with open(INDEX_PATH) as f:
-            return json.load(f)
-
+def fetch_index_from_ao3():
+    """Fetch the current chapter list from AO3 navigate page."""
     print("Fetching chapter index from AO3...")
     content = fetch(NAVIGATE_URL)
     if not content:
@@ -277,7 +280,7 @@ def get_chapter_index():
         r'.*?<span[^>]*class="[^"]*datetime[^"]*"[^>]*>\(([^)]+)\)</span>',
         content, re.DOTALL
     )
-    index = [
+    return [
         {
             "chapter_id": cid,
             "title": title.strip(),
@@ -287,10 +290,96 @@ def get_chapter_index():
         }
         for cid, title, date in items
     ]
+
+
+def get_chapter_index():
+    """Load or build chapter index."""
+    if os.path.exists(INDEX_PATH):
+        with open(INDEX_PATH) as f:
+            return json.load(f)
+
+    index = fetch_index_from_ao3()
     with open(INDEX_PATH, "w") as f:
         json.dump(index, f, indent=2)
     print(f"  Saved index with {len(index)} chapters.")
     return index
+
+
+def cmd_update():
+    """Check AO3 for new chapters, download any that are missing."""
+    existing = get_chapter_index()
+    existing_ids = {ch["chapter_id"] for ch in existing}
+
+    fresh = fetch_index_from_ao3()
+    new_chapters = [ch for ch in fresh if ch["chapter_id"] not in existing_ids]
+
+    if not new_chapters:
+        print(f"No new chapters. Index has {len(existing)} chapters, AO3 has {len(fresh)}.")
+        return
+
+    print(f"Found {len(new_chapters)} new chapter(s):")
+    for ch in new_chapters:
+        print(f"  Ch.{fresh.index(ch) + 1}  {ch['title']}  ({ch['date']})")
+
+    # Update the index file
+    updated = existing + new_chapters
+    with open(INDEX_PATH, "w") as f:
+        json.dump(updated, f, indent=2)
+    print(f"  Updated index: {len(existing)} → {len(updated)} chapters.")
+
+    # Download new chapters
+    os.makedirs(OUTPUT_DIR, exist_ok=True)
+    for ch in new_chapters:
+        i = next(j + 1 for j, c in enumerate(updated) if c["chapter_id"] == ch["chapter_id"])
+        title = ch["title"]
+        ao3_url = ch["ao3_url"]
+        filename = f"{i:04d}_{sanitize_filename(title)}.md"
+        filepath = os.path.join(OUTPUT_DIR, filename)
+
+        print(f"\nDownloading Ch.{i}: {title}")
+        html_content = fetch(ao3_url)
+        if not html_content:
+            print("  FAILED — skipping")
+            time.sleep(DELAY)
+            continue
+
+        chapter_html = extract_chapter_content(html_content)
+        if not chapter_html:
+            print("  WARNING: Could not extract content — skipping")
+            time.sleep(DELAY)
+            continue
+
+        notes_before = extract_author_notes(html_content, "before")
+        notes_after  = extract_author_notes(html_content, "after")
+        chapter_md   = html_to_markdown(chapter_html)
+
+        lines = [f"# {title}\n"]
+        lines.append(f"*Source: {ao3_url}*")
+        if ch.get("date"):
+            lines.append(f"*Published: {ch['date']}*")
+        lines.append("\n---\n")
+        if notes_before:
+            lines.append("**Author's Note:**\n")
+            lines.append(f"> {html_to_markdown(notes_before)}\n")
+            lines.append("---\n")
+        lines.append(chapter_md)
+        if notes_after:
+            lines.append("\n\n---\n")
+            lines.append("**Author's End Note:**\n")
+            lines.append(f"> {html_to_markdown(notes_after)}")
+
+        with open(filepath, "w", encoding="utf-8") as f:
+            f.write("\n".join(lines) + "\n")
+        print(f"  Saved: {filename} (~{len(chapter_md.split())} words)")
+        time.sleep(DELAY)
+
+    chapter_list = ", ".join(
+        f"Ch.{next(j+1 for j,c in enumerate(updated) if c['chapter_id']==ch['chapter_id'])} ({ch['title']})"
+        for ch in new_chapters
+    )
+    print("\nDone. Next steps:")
+    print(f"  1. Ask Claude: \"can you process this?\" — it will summarise {chapter_list}")
+    print("  2. Run: python3 wiki/scripts/build.py --all")
 
 
 def sanitize_filename(s):
@@ -300,6 +389,10 @@ def sanitize_filename(s):
 
 
 def main():
+    if "--update" in sys.argv:
+        cmd_update()
+        return
+
     os.makedirs(OUTPUT_DIR, exist_ok=True)
 
     # Parse args
