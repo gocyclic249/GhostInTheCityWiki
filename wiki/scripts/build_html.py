@@ -76,7 +76,7 @@ def page_shell(title, body, css_path="assets/style.css", active_nav=""):
         ("braindances.html",        "Braindances"),
         ("rockerboy.html",          "Rockerboy"),
         ("characters/index.html",   "Characters"),
-        ("charsheet.html",          "Character Sheet"),
+        ("charsheet.html",          "Gonk Stats"),
     ]
 
     def nav_href(target):
@@ -139,6 +139,7 @@ def build_index(summaries, characters, braindances, ch_total):
 
     body = f"""
       <h1 class="page-title">Ghost in the City</h1>
+      <p class="blackwall-credit"><a href="https://claude.ai" rel="noopener" target="_blank">Made with help from beyond the Blackwall</a></p>
       <p class="story-summary">
         A <em>Cyberpunk 2077 / Ghost in the Shell</em> crossover SI (Self-Insert) by
         <strong>Seras</strong>. A gamer wakes up in Night City as Motoko Kusanagi —
@@ -177,7 +178,7 @@ def build_index(summaries, characters, braindances, ch_total):
         <li><a href="braindances.html">Braindance Catalog</a> — every BD Motoko produces or sells</li>
         <li><a href="rockerboy.html">Rockerboy</a> — every performance and studio session in chapter order</li>
         <li><a href="characters/index.html">Character Profiles</a> — bios and stats</li>
-        <li><a href="charsheet.html">Character Sheet</a> — Motoko's CP2077 stats, skills, perks, and cyberware</li>
+        <li><a href="charsheet.html">Gonk Stats</a> — Motoko's CP2077 stats, skills, perks, and cyberware</li>
       </ul>
 """
     out = page_shell("Home", body, active_nav="index.html")
@@ -360,36 +361,65 @@ def build_cp_stats_block(cp):
     level     = cp.get("level", "?")
     attrs     = cp.get("attributes", {})
     skills    = cp.get("skills", [])
-    perks     = cp.get("perks", [])
     cyberware = cp.get("cyberware", [])
 
     ATTR_ORDER = ["Body", "Reflexes", "Technical Ability", "Intelligence", "Cool"]
     MAX_ATTR   = 20
 
-    attr_rows = "".join(
-        f'<div class="cp-attr-row">'
-        f'<span class="cp-attr-name">{e(a)}</span>'
-        f'<div class="cp-attr-bar">'
-        f'<div class="cp-attr-fill" style="width:{int(attrs.get(a, 0) / MAX_ATTR * 100)}%"></div>'
-        f'</div>'
-        f'<span class="cp-attr-val">{e(str(attrs.get(a, "—")))}</span>'
-        f'</div>'
-        for a in ATTR_ORDER
-    )
+    # Group skills by attribute
+    skills_by_attr = {}
+    for sk in skills:
+        a = sk.get("attribute", "")
+        skills_by_attr.setdefault(a, []).append(sk)
 
-    skill_rows = "".join(
-        f'<div class="cp-skill-row">'
-        f'<span class="cp-skill-name">{e(sk.get("name", ""))}</span>'
-        f'<span class="cp-skill-attr">{e(sk.get("attribute", ""))}</span>'
-        f'<div class="cp-skill-bar">'
-        f'<div class="cp-skill-fill" style="width:{int(sk.get("level", 0) / 20 * 100)}%"></div>'
-        f'</div>'
-        f'<span class="cp-skill-level">{e(str(sk.get("level", "—")))}</span>'
-        f'</div>'
-        for sk in skills
-    )
+    # Build attribute sections — each with its bar, then nested skills + perks
+    attr_sections = ""
+    for a in ATTR_ORDER:
+        val = attrs.get(a, 0)
+        bar_width = int(val / MAX_ATTR * 100)
 
-    perk_chips = "".join(f'<span class="cp-perk-chip">{e(p)}</span>' for p in perks)
+        attr_header = (
+            f'<div class="cp-attr-row">'
+            f'<span class="cp-attr-name">{e(a)}</span>'
+            f'<div class="cp-attr-bar">'
+            f'<div class="cp-attr-fill" style="width:{bar_width}%"></div>'
+            f'</div>'
+            f'<span class="cp-attr-val">{e(str(val))}</span>'
+            f'</div>'
+        )
+
+        skill_html = ""
+        for sk in skills_by_attr.get(a, []):
+            sk_name  = sk.get("name", "")
+            sk_level = sk.get("level", 0)
+            sk_perks = sk.get("perks", [])
+            sk_bar   = int(sk_level / 20 * 100)
+
+            skill_row = (
+                f'<div class="cp-skill-row">'
+                f'<span class="cp-skill-name">{e(sk_name)}</span>'
+                f'<div class="cp-skill-bar">'
+                f'<div class="cp-skill-fill" style="width:{sk_bar}%"></div>'
+                f'</div>'
+                f'<span class="cp-skill-level">{e(str(sk_level))}</span>'
+                f'</div>'
+            )
+
+            perk_html = ""
+            if sk_perks:
+                chips = "".join(
+                    f'<span class="cp-perk-chip">{e(p)}</span>' for p in sk_perks
+                )
+                perk_html = f'<div class="cp-perk-row">{chips}</div>'
+
+            skill_html += skill_row + perk_html
+
+        attr_sections += (
+            f'<div class="cp-attr-group">'
+            f'{attr_header}'
+            f'<div class="cp-skill-list">{skill_html}</div>'
+            f'</div>'
+        )
 
     cw_items = "".join(f'<li>{e(item)}</li>' for item in cyberware)
     cw_html  = f'<ul class="cp-cyberware-list">{cw_items}</ul>' if cw_items else ""
@@ -398,14 +428,9 @@ def build_cp_stats_block(cp):
 
     return (
         f'<div class="cp-stats-block">'
-        f'<h3 class="char-section-label">// Character Sheet ({header_note})</h3>'
+        f'<h3 class="char-section-label">// Gonk Stats ({header_note})</h3>'
         f'<div class="cp-level-badge">// Character Level &nbsp; {e(str(level))}</div>'
-        f'<h4 class="cp-subsection">// Attributes</h4>'
-        f'<div class="cp-attr-list">{attr_rows}</div>'
-        f'<h4 class="cp-subsection">// Skills</h4>'
-        f'<div class="cp-skill-list">{skill_rows}</div>'
-        f'<h4 class="cp-subsection">// Perks</h4>'
-        f'<div class="cp-perk-list">{perk_chips}</div>'
+        f'{attr_sections}'
         f'<h4 class="cp-subsection">// Cyberware</h4>'
         f'{cw_html}'
         f'</div>'
@@ -495,7 +520,7 @@ def build_charsheet(characters):
         cp_html = '<p class="placeholder-note">[Character sheet pending — no cp_stats in Motoko\'s cache entry]</p>'
 
     body = f"""
-      <h1 class="page-title">Character Sheet</h1>
+      <h1 class="page-title">Gonk Stats</h1>
       <p>
         Motoko Kusanagi's stats under the
         <em>Cyberpunk 2077</em> pre-Update 2.0 system.
@@ -503,7 +528,7 @@ def build_charsheet(characters):
       </p>
       {cp_html}
 """
-    out = page_shell("Character Sheet", body, active_nav="charsheet.html")
+    out = page_shell("Gonk Stats", body, active_nav="charsheet.html")
     dest = os.path.join(BUILD_DIR, "charsheet.html")
     with open(dest, "w", encoding="utf-8") as f:
         f.write(out)

@@ -18,36 +18,142 @@
       "as_of": "Chapter 242",
       "level": 30,
       "attributes": {
-        "Body":              9,
-        "Reflexes":          9,
+        "Body": 10,
+        "Reflexes": 10,
         "Technical Ability": 10,
-        "Intelligence":      16,
-        "Cool":              10
+        "Intelligence": 16,
+        "Cool": 10
       },
       "skills": [
-        { "name": "Street Brawler",  "attribute": "Body",              "level": 9  },
-        { "name": "Athletics",       "attribute": "Body",              "level": 9  },
-        { "name": "Annihilation",    "attribute": "Body",              "level": 6  },
-        { "name": "Blades",          "attribute": "Reflexes",          "level": 10 },
-        { "name": "Assault",         "attribute": "Reflexes",          "level": 8  },
-        { "name": "Handguns",        "attribute": "Reflexes",          "level": 8  },
-        { "name": "Quick Hacks",     "attribute": "Intelligence",      "level": 12 },
-        { "name": "Breach Protocol", "attribute": "Intelligence",      "level": 9  },
-        { "name": "Programming",     "attribute": "Intelligence",      "level": 15 },
-        { "name": "Engineering",     "attribute": "Technical Ability", "level": 6  },
-        { "name": "Crafting",        "attribute": "Technical Ability", "level": 8  },
-        { "name": "Ninjutsu",        "attribute": "Cool",              "level": 9  },
-        { "name": "Cold Blood",      "attribute": "Cool",              "level": 8  }
-      ],
-      "perks": [
-        "Ambidextrous", "Quick Draw", "Gun Nut", "Cat-like", "Cool Nerves",
-        "Danger Sense", "Cyber Ninja", "Fearless Chill", "Wall Breaking",
-        "Cyber Security", "Robotics Wizard", "Parry", "Improvised Weapons",
-        "Design Wizard", "Rifle Ace", "Drifting", "Rapid Reload"
+        {
+          "name": "Street Brawler",
+          "attribute": "Body",
+          "level": 9,
+          "perks": [
+            "Improvised Weapons"
+          ]
+        },
+        {
+          "name": "Athletics",
+          "attribute": "Body",
+          "level": 9,
+          "perks": [
+            "Cat-like",
+            "Drifting",
+            "Parkour"
+          ]
+        },
+        {
+          "name": "Annihilation",
+          "attribute": "Body",
+          "level": 6,
+          "perks": [
+            "Slam Fire"
+          ]
+        },
+        {
+          "name": "Blades",
+          "attribute": "Reflexes",
+          "level": 10,
+          "perks": [
+            "Ambidextrous",
+            "Parry"
+          ]
+        },
+        {
+          "name": "Assault",
+          "attribute": "Reflexes",
+          "level": 8,
+          "perks": [
+            "Gun Nut",
+            "Rifle Ace",
+            "Rapid Reload"
+          ]
+        },
+        {
+          "name": "Handguns",
+          "attribute": "Reflexes",
+          "level": 9,
+          "perks": [
+            "Quick Draw"
+          ]
+        },
+        {
+          "name": "Quick Hacks",
+          "attribute": "Intelligence",
+          "level": 13,
+          "perks": [
+            "Cyber Security",
+            "Ninja Hacking"
+          ]
+        },
+        {
+          "name": "Breach Protocol",
+          "attribute": "Intelligence",
+          "level": 15,
+          "perks": [
+            "Wall Breaking",
+            "Team Breach"
+          ]
+        },
+        {
+          "name": "Programming",
+          "attribute": "Intelligence",
+          "level": 15,
+          "perks": [
+            "Robotics Wizard",
+            "Stress Testing"
+          ]
+        },
+        {
+          "name": "Engineering",
+          "attribute": "Technical Ability",
+          "level": 6,
+          "perks": [
+            "Robotics Engineering"
+          ]
+        },
+        {
+          "name": "Crafting",
+          "attribute": "Technical Ability",
+          "level": 8,
+          "perks": [
+            "Design Wizard",
+            "Enduring Builds"
+          ]
+        },
+        {
+          "name": "Ninjutsu",
+          "attribute": "Cool",
+          "level": 10,
+          "perks": [
+            "Cyber Ninja",
+            "Danger Sense",
+            "Ninja Running"
+          ]
+        },
+        {
+          "name": "Cold Blood",
+          "attribute": "Cool",
+          "level": 8,
+          "perks": [
+            "Cool Nerves",
+            "Fearless Chill"
+          ]
+        },
+        {
+          "name": "Rockerboy",
+          "attribute": "Cool",
+          "level": 8,
+          "perks": [
+            "Perfect Musical Memory",
+            "Siren Song"
+          ]
+        }
       ],
       "cyberware": [
-        "Militech Eagle MkV Cyberarms \u00d72 (Gorilla Mod)",
-        "Kiroshi Optical Array \u2014 yellow, low-light, biometric blur",
+        "Militech Eagle MkV Cyberarms ×2 (Gorilla Mod)",
+        "Kiroshi Optical Array — yellow, low-light, biometric blur",
         "Sandevistan (Sandy)",
         "Military-grade Cyberdeck",
         "Neural Interface",
