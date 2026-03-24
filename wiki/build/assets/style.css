@@ -89,13 +89,8 @@ p { margin-bottom: 1em; }
 
 .site-title a { color: inherit; }
 
-/* Floating search bar — bottom right */
+/* Search bar in header */
 .search-float {
-  position: fixed !important;
-  top: 0.5rem !important;
-  right: 1rem !important;
-  left: auto !important;
-  z-index: 1000 !important;
   display: flex;
   gap: 0;
 }

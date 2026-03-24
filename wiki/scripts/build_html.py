@@ -99,7 +99,7 @@ def page_shell(title, body, css_path="assets/style.css", active_nav=""):
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{e(title)} — Ghost in the City Wiki</title>
   {FONT_LINK}
-  <link rel="stylesheet" href="{css_path}">
+  <link rel="stylesheet" href="{css_path}?v=3">
 </head>
 <body>
   <div class="site-wrapper">
