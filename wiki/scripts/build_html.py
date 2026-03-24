@@ -104,8 +104,12 @@ def page_shell(title, body, css_path="assets/style.css", active_nav=""):
 <body>
   <div class="site-wrapper">
     <header class="site-header">
-      <div class="site-title">
+      <div class="site-title" style="display:flex;align-items:center;justify-content:space-between;">
         <a href="{nav_href('index.html')}">&#x2588; Ghost in the City // Wiki</a>
+        <form class="search-float" style="display:flex;gap:0;margin:0;" action="{nav_href('search.html')}" method="GET">
+          <input type="text" name="q" placeholder="// search" aria-label="Search">
+          <button type="submit">&#x25B6;</button>
+        </form>
       </div>
       <nav>
         {nav_links}
@@ -140,6 +144,7 @@ def build_index(summaries, characters, braindances, ch_total):
     body = f"""
       <h1 class="page-title">Ghost in the City</h1>
       <p class="blackwall-credit"><a href="https://claude.ai" rel="noopener" target="_blank">Made with help from beyond the Blackwall</a></p>
+      <p class="blackwall-credit"><a href="https://github.com/gocyclic249/GhostInTheCityWiki/issues" rel="noopener" target="_blank">Update Wiki Engram or Report Blackwall Breach</a></p>
       <p class="story-summary">
         A <em>Cyberpunk 2077 / Ghost in the Shell</em> crossover SI (Self-Insert) by
         <strong>Seras</strong>. A gamer wakes up in Night City as Motoko Kusanagi —
@@ -631,6 +636,31 @@ def build_rockerboy(events):
     print(f"  Wrote {dest}")
 
 
+# ── search.html ───────────────────────────────────────────────────────────
+
+def build_search():
+    body = """
+      <h1 class="page-title">Search Results</h1>
+      <script async src="https://cse.google.com/cse.js?cx=d4dfaaef6c88f4085"></script>
+      <div class="gcse-searchresults-only"></div>
+      <script>
+        // Read ?q= param and feed it to Google CSE once it loads
+        var q = new URLSearchParams(window.location.search).get('q');
+        if (q) {
+          var wait = setInterval(function() {
+            var el = google.search.cse.element.getElement('searchresults-only0');
+            if (el) { el.execute(q); clearInterval(wait); }
+          }, 100);
+        }
+      </script>
+"""
+    out = page_shell("Search", body, active_nav="")
+    dest = os.path.join(BUILD_DIR, "search.html")
+    with open(dest, "w", encoding="utf-8")as f:
+        f.write(out)
+    print(f"  Wrote {dest}")
+
+
 # ── Main entry point ───────────────────────────────────────────────────────
 
 def main():
@@ -654,6 +684,7 @@ def main():
     build_rockerboy(rockerboy)
     build_char_index(characters)
     build_charsheet(characters)
+    build_search()
 
     for slug, char in characters.items():
         build_char_page(slug, char)

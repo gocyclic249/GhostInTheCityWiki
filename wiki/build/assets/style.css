@@ -89,6 +89,52 @@ p { margin-bottom: 1em; }
 
 .site-title a { color: inherit; }
 
+/* Floating search bar — bottom right */
+.search-float {
+  position: fixed !important;
+  top: 0.5rem !important;
+  right: 1rem !important;
+  left: auto !important;
+  z-index: 1000 !important;
+  display: flex;
+  gap: 0;
+}
+
+.search-float input {
+  background: var(--surface);
+  border: 1px solid var(--accent-cyan);
+  border-right: none;
+  color: var(--text);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.75rem;
+  padding: 0.3rem 0.5rem;
+  width: 140px;
+  outline: none;
+  border-radius: 2px 0 0 2px;
+}
+
+.search-float input::placeholder { color: var(--text-dim); }
+.search-float input:focus { box-shadow: var(--glow-cyan); }
+
+.search-float button {
+  background: var(--accent-cyan);
+  border: 1px solid var(--accent-cyan);
+  color: var(--bg);
+  font-size: 0.7rem;
+  padding: 0.3rem 0.5rem;
+  cursor: pointer;
+  border-radius: 0 2px 2px 0;
+  font-family: 'Share Tech Mono', monospace;
+}
+
+.search-float button:hover { box-shadow: var(--glow-cyan); }
+
+/* Search results page — Google CSE overrides */
+.gsc-control-cse { background-color: transparent !important; border: none !important; }
+.gsc-result .gs-title a { color: var(--accent-cyan) !important; }
+.gsc-result .gs-snippet { color: var(--text) !important; }
+.gsc-results .gsc-cursor-page { color: var(--accent-cyan) !important; }
+
 nav {
   display: flex;
   flex-wrap: wrap;
