@@ -661,6 +661,50 @@ def build_search():
     print(f"  Wrote {dest}")
 
 
+# ── sitemap.xml ───────────────────────────────────────────────────────────
+
+SITE_BASE = "https://ghostinthecity.neocities.org"
+
+# Pages listed in priority order — character pages are added dynamically
+STATIC_PAGES = [
+    ("index.html",              "1.0"),
+    ("chapters.html",           "0.9"),
+    ("braindances.html",        "0.8"),
+    ("rockerboy.html",          "0.8"),
+    ("characters/index.html",   "0.8"),
+    ("charsheet.html",          "0.7"),
+]
+
+
+def build_sitemap(characters):
+    urls = []
+    for page, priority in STATIC_PAGES:
+        urls.append(
+            f"  <url>\n"
+            f"    <loc>{SITE_BASE}/{page}</loc>\n"
+            f"    <priority>{priority}</priority>\n"
+            f"  </url>"
+        )
+    for slug in characters:
+        urls.append(
+            f"  <url>\n"
+            f"    <loc>{SITE_BASE}/characters/{slug}.html</loc>\n"
+            f"    <priority>0.6</priority>\n"
+            f"  </url>"
+        )
+
+    xml = (
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+        + "\n".join(urls) + "\n"
+        '</urlset>\n'
+    )
+    dest = os.path.join(BUILD_DIR, "sitemap.xml")
+    with open(dest, "w", encoding="utf-8") as f:
+        f.write(xml)
+    print(f"  Wrote {dest}")
+
+
 # ── Main entry point ───────────────────────────────────────────────────────
 
 def main():
@@ -689,6 +733,7 @@ def main():
     for slug, char in characters.items():
         build_char_page(slug, char)
 
+    build_sitemap(characters)
     print("Done.")
 
 
