@@ -21,6 +21,9 @@ SUMMARIES_JSON   = os.path.join(CACHE_DIR, "chapter_summaries.json")
 BRAINDANCES_JSON = os.path.join(CACHE_DIR, "braindances.json")
 CHARACTERS_JSON  = os.path.join(CACHE_DIR, "characters.json")
 ROCKERBOY_JSON   = os.path.join(CACHE_DIR, "rockerboy.json")
+SIDESTORIES_JSON = os.path.join(
+    os.path.dirname(WIKI_DIR), "sidestories_index.json"
+)
 
 os.makedirs(BUILD_DIR, exist_ok=True)
 os.makedirs(CHARS_DIR, exist_ok=True)
@@ -51,6 +54,10 @@ def load_rockerboy():
     return load_json(ROCKERBOY_JSON, [])
 
 
+def load_sidestories():
+    return load_json(SIDESTORIES_JSON, [])
+
+
 # ── HTML helpers ───────────────────────────────────────────────────────────
 
 def e(text):
@@ -75,6 +82,7 @@ def page_shell(title, body, css_path="assets/style.css", active_nav=""):
         ("chapters.html",           "Chapters"),
         ("braindances.html",        "Braindances"),
         ("rockerboy.html",          "Rockerboy"),
+        ("sidestories.html",        "Jig Jig Street"),
         ("characters/index.html",   "Characters"),
         ("charsheet.html",          "Gonk Stats"),
     ]
@@ -148,10 +156,11 @@ def total_kills(summaries):
 
 # ── index.html ─────────────────────────────────────────────────────────────
 
-def build_index(summaries, characters, braindances, ch_total):
+def build_index(summaries, characters, braindances, sidestories, ch_total):
     kill_count    = total_kills(summaries)
     ch_summarized = sum(1 for ch in summaries.values() if ch.get("summary"))
     bd_count      = len(braindances)
+    ss_count      = len(sidestories)
     char_count    = len(characters)
 
     body = f"""
@@ -188,6 +197,10 @@ def build_index(summaries, characters, braindances, ch_total):
           <span class="stat-label">Characters</span>
           <span class="stat-value">{e(str(char_count))}</span>
         </div>
+        <div class="stat-card">
+          <span class="stat-label">Side Stories</span>
+          <span class="stat-value">{e(str(ss_count))}</span>
+        </div>
       </div>
 
       <h2>Navigation</h2>
@@ -195,6 +208,7 @@ def build_index(summaries, characters, braindances, ch_total):
         <li><a href="chapters.html">Chapter Summaries</a> — two-paragraph recaps for all {e(str(ch_total))} chapters</li>
         <li><a href="braindances.html">Braindance Catalog</a> — every BD Motoko produces or sells</li>
         <li><a href="rockerboy.html">Rockerboy</a> — every performance and studio session in chapter order</li>
+        <li><a href="sidestories.html">Tales from Jig Jig Street</a> — community side stories from SpaceBattles</li>
         <li><a href="characters/index.html">Character Profiles</a> — bios and stats</li>
         <li><a href="charsheet.html">Gonk Stats</a> — Motoko's CP2077 stats, skills, perks, and cyberware</li>
       </ul>
@@ -649,6 +663,116 @@ def build_rockerboy(events):
     print(f"  Wrote {dest}")
 
 
+# ── sidestories.html ─────────────────────────────────────────────────────
+
+def parse_word_count(wc_str):
+    """Convert word count strings like '1.5k', '420', '59k' to integers."""
+    if not wc_str or wc_str == "?":
+        return 0
+    wc_str = wc_str.replace(",", "")
+    if wc_str.lower().endswith("k"):
+        try:
+            return int(float(wc_str[:-1]) * 1000)
+        except ValueError:
+            return 0
+    try:
+        return int(wc_str)
+    except ValueError:
+        return 0
+
+
+def build_sidestories(sidestories):
+    # Load summaries cache
+    ss_summaries_path = os.path.join(CACHE_DIR, "sidestory_summaries.json")
+    ss_cache = load_json(ss_summaries_path, {})
+
+    if not sidestories:
+        list_html = '<p class="placeholder-note">[Side stories pending — run scrape_sidestories.py to build the index]</p>'
+    else:
+        total_words = sum(parse_word_count(ss.get("word_count", "0"))
+                         for ss in sidestories)
+
+        items = []
+        for ss in sidestories:
+            idx     = ss.get("index", "?")
+            title   = ss.get("title", "Untitled")
+            wc      = ss.get("word_count", "?")
+            date    = ss.get("date", "")
+            sb_url  = ss.get("sb_url", "")
+            post_id = ss.get("post_id", "")
+
+            wc_html = (
+                f'<span class="ss-words" title="~{e(str(wc))} words">&#x270E; {e(str(wc))}</span>'
+                if wc and wc != "?" else ""
+            )
+
+            link_html = (
+                f'<a href="{e(sb_url)}" rel="noopener" target="_blank">'
+                f'SpaceBattles &#8599;</a>'
+                if sb_url else ""
+            )
+
+            date_html = f'<span class="ss-date">{e(date)}</span>' if date else ""
+
+            # Check for summary in cache
+            cached = ss_cache.get(str(post_id), {})
+            summary_paras = cached.get("summary", [])
+
+            if summary_paras:
+                summary_html = "".join(f"<p>{e(p)}</p>" for p in summary_paras)
+                items.append(f"""      <li>
+        <details class="ss-entry-detail">
+          <summary class="ss-entry">
+            <span class="ss-num">{e(str(idx).zfill(3))}</span>
+            <span class="ss-title">{e(title)}</span>
+            {wc_html}
+            {date_html}
+            {link_html}
+          </summary>
+          <div class="ss-summary-body">
+            {summary_html}
+          </div>
+        </details>
+      </li>""")
+            else:
+                items.append(f"""      <li class="ss-entry">
+        <span class="ss-num">{e(str(idx).zfill(3))}</span>
+        <span class="ss-title">{e(title)}</span>
+        {wc_html}
+        {date_html}
+        {link_html}
+      </li>""")
+
+        list_html = f'<ul class="ss-list">\n' + "\n".join(items) + "\n      </ul>"
+
+    ss_count = len(sidestories)
+    summarized = len(ss_cache)
+    total_words = sum(parse_word_count(ss.get("word_count", "0"))
+                      for ss in sidestories)
+
+    body = f"""
+      <h1 class="page-title">Tales from Jig Jig Street</h1>
+      <p>
+        Community-written side stories, omakes, and snippets from the
+        <a href="https://forums.spacebattles.com/threads/ghost-in-the-city-cyberpunk-gamer-si.1046809/"
+           rel="noopener" target="_blank">SpaceBattles thread</a>.
+        Canon and non-canon glimpses into Night City through other eyes.
+      </p>
+      <p>
+        {e(str(ss_count))} side stories
+        ({e(str(summarized))}/{e(str(ss_count))} summarised).
+        ~{e(str(f'{total_words:,}'))} words total.
+      </p>
+      {list_html}
+"""
+    out = page_shell("Tales from Jig Jig Street", body,
+                     active_nav="sidestories.html")
+    dest = os.path.join(BUILD_DIR, "sidestories.html")
+    with open(dest, "w", encoding="utf-8") as f:
+        f.write(out)
+    print(f"  Wrote {dest}")
+
+
 # ── search.html ───────────────────────────────────────────────────────────
 
 def build_search():
@@ -684,6 +808,7 @@ STATIC_PAGES = [
     ("chapters.html",           "0.9"),
     ("braindances.html",        "0.8"),
     ("rockerboy.html",          "0.8"),
+    ("sidestories.html",        "0.8"),
     ("characters/index.html",   "0.8"),
     ("charsheet.html",          "0.7"),
 ]
@@ -726,6 +851,7 @@ def main():
     braindances = load_braindances()
     characters  = load_characters()
     rockerboy   = load_rockerboy()
+    sidestories = load_sidestories()
 
     threadmarks_path = os.path.join(os.path.dirname(WIKI_DIR), "threadmarks_index.json")
     if os.path.exists(threadmarks_path):
@@ -735,10 +861,11 @@ def main():
         ch_total = len(summaries)
 
     print("Building HTML...")
-    build_index(summaries, characters, braindances, ch_total)
+    build_index(summaries, characters, braindances, sidestories, ch_total)
     build_chapters(summaries)
     build_braindances(braindances)
     build_rockerboy(rockerboy)
+    build_sidestories(sidestories)
     build_char_index(characters)
     build_charsheet(characters)
     build_search()
