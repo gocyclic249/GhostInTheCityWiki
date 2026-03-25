@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Search — Ghost in the City Wiki</title>
+  <meta name="description" content="Fan wiki for Ghost in the City — a Cyberpunk 2077 / Ghost in the Shell crossover fanfiction by Seras.">
+  <meta name="keywords" content="Ghost in the City, Cyberpunk 2077, Ghost in the Shell, fanfiction, Motoko Kusanagi, Night City, wiki">
+  <meta name="author" content="GhostInTheCity Wiki Contributors">
+  <meta property="og:title" content="Search — Ghost in the City Wiki">
+  <meta property="og:description" content="Fan wiki for Ghost in the City — a Cyberpunk 2077 / Ghost in the Shell crossover fanfiction by Seras.">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Ghost in the City Wiki">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Search — Ghost in the City Wiki">
+  <meta name="twitter:description" content="Fan wiki for Ghost in the City — a Cyberpunk 2077 / Ghost in the Shell crossover fanfiction by Seras.">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/style.css?v=3">
+</head>
+<body>
+  <div class="site-wrapper">
+    <header class="site-header">
+      <div class="site-title" style="display:flex;align-items:center;justify-content:space-between;">
+        <a href="index.html">&#x2588; Ghost in the City // Wiki</a>
+        <form class="search-float" style="display:flex;gap:0;margin:0;" action="search.html" method="GET">
+          <input type="text" name="q" placeholder="// search" aria-label="Search">
+          <button type="submit">&#x25B6;</button>
+        </form>
+      </div>
+      <nav>
+        <a href="index.html">Home</a>
+<a href="chapters.html">Chapters</a>
+<a href="braindances.html">Braindances</a>
+<a href="rockerboy.html">Rockerboy</a>
+<a href="characters/index.html">Characters</a>
+<a href="charsheet.html">Gonk Stats</a>
+      </nav>
+    </header>
+    <main>
+
+      <h1 class="page-title">Search Results</h1>
+      <script async src="https://cse.google.com/cse.js?cx=d4dfaaef6c88f4085"></script>
+      <div class="gcse-searchresults-only"></div>
+      <script>
+        // Read ?q= param and feed it to Google CSE once it loads
+        var q = new URLSearchParams(window.location.search).get('q');
+        if (q) {
+          var wait = setInterval(function() {
+            var el = google.search.cse.element.getElement('searchresults-only0');
+            if (el) { el.execute(q); clearInterval(wait); }
+          }, 100);
+        }
+      </script>
+
+    </main>
+    <footer class="site-footer">
+      Fan wiki — unofficial. Story by Seras. &nbsp;|&nbsp;
+      <a href="https://archiveofourown.org/works/42385683" rel="noopener">Read on AO3</a>
+    </footer>
+  </div>
+</body>
+</html>

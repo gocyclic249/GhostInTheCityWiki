@@ -92,12 +92,25 @@ def page_shell(title, body, css_path="assets/style.css", active_nav=""):
         for href, label in nav_items
     )
 
+    site_name = "Ghost in the City Wiki"
+    full_title = site_name if title == site_name else f"{e(title)} — {site_name}"
+
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{e(title)} — Ghost in the City Wiki</title>
+  <title>{full_title}</title>
+  <meta name="description" content="Fan wiki for Ghost in the City — a Cyberpunk 2077 / Ghost in the Shell crossover fanfiction by Seras.">
+  <meta name="keywords" content="Ghost in the City, Cyberpunk 2077, Ghost in the Shell, fanfiction, Motoko Kusanagi, Night City, wiki">
+  <meta name="author" content="GhostInTheCity Wiki Contributors">
+  <meta property="og:title" content="{full_title}">
+  <meta property="og:description" content="Fan wiki for Ghost in the City — a Cyberpunk 2077 / Ghost in the Shell crossover fanfiction by Seras.">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="{site_name}">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="{full_title}">
+  <meta name="twitter:description" content="Fan wiki for Ghost in the City — a Cyberpunk 2077 / Ghost in the Shell crossover fanfiction by Seras.">
   {FONT_LINK}
   <link rel="stylesheet" href="{css_path}?v=3">
 </head>
@@ -186,7 +199,7 @@ def build_index(summaries, characters, braindances, ch_total):
         <li><a href="charsheet.html">Gonk Stats</a> — Motoko's CP2077 stats, skills, perks, and cyberware</li>
       </ul>
 """
-    out = page_shell("Home", body, active_nav="index.html")
+    out = page_shell("Ghost in the City Wiki", body, active_nav="index.html")
     dest = os.path.join(BUILD_DIR, "index.html")
     with open(dest, "w", encoding="utf-8") as f:
         f.write(out)
