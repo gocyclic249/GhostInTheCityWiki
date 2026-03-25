@@ -718,6 +718,105 @@ nav a:hover, nav a.active {
   border-left: 3px solid var(--accent-cyan);
 }
 
+/* ── Side Stories (Jig Jig Street) ──────────────────────────────── */
+.ss-list {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ss-entry {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--surface);
+  border-left: 3px solid var(--border);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.9rem;
+  transition: border-color 0.2s, background 0.2s;
+  flex-wrap: wrap;
+}
+
+.ss-entry:hover {
+  border-left-color: var(--accent-purple);
+  background: var(--surface-2);
+}
+
+.ss-num {
+  color: var(--text-dim);
+  font-size: 0.8rem;
+  min-width: 2.5rem;
+}
+
+.ss-title {
+  color: var(--text);
+  flex: 1;
+  min-width: 0;
+}
+
+.ss-words {
+  color: var(--accent-purple);
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.ss-date {
+  color: var(--text-dim);
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.ss-entry a {
+  color: var(--accent-cyan);
+  text-decoration: none;
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.ss-entry a:hover {
+  text-shadow: var(--glow-cyan);
+}
+
+.ss-entry-detail {
+  background: var(--surface);
+  border-left: 3px solid var(--border);
+  transition: border-color 0.2s;
+}
+
+.ss-entry-detail[open] {
+  border-left-color: var(--accent-purple);
+}
+
+.ss-entry-detail summary.ss-entry {
+  cursor: pointer;
+  list-style: none;
+}
+
+.ss-entry-detail summary.ss-entry::-webkit-details-marker { display: none; }
+
+.ss-entry-detail summary.ss-entry::before {
+  content: '▸';
+  color: var(--accent-purple);
+  margin-right: 0.25rem;
+  transition: transform 0.15s;
+  display: inline-block;
+}
+
+.ss-entry-detail[open] summary.ss-entry::before { transform: rotate(90deg); }
+
+.ss-summary-body {
+  padding: 0.5rem 1rem 0.75rem 3.5rem;
+  color: var(--text);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  border-top: 1px solid var(--border);
+}
+
+.ss-summary-body p { margin-bottom: 0.5rem; }
+
 /* ── Rockerboy timeline ─────────────────────────────────────────── */
 .rb-timeline {
   display: flex;
