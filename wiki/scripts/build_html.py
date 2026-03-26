@@ -241,16 +241,6 @@ def build_index(summaries, characters, braindances, sidestories, ch_total):
           <span class="stat-value">{e(str(ss_count))}</span>
         </div>
       </div>
-
-      <h2>Navigation</h2>
-      <ul>
-        <li><a href="chapters.html">Chapter Summaries</a> — two-paragraph recaps for all {e(str(ch_total))} chapters</li>
-        <li><a href="braindances.html">Braindance Catalog</a> — every BD Motoko produces or sells</li>
-        <li><a href="rockerboy.html">Rockerboy</a> — every performance and studio session in chapter order</li>
-        <li><a href="sidestories.html">Tales from Jig Jig Street</a> — community side stories from SpaceBattles</li>
-        <li><a href="characters/index.html">Character Profiles</a> — bios and stats</li>
-        <li><a href="charsheet.html">Gonk Stats</a> — Motoko's CP2077 stats, skills, perks, and cyberware</li>
-      </ul>
 """
     out = page_shell("Ghost in the City Wiki", body, active_nav="index.html",
                       description=f"Fan wiki for Ghost in the City — a Cyberpunk 2077 / Ghost in the Shell crossover SI by Seras. {ch_total} chapters, {char_count} character profiles, {ss_count} community side stories.",
