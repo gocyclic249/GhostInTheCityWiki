@@ -35,7 +35,11 @@ OUTPUT_DIR = os.path.join(BASE_DIR, "sidestories")
 INDEX_PATH = os.path.join(BASE_DIR, "sidestories_index.json")
 
 # Tavily API — used to bypass Cloudflare on SpaceBattles
-TAVILY_API_KEY = os.environ.get("TAVILY_API_KEY", "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")
+TAVILY_API_KEY = os.environ.get("TAVILY_API_KEY", "")
+if not TAVILY_API_KEY:
+    print("ERROR: TAVILY_API_KEY environment variable is required.")
+    print("  Set it with: export TAVILY_API_KEY=your-key-here")
+    sys.exit(1)
 TAVILY_EXTRACT_URL = "https://api.tavily.com/extract"
 
 DELAY = 1.0  # seconds between Tavily API calls
@@ -113,11 +117,24 @@ def parse_threadmark_entries(text):
     while i < len(lines) - 1:
         line = lines[i]
 
-        # Check if next line starts with "Words"
-        if i + 1 < len(lines) and lines[i + 1].startswith("Words "):
+        # Look ahead for a "Words" line, skipping award badge lines between
+        # the title and the word count (badges look like "[![Image ...")
+        words_offset = None
+        for peek in range(1, 4):
+            if i + peek >= len(lines):
+                break
+            if lines[i + peek].startswith("Words "):
+                words_offset = peek
+                break
+            # Only skip award/image lines between title and Words
+            if "![Image" not in lines[i + peek] and "Award" not in lines[i + peek]:
+                break
+
+        if words_offset:
             raw_title = line
-            word_line = lines[i + 1]
-            date_line = lines[i + 2] if i + 2 < len(lines) else ""
+            word_line = lines[i + words_offset]
+            date_idx = i + words_offset + 1
+            date_line = lines[date_idx] if date_idx < len(lines) else ""
 
             # Skip navigation/boilerplate
             skip_titles = {
@@ -129,8 +146,13 @@ def parse_threadmark_entries(text):
                 i += 1
                 continue
 
-            # Parse markdown link: *   [Title](URL) or [![Image...](...)...](award_url)
-            link_m = re.search(r'\[([^\[\]]+)\]\((https://forums\.spacebattles\.com/[^)]+)\)', raw_title)
+            # Parse markdown link: *   [Title](URL)
+            # Use a greedy match for the link text to handle nested brackets
+            # like [UR'S ANGELS [BABYLONIAN DEVILS]]
+            link_m = re.search(
+                r'\[(.+)\]\((https://forums\.spacebattles\.com/[^)]+)\)$',
+                raw_title
+            )
             if link_m:
                 title = link_m.group(1).strip()
                 sb_url = link_m.group(2).strip()
@@ -166,7 +188,7 @@ def parse_threadmark_entries(text):
                 "sb_url": sb_url,
                 "post_id": post_id,
             })
-            i += 3 if date else 2
+            i += words_offset + (2 if date else 1)
             continue
 
         i += 1
