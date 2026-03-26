@@ -159,7 +159,7 @@ def page_shell(title, body, css_path="assets/style.css", active_nav="",
   <meta name="twitter:title" content="{full_title}">
   <meta name="twitter:description" content="{desc_escaped}">
   {FONT_LINK}
-  <link rel="stylesheet" href="{css_path}?v=3">
+  <link rel="stylesheet" href="{css_path}?v=4">
 </head>
 <body>
   <div class="site-wrapper">
