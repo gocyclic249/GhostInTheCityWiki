@@ -9,6 +9,7 @@ import json
 import os
 import sys
 from datetime import datetime, timezone
+from urllib.parse import urlparse
 
 # ── Paths ──────────────────────────────────────────────────────────────────
 
@@ -64,6 +65,19 @@ def load_sidestories():
 def e(text):
     """HTML-escape a string."""
     return html.escape(str(text), quote=True)
+
+
+def safe_url(url):
+    """Validate URL scheme is safe for use in href attributes."""
+    if not url:
+        return ""
+    try:
+        parsed = urlparse(url)
+        if parsed.scheme in ("http", "https", "mailto", ""):
+            return e(url)
+    except Exception:
+        pass
+    return ""
 
 
 CSS_PATH = "assets/style.css"  # relative — overridden per page depth
@@ -273,14 +287,14 @@ def build_chapters(summaries):
                 paras
                 + kill_note_html
                 + (f'<p class="chapter-meta">Date: {e(date)}'
-                   + (f' &nbsp;|&nbsp; <a href="{e(url)}" rel="noopener">AO3 &#8599;</a>' if url else "")
+                   + (f' &nbsp;|&nbsp; <a href="{safe_url(url)}" rel="noopener">AO3 &#8599;</a>' if url else "")
                    + "</p>")
             )
         else:
             body_html = (
                 '<p class="placeholder-note">[Summary pending]</p>'
                 + (f'<p class="chapter-meta">Date: {e(date)}'
-                   + (f' &nbsp;|&nbsp; <a href="{e(url)}" rel="noopener">AO3 &#8599;</a>' if url else "")
+                   + (f' &nbsp;|&nbsp; <a href="{safe_url(url)}" rel="noopener">AO3 &#8599;</a>' if url else "")
                    + "</p>")
             )
 
@@ -640,7 +654,7 @@ def build_rockerboy(events):
                 yt_url  = song.get("youtube_url")
                 if yt_url:
                     song_label = (
-                        f'<a class="rb-song-link" href="{e(yt_url)}" '
+                        f'<a class="rb-song-link" href="{safe_url(yt_url)}" '
                         f'rel="noopener" target="_blank">{e(title_)} &#x2197;</a>'
                     )
                 else:
@@ -739,7 +753,7 @@ def build_sidestories(sidestories):
             )
 
             link_html = (
-                f'<a href="{e(sb_url)}" rel="noopener" target="_blank">'
+                f'<a href="{safe_url(sb_url)}" rel="noopener" target="_blank">'
                 f'SpaceBattles &#8599;</a>'
                 if sb_url else ""
             )
