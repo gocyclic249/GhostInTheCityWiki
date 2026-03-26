@@ -336,17 +336,29 @@ def extract_post_content(raw_content, post_id):
     # Remove markdown image syntax to get just the text content
     context = re.sub(r'!\[[^\]]*\]\([^)]+\)', '', text)
     context = re.sub(r'\[([^\]]+)\]\([^)]+\)', r'\1', context)
+    # Remove "Click to expand/shrink" artifacts
+    context = re.sub(r'\[Click to expand\.\.\.\]\([^)]*\)', '', context)
+    context = re.sub(r'\[Click to shrink\.\.\.\]\([^)]*\)', '', context)
+    context = re.sub(r'Click to expand\.\.\.', '', context)
+    context = re.sub(r'Click to shrink\.\.\.', '', context)
     # Remove boilerplate lines
     context_lines = []
     for line in context.split("\n"):
         stripped = line.strip()
         if not stripped:
             continue
-        if stripped.startswith("*   ["):
+        if stripped.startswith("*   [") or stripped.startswith("*   #"):
             continue
         if stripped.startswith("[!["):
             continue
         if stripped.startswith("####"):
+            continue
+        # Skip quote marker lines (bare > or lines that are only > characters)
+        if re.match(r'^>+\s*$', stripped):
+            continue
+        # Strip leading quote markers from content lines
+        stripped = re.sub(r'^(?:>\s*)+', '', stripped).strip()
+        if not stripped:
             continue
         context_lines.append(stripped)
     context = " ".join(context_lines).strip()

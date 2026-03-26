@@ -885,9 +885,15 @@ def build_photomode(media_entries):
 
             context_html = ""
             if context and len(context) > 5:
-                # Truncate long context
-                short = context[:200] + "..." if len(context) > 200 else context
-                context_html = f'<p class="pm-context">{e(short)}</p>'
+                import re as _re
+                # Strip any remaining quote markers, post refs, click artifacts
+                clean = _re.sub(r'(?:^|\s)>\s*', ' ', context)
+                clean = _re.sub(r'Click to (?:expand|shrink)\.\.\.', '', clean)
+                clean = _re.sub(r'\*\s+#[\d,]+', '', clean)
+                clean = _re.sub(r'\s{2,}', ' ', clean).strip()
+                if clean and len(clean) > 5:
+                    short = clean[:200] + "..." if len(clean) > 200 else clean
+                    context_html = f'<p class="pm-context">{e(short)}</p>'
 
             cards.append(f"""    <div class="pm-card">
       <a href="media/{e(local_file)}" target="_blank" class="pm-img-link">
