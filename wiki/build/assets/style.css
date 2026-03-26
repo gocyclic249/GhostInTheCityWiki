@@ -967,7 +967,7 @@ nav a:hover, nav a.active {
 /* ── Photomode gallery ────────────────────────────────────────────── */
 .pm-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
   gap: 1.5rem;
   margin: 2rem 0;
 }
@@ -975,6 +975,7 @@ nav a:hover, nav a.active {
 .pm-card {
   background: var(--surface);
   border: 1px solid var(--border);
+  border-top: 3px solid var(--accent-pink);
   overflow: hidden;
   transition: border-color 0.15s, box-shadow 0.15s;
 }
@@ -985,13 +986,18 @@ nav a:hover, nav a.active {
 }
 
 .pm-img-link {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: var(--bg);
+  padding: 0.5rem;
+  min-height: 200px;
+  max-height: 70vh;
 }
 
 .pm-img {
-  width: 100%;
-  max-height: 80vh;
+  max-width: 100%;
+  max-height: 65vh;
   object-fit: contain;
   display: block;
   transition: opacity 0.15s;
@@ -1005,6 +1011,7 @@ nav a:hover, nav a.active {
   display: flex;
   gap: 2px;
   background: var(--bg);
+  padding: 0 0.5rem 0.5rem;
 }
 
 .pm-extra-img {
