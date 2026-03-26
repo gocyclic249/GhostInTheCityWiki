@@ -736,10 +736,6 @@ def parse_word_count(wc_str):
 
 
 def build_sidestories(sidestories):
-    # Load summaries cache
-    ss_summaries_path = os.path.join(CACHE_DIR, "sidestory_summaries.json")
-    ss_cache = load_json(ss_summaries_path, {})
-
     if not sidestories:
         list_html = '<p class="placeholder-note">[Side stories pending — run scrape_sidestories.py to build the index]</p>'
     else:
@@ -753,7 +749,6 @@ def build_sidestories(sidestories):
             wc      = ss.get("word_count", "?")
             date    = ss.get("date", "")
             sb_url  = ss.get("sb_url", "")
-            post_id = ss.get("post_id", "")
 
             wc_html = (
                 f'<span class="ss-words" title="~{e(str(wc))} words">&#x270E; {e(str(wc))}</span>'
@@ -768,28 +763,7 @@ def build_sidestories(sidestories):
 
             date_html = f'<span class="ss-date">{e(date)}</span>' if date else ""
 
-            # Check for summary in cache
-            cached = ss_cache.get(str(post_id), {})
-            summary_paras = cached.get("summary", [])
-
-            if summary_paras:
-                summary_html = "".join(f"<p>{e(p)}</p>" for p in summary_paras)
-                items.append(f"""      <li>
-        <details class="ss-entry-detail">
-          <summary class="ss-entry">
-            <span class="ss-num">{e(str(idx).zfill(3))}</span>
-            <span class="ss-title">{e(title)}</span>
-            {wc_html}
-            {date_html}
-            {link_html}
-          </summary>
-          <div class="ss-summary-body">
-            {summary_html}
-          </div>
-        </details>
-      </li>""")
-            else:
-                items.append(f"""      <li class="ss-entry">
+            items.append(f"""      <li class="ss-entry">
         <span class="ss-num">{e(str(idx).zfill(3))}</span>
         <span class="ss-title">{e(title)}</span>
         {wc_html}
@@ -800,7 +774,6 @@ def build_sidestories(sidestories):
         list_html = f'<ul class="ss-list">\n' + "\n".join(items) + "\n      </ul>"
 
     ss_count = len(sidestories)
-    summarized = len(ss_cache)
     total_words = sum(parse_word_count(ss.get("word_count", "0"))
                       for ss in sidestories)
 
@@ -813,8 +786,7 @@ def build_sidestories(sidestories):
         Canon and non-canon glimpses into Night City through other eyes.
       </p>
       <p>
-        {e(str(ss_count))} side stories
-        ({e(str(summarized))}/{e(str(ss_count))} summarised).
+        {e(str(ss_count))} side stories.
         ~{e(str(f'{total_words:,}'))} words total.
       </p>
       {list_html}
