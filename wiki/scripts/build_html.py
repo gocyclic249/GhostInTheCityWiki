@@ -8,6 +8,7 @@ import html
 import json
 import os
 import sys
+from datetime import datetime, timezone
 
 # ── Paths ──────────────────────────────────────────────────────────────────
 
@@ -75,7 +76,8 @@ FONT_LINK = (
 )
 
 
-def page_shell(title, body, css_path="assets/style.css", active_nav=""):
+def page_shell(title, body, css_path="assets/style.css", active_nav="",
+               description="", canonical_path=""):
     """Wrap body HTML in a full page shell."""
     nav_items = [
         ("index.html",              "Home"),
@@ -103,22 +105,37 @@ def page_shell(title, body, css_path="assets/style.css", active_nav=""):
     site_name = "Ghost in the City Wiki"
     full_title = site_name if title == site_name else f"{e(title)} — {site_name}"
 
+    # Per-page description for SEO — falls back to site-wide default
+    if not description:
+        description = "Fan wiki for Ghost in the City — a Cyberpunk 2077 / Ghost in the Shell crossover fanfiction by Seras."
+    desc_escaped = e(description)
+
+    # Canonical URL
+    canonical_tag = ""
+    og_url_tag = ""
+    if canonical_path:
+        canonical_url = f"{SITE_BASE}/{canonical_path}"
+        canonical_tag = f'<link rel="canonical" href="{canonical_url}">'
+        og_url_tag = f'<meta property="og:url" content="{canonical_url}">'
+
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{full_title}</title>
-  <meta name="description" content="Fan wiki for Ghost in the City — a Cyberpunk 2077 / Ghost in the Shell crossover fanfiction by Seras.">
+  <meta name="description" content="{desc_escaped}">
   <meta name="keywords" content="Ghost in the City, Cyberpunk 2077, Ghost in the Shell, fanfiction, Motoko Kusanagi, Night City, wiki">
   <meta name="author" content="GhostInTheCity Wiki Contributors">
+  {canonical_tag}
   <meta property="og:title" content="{full_title}">
-  <meta property="og:description" content="Fan wiki for Ghost in the City — a Cyberpunk 2077 / Ghost in the Shell crossover fanfiction by Seras.">
+  <meta property="og:description" content="{desc_escaped}">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="{site_name}">
+  {og_url_tag}
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="{full_title}">
-  <meta name="twitter:description" content="Fan wiki for Ghost in the City — a Cyberpunk 2077 / Ghost in the Shell crossover fanfiction by Seras.">
+  <meta name="twitter:description" content="{desc_escaped}">
   {FONT_LINK}
   <link rel="stylesheet" href="{css_path}?v=3">
 </head>
@@ -213,7 +230,9 @@ def build_index(summaries, characters, braindances, sidestories, ch_total):
         <li><a href="charsheet.html">Gonk Stats</a> — Motoko's CP2077 stats, skills, perks, and cyberware</li>
       </ul>
 """
-    out = page_shell("Ghost in the City Wiki", body, active_nav="index.html")
+    out = page_shell("Ghost in the City Wiki", body, active_nav="index.html",
+                      description=f"Fan wiki for Ghost in the City — a Cyberpunk 2077 / Ghost in the Shell crossover SI by Seras. {ch_total} chapters, {char_count} character profiles, {ss_count} community side stories.",
+                      canonical_path="index.html")
     dest = os.path.join(BUILD_DIR, "index.html")
     with open(dest, "w", encoding="utf-8") as f:
         f.write(out)
@@ -297,7 +316,9 @@ def build_chapters(summaries):
 {chr(10).join(items_html)}
       </ul>
 """
-    out = page_shell("Chapters", body, active_nav="chapters.html")
+    out = page_shell("Chapters", body, active_nav="chapters.html",
+                      description=f"Chapter-by-chapter summaries for Ghost in the City. {summarized}/{len(index)} chapters summarised with kill counts and key events.",
+                      canonical_path="chapters.html")
     dest = os.path.join(BUILD_DIR, "chapters.html")
     with open(dest, "w", encoding="utf-8") as f:
         f.write(out)
@@ -341,7 +362,9 @@ def build_braindances(braindances):
       </p>
       {cards_html}
 """
-    out = page_shell("Braindances", body, active_nav="braindances.html")
+    out = page_shell("Braindances", body, active_nav="braindances.html",
+                      description=f"Braindance catalog for Ghost in the City — every BD Motoko produces, commissions, or sells throughout the story. {len(braindances)} entries.",
+                      canonical_path="braindances.html")
     dest = os.path.join(BUILD_DIR, "braindances.html")
     with open(dest, "w", encoding="utf-8") as f:
         f.write(out)
@@ -378,7 +401,9 @@ def build_char_index(characters):
       {grid_html}
 """
     out = page_shell("Characters", body, css_path="../assets/style.css",
-                     active_nav="characters/index.html")
+                     active_nav="characters/index.html",
+                     description=f"Character profiles for Ghost in the City — bios, stats, and faction details for {len(characters)} characters from the Cyberpunk 2077 / Ghost in the Shell crossover.",
+                     canonical_path="characters/index.html")
     dest = os.path.join(CHARS_DIR, "index.html")
     with open(dest, "w", encoding="utf-8") as f:
         f.write(out)
@@ -532,8 +557,11 @@ def build_char_page(slug, char):
       </div>
       <p><a href="index.html">&#x2190; All Characters</a></p>
 """
+    char_desc = description if description else f"{name} — character profile from Ghost in the City, a Cyberpunk 2077 / Ghost in the Shell crossover."
     out = page_shell(name, body, css_path="../assets/style.css",
-                     active_nav="characters/index.html")
+                     active_nav="characters/index.html",
+                     description=char_desc,
+                     canonical_path=f"characters/{slug}.html")
     dest = os.path.join(CHARS_DIR, f"{slug}.html")
     with open(dest, "w", encoding="utf-8") as f:
         f.write(out)
@@ -560,7 +588,9 @@ def build_charsheet(characters):
       </p>
       {cp_html}
 """
-    out = page_shell("Gonk Stats", body, active_nav="charsheet.html")
+    out = page_shell("Gonk Stats", body, active_nav="charsheet.html",
+                      description="Motoko Kusanagi's Cyberpunk 2077 character sheet — attributes, skills, perks, and cyberware from Ghost in the City.",
+                      canonical_path="charsheet.html")
     dest = os.path.join(BUILD_DIR, "charsheet.html")
     with open(dest, "w", encoding="utf-8") as f:
         f.write(out)
@@ -656,7 +686,9 @@ def build_rockerboy(events):
       </p>
       {body_content}
 """
-    out = page_shell("Rockerboy", body, active_nav="rockerboy.html")
+    out = page_shell("Rockerboy", body, active_nav="rockerboy.html",
+                      description=f"Rockerboy timeline for Ghost in the City — every performance, studio session, and setlist from Motoko's music career. {len(events)} events.",
+                      canonical_path="rockerboy.html")
     dest = os.path.join(BUILD_DIR, "rockerboy.html")
     with open(dest, "w", encoding="utf-8") as f:
         f.write(out)
@@ -766,7 +798,9 @@ def build_sidestories(sidestories):
       {list_html}
 """
     out = page_shell("Tales from Jig Jig Street", body,
-                     active_nav="sidestories.html")
+                     active_nav="sidestories.html",
+                     description=f"Community side stories for Ghost in the City — {ss_count} fan-written omakes and snippets from SpaceBattles. ~{total_words:,} words total.",
+                     canonical_path="sidestories.html")
     dest = os.path.join(BUILD_DIR, "sidestories.html")
     with open(dest, "w", encoding="utf-8") as f:
         f.write(out)
@@ -791,7 +825,9 @@ def build_search():
         }
       </script>
 """
-    out = page_shell("Search", body, active_nav="")
+    out = page_shell("Search", body, active_nav="",
+                      description="Search the Ghost in the City wiki — find chapters, characters, braindances, and side stories.",
+                      canonical_path="search.html")
     dest = os.path.join(BUILD_DIR, "search.html")
     with open(dest, "w", encoding="utf-8")as f:
         f.write(out)
@@ -815,11 +851,13 @@ STATIC_PAGES = [
 
 
 def build_sitemap(characters):
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     urls = []
     for page, priority in STATIC_PAGES:
         urls.append(
             f"  <url>\n"
             f"    <loc>{SITE_BASE}/{page}</loc>\n"
+            f"    <lastmod>{today}</lastmod>\n"
             f"    <priority>{priority}</priority>\n"
             f"  </url>"
         )
@@ -827,6 +865,7 @@ def build_sitemap(characters):
         urls.append(
             f"  <url>\n"
             f"    <loc>{SITE_BASE}/characters/{slug}.html</loc>\n"
+            f"    <lastmod>{today}</lastmod>\n"
             f"    <priority>0.6</priority>\n"
             f"  </url>"
         )
@@ -840,6 +879,19 @@ def build_sitemap(characters):
     dest = os.path.join(BUILD_DIR, "sitemap.xml")
     with open(dest, "w", encoding="utf-8") as f:
         f.write(xml)
+    print(f"  Wrote {dest}")
+
+
+def build_robots():
+    content = (
+        f"User-agent: *\n"
+        f"Allow: /\n"
+        f"\n"
+        f"Sitemap: {SITE_BASE}/sitemap.xml\n"
+    )
+    dest = os.path.join(BUILD_DIR, "robots.txt")
+    with open(dest, "w", encoding="utf-8") as f:
+        f.write(content)
     print(f"  Wrote {dest}")
 
 
@@ -874,6 +926,7 @@ def main():
         build_char_page(slug, char)
 
     build_sitemap(characters)
+    build_robots()
     print("Done.")
 
 
