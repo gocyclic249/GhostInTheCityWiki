@@ -60,6 +60,13 @@ def load_sidestories():
     return load_json(SIDESTORIES_JSON, [])
 
 
+MEDIA_JSON = os.path.join(os.path.dirname(WIKI_DIR), "media_index.json")
+
+
+def load_media():
+    return load_json(MEDIA_JSON, [])
+
+
 # ── HTML helpers ───────────────────────────────────────────────────────────
 
 def e(text):
@@ -99,6 +106,7 @@ def page_shell(title, body, css_path="assets/style.css", active_nav="",
         ("braindances.html",        "Braindances"),
         ("rockerboy.html",          "Rockerboy"),
         ("sidestories.html",        "Jig Jig Street"),
+        ("photomode.html",          "Photomode"),
         ("characters/index.html",   "Characters"),
         ("charsheet.html",          "Gonk Stats"),
     ]
@@ -821,6 +829,114 @@ def build_sidestories(sidestories):
     print(f"  Wrote {dest}")
 
 
+# ── photomode.html ────────────────────────────────────────────────────────
+
+def build_photomode(media_entries):
+    if not media_entries:
+        gallery_html = '<p class="placeholder-note">[Photomode pending — run scrape_media.py to build the index]</p>'
+    else:
+        # Only show entries that have images
+        with_images = [m for m in media_entries if m.get("images")]
+
+        cards = []
+        for m in with_images:
+            title = m.get("title", "Untitled")
+            artist = m.get("artist", "Unknown")
+            date = m.get("date", "")
+            sb_url = m.get("sb_url", "")
+            context = m.get("context", "")
+            images = m.get("images", [])
+
+            if not images:
+                continue
+
+            # Use first image as the card image
+            img = images[0]
+            local_file = img.get("local_file", "")
+            img_src = f"media/{e(local_file)}" if local_file else ""
+
+            # Build additional images if more than one
+            extra_html = ""
+            if len(images) > 1:
+                extra_imgs = []
+                for extra in images[1:]:
+                    ef = extra.get("local_file", "")
+                    if ef:
+                        extra_imgs.append(
+                            f'<a href="media/{e(ef)}" target="_blank">'
+                            f'<img class="pm-extra-img" src="media/{e(ef)}" '
+                            f'loading="lazy" alt="{e(extra.get("alt_text", ""))}">'
+                            f'</a>'
+                        )
+                if extra_imgs:
+                    extra_html = (
+                        f'<div class="pm-extra-images">'
+                        + "".join(extra_imgs)
+                        + '</div>'
+                    )
+
+            link_html = (
+                f'<a href="{safe_url(sb_url)}" rel="noopener" target="_blank">'
+                f'SpaceBattles &#8599;</a>'
+                if sb_url else ""
+            )
+
+            date_html = f'<span class="pm-date">{e(date)}</span>' if date else ""
+
+            context_html = ""
+            if context and len(context) > 5:
+                # Truncate long context
+                short = context[:200] + "..." if len(context) > 200 else context
+                context_html = f'<p class="pm-context">{e(short)}</p>'
+
+            cards.append(f"""    <div class="pm-card">
+      <a href="media/{e(local_file)}" target="_blank" class="pm-img-link">
+        <img class="pm-img" src="{img_src}" loading="lazy" alt="{e(title)}">
+      </a>
+      {extra_html}
+      <div class="pm-info">
+        <span class="pm-title">{e(title)}</span>
+        <span class="pm-artist">// {e(artist)}</span>
+        {context_html}
+        <div class="pm-meta">
+          {date_html}
+          {link_html}
+        </div>
+      </div>
+    </div>""")
+
+        gallery_html = (
+            f'<div class="pm-grid">\n'
+            + "\n".join(cards)
+            + "\n</div>"
+        )
+
+    media_count = len([m for m in media_entries if m.get("images")])
+    total_images = sum(len(m.get("images", [])) for m in media_entries)
+
+    body = f"""
+      <h1 class="page-title">Photomode</h1>
+      <p>
+        Fan art, AI-generated images, and visual media from the
+        <a href="https://forums.spacebattles.com/threads/ghost-in-the-city-cyberpunk-gamer-si.1046809/"
+           rel="noopener" target="_blank">SpaceBattles thread</a>.
+        Click any image to view full size.
+      </p>
+      <p>
+        {e(str(media_count))} posts, {e(str(total_images))} images.
+      </p>
+      {gallery_html}
+"""
+    out = page_shell("Photomode", body,
+                     active_nav="photomode.html",
+                     description=f"Fan art gallery for Ghost in the City — {media_count} posts with {total_images} images from the SpaceBattles community.",
+                     canonical_path="photomode.html")
+    dest = os.path.join(BUILD_DIR, "photomode.html")
+    with open(dest, "w", encoding="utf-8") as f:
+        f.write(out)
+    print(f"  Wrote {dest}")
+
+
 # ── search.html ───────────────────────────────────────────────────────────
 
 def build_search():
@@ -859,6 +975,7 @@ STATIC_PAGES = [
     ("braindances.html",        "0.8"),
     ("rockerboy.html",          "0.8"),
     ("sidestories.html",        "0.8"),
+    ("photomode.html",          "0.8"),
     ("characters/index.html",   "0.8"),
     ("charsheet.html",          "0.7"),
 ]
@@ -918,6 +1035,7 @@ def main():
     characters  = load_characters()
     rockerboy   = load_rockerboy()
     sidestories = load_sidestories()
+    media       = load_media()
 
     threadmarks_path = os.path.join(os.path.dirname(WIKI_DIR), "threadmarks_index.json")
     if os.path.exists(threadmarks_path):
@@ -932,6 +1050,7 @@ def main():
     build_braindances(braindances)
     build_rockerboy(rockerboy)
     build_sidestories(sidestories)
+    build_photomode(media)
     build_char_index(characters)
     build_charsheet(characters)
     build_search()
