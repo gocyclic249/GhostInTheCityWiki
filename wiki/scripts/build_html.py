@@ -208,10 +208,19 @@ def build_index(summaries, characters, braindances, sidestories, ch_total):
       <p class="blackwall-credit"><a href="https://github.com/gocyclic249/GhostInTheCityWiki/issues" rel="noopener" target="_blank">Update Wiki Engram or Report Blackwall Breach</a></p>
       <p class="story-summary">
         A <em>Cyberpunk 2077 / Ghost in the Shell</em> crossover SI (Self-Insert) by
-        <strong>Seras</strong>. A gamer wakes up in Night City as Motoko Kusanagi —
-        without memories, without allies, and with a body that was purpose-built to be
-        the best netrunner in the world. {e(str(ch_total))} chapters of corpo-politics, heists, street
-        violence, and one woman clawing her way from coma patient to legend.
+        <strong>Seras</strong>. A gamer flatlines in the real world and wakes up in Night City,
+        2075 — jacked into the body of fourteen-year-old Motoko Kusanagi, stripped of chrome
+        by Scavs, fresh out of a year-long coma, and running on fumes. No eddies. No cyberware.
+        No allies except a hothead Tyger Claw brother with a katana and a death wish.
+        But the corpo gods left a gift in the wreckage: a shard labelled "Gema / Gamer" that
+        boots a full stat screen behind her Kiroshi optics. Every pushup, every kill, every gig
+        ticks the XP counter. The grind has begun.
+        {e(str(ch_total))} chapters of Motoko clawing her way from a zeroed-out nobody to Night City
+        legend — netrunner, assassin, Kensei swordswoman, founder of Section 9, and frontwoman
+        of Stand Alone Complex. Corpo heists, gang wars, Scav raids, Cyberpsycho throwdowns,
+        Tyger Claw politics, Aldecaldo barbeques, and a kill count north of {e(str(kill_count))}.
+        She'll hack your subnet, flatline your crew, write a song about it, and be home in time
+        for ramen at Cherry Blossom Market.
       </p>
 
       <div class="kill-counter-block">
