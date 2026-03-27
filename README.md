@@ -2,6 +2,8 @@
 
 Fan wiki for **Ghost in the City** by Seras — a *Cyberpunk 2077 / Ghost in the Shell* crossover SI hosted on [AO3](https://archiveofourown.org/works/42385683).
 
+[Wiki](https://ghostinthecity.neocities.org/)
+
 ---
 
 ## How to Edit Wiki Content
