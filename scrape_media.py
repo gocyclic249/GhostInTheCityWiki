@@ -10,7 +10,17 @@ Usage:
   python3 scrape_media.py --from N             # start downloading from entry N
   python3 scrape_media.py --from N --to M      # download entries N to M
   python3 scrape_media.py --redownload         # force re-download of all
+  python3 scrape_media.py --retry-empty        # re-fetch only posts with no images found
+  python3 scrape_media.py --show-manual        # list images needing manual browser download
+  python3 scrape_media.py --grab-sb            # download SB attachments via gallery-dl + cookies
   python3 scrape_media.py --status             # show index stats
+
+SB attachment downloads require gallery-dl with browser cookies:
+  1. Install: pip install gallery-dl (or use the venv at ~/.local/gallery-dl-venv/)
+  2. Export cookies from a browser where you're logged into SpaceBattles:
+     - Install a "cookies.txt" browser extension
+     - Export cookies for forums.spacebattles.com to cookies-sb.txt
+  3. Run: python3 scrape_media.py --grab-sb --cookies cookies-sb.txt
 """
 
 import urllib.request
@@ -31,6 +41,12 @@ PER_PAGE = 25
 BASE_DIR   = os.path.dirname(os.path.abspath(__file__))
 IMAGE_DIR  = os.path.join(BASE_DIR, "wiki", "build", "media")
 INDEX_PATH = os.path.join(BASE_DIR, "media_index.json")
+COOKIES_PATH = os.path.join(BASE_DIR, "cookies-sb.txt")
+
+# gallery-dl binary — check venv first, fall back to system
+GALLERY_DL = os.path.expanduser("~/.local/gallery-dl-venv/bin/gallery-dl")
+if not os.path.exists(GALLERY_DL):
+    GALLERY_DL = "gallery-dl"  # hope it's on PATH
 
 # Tavily API
 TAVILY_API_KEY = os.environ.get("TAVILY_API_KEY", "")
@@ -240,31 +256,71 @@ def is_skip_url(url):
     return False
 
 
+def _is_image_url(url):
+    """Check if a URL points to an image (by extension or known image host)."""
+    path = url.split("?")[0].split("#")[0].lower()
+    if re.search(r'\.(png|jpg|jpeg|gif|webp|svg)$', path):
+        return True
+    # Known image hosts where URLs may lack extensions
+    if re.match(r'https?://i\.imgur\.com/', url):
+        return True
+    return False
+
+
+def _add_image(images, url, alt_text=""):
+    """Add an image to the list if it's not a duplicate or skip URL."""
+    url = url.strip()
+    if is_skip_url(url):
+        return
+    # Skip SB member profile links
+    if re.search(r'forums\.spacebattles\.com/members/', url):
+        return
+    # Skip if alt text suggests it's an avatar
+    if alt_text and re.match(r'^Image \d+: \w+$', alt_text):
+        if 'avatar' in url.lower():
+            return
+    # Avoid duplicates
+    if not any(img["url"] == url for img in images):
+        images.append({"url": url, "alt_text": alt_text})
+
+
 def extract_images_from_content(text):
     """Extract image URLs from markdown content. Returns list of {url, alt_text}."""
     images = []
-    # Match ![alt](url) patterns
-    for m in re.finditer(r'!\[([^\]]*)\]\((https?://[^)]+)\)', text):
-        alt = m.group(1).strip()
-        url = m.group(2).strip()
-        if is_skip_url(url):
-            continue
-        # Skip if alt text suggests it's an avatar
-        if alt and re.match(r'^Image \d+: \w+$', alt):
-            # Could be "Image 5: Username" — check if URL is an avatar
-            if 'avatar' in url.lower():
-                continue
-        images.append({"url": url, "alt_text": alt})
 
-    # Also match plain image links like [caption](url) where URL ends in image extension
-    for m in re.finditer(r'(?<!!)\[([^\]]+)\]\((https?://[^)]+\.(?:png|jpg|jpeg|gif|webp)[^)]*)\)', text):
-        url = m.group(2).strip()
-        if is_skip_url(url):
-            continue
-        alt = m.group(1).strip()
-        # Avoid duplicates
-        if not any(img["url"] == url for img in images):
-            images.append({"url": url, "alt_text": alt})
+    # 1. Match ![alt](url) patterns (including empty alt text)
+    for m in re.finditer(r'!\[([^\]]*)\]\((https?://[^)]+)\)', text):
+        _add_image(images, m.group(2), m.group(1).strip())
+
+    # 2. Match [caption](url) where URL ends in image extension (including empty caption)
+    for m in re.finditer(r'(?<!!)\[([^\]]*)\]\((https?://[^)]+\.(?:png|jpg|jpeg|gif|webp)[^)]*)\)', text):
+        _add_image(images, m.group(2), m.group(1).strip())
+
+    # 3. Match <img> tags that Tavily may pass through from HTML
+    for m in re.finditer(r'<img[^>]+src=["\']([^"\']+)["\']', text):
+        _add_image(images, m.group(1))
+
+    # 4. Match bare image URLs on their own line or surrounded by whitespace
+    for m in re.finditer(r'(?:^|\s)(https?://[^\s<>\[\]()]+\.(?:png|jpg|jpeg|gif|webp)(?:\?[^\s<>\[\]()]*)?)(?:\s|$)', text, re.MULTILINE):
+        _add_image(images, m.group(1))
+
+    # 5. Match bare imgur URLs without file extensions (imgur serves images without .ext)
+    for m in re.finditer(r'(?:^|\s)(https?://i\.imgur\.com/\w+)(?:\s|$)', text, re.MULTILINE):
+        _add_image(images, m.group(1))
+
+    # 6. Match SB attachment URLs (extension is in the slug like "name-png.12345/")
+    for m in re.finditer(r'(https?://forums\.spacebattles\.com/attachments/[^)\s]+)', text):
+        url = m.group(1).rstrip("/")
+        # Verify it looks like an image attachment (has -png, -jpg, etc. in slug)
+        if re.search(r'-(?:png|jpg|jpeg|gif|webp)\.\d+$', url):
+            _add_image(images, url + "/")
+
+    # 7. Match [](url) empty-bracket links to any URL (catches remaining cases)
+    for m in re.finditer(r'(?<!!)\[\]\((https?://[^)]+)\)', text):
+        url = m.group(1).strip()
+        # Only add if it looks like it could be an image (not a member profile, etc.)
+        if _is_image_url(url) or 'attachments/' in url:
+            _add_image(images, url)
 
     return images
 
@@ -378,10 +434,16 @@ def extract_post_content(raw_content, post_id):
 def guess_extension(url, content_type=""):
     """Guess file extension from URL or content-type."""
     # Try URL first
-    path = url.split("?")[0].split("#")[0]
+    path = url.split("?")[0].split("#")[0].rstrip("/")
     ext_m = re.search(r'\.(png|jpg|jpeg|gif|webp|svg)$', path, re.IGNORECASE)
     if ext_m:
         ext = ext_m.group(1).lower()
+        return "jpg" if ext == "jpeg" else ext
+
+    # SB attachments: extension is in slug like "name-png.12345"
+    sb_ext = re.search(r'-(png|jpg|jpeg|gif|webp)\.\d+$', path, re.IGNORECASE)
+    if sb_ext:
+        ext = sb_ext.group(1).lower()
         return "jpg" if ext == "jpeg" else ext
 
     # Try content-type
@@ -401,9 +463,19 @@ def guess_extension(url, content_type=""):
 
 def download_image(url, filepath):
     """Download an image from a URL to a local file."""
+    # SpaceBattles attachments are behind Cloudflare — can't download directly
+    if "forums.spacebattles.com/attachments/" in url:
+        print(f"    SB attachment (Cloudflare-blocked) — needs manual download")
+        return "manual"
+
+    # Discord CDN URLs expire and return 404
+    if re.search(r'(cdn|media)\.discord(app)?\.com/', url):
+        print(f"    Discord CDN URL (expired) — skipping")
+        return False
+
     try:
         req = urllib.request.Request(url, headers={
-            "User-Agent": "Mozilla/5.0 (compatible; GhostInTheCityWiki/1.0)",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
         })
         with urllib.request.urlopen(req, timeout=30) as resp:
             content_type = resp.headers.get("Content-Type", "")
@@ -413,6 +485,14 @@ def download_image(url, filepath):
             with open(filepath, "wb") as f:
                 f.write(data)
             return True
+    except urllib.error.HTTPError as e:
+        if e.code == 403:
+            print(f"    403 Forbidden (Cloudflare?) — {url[:60]}...")
+        elif e.code == 404:
+            print(f"    404 Not Found (deleted/expired?) — {url[:60]}...")
+        else:
+            print(f"    HTTP {e.code}: {url[:60]}...")
+        return False
     except Exception as e:
         print(f"    Download failed: {e}")
         return False
@@ -420,7 +500,7 @@ def download_image(url, filepath):
 
 # ── Main download logic ───────────────────────────────────────────────────
 
-def download_media(index, start_num=1, end_num=None, redownload=False):
+def download_media(index, start_num=1, end_num=None, redownload=False, retry_empty=False):
     """Download media posts and their images."""
     os.makedirs(IMAGE_DIR, exist_ok=True)
 
@@ -429,6 +509,7 @@ def download_media(index, start_num=1, end_num=None, redownload=False):
     skipped = 0
     failed = []
     total_images = 0
+    manual_needed = []  # (entry_index, title, url, filename) tuples
 
     for entry in index[start_num - 1:]:
         i = entry["index"]
@@ -439,8 +520,19 @@ def download_media(index, start_num=1, end_num=None, redownload=False):
         sb_url = entry.get("sb_url", "")
         post_id = entry.get("post_id", "")
 
-        # Check if we already have images for this post
-        if not redownload:
+        # --retry-empty: only process entries that have no images
+        if retry_empty:
+            if entry.get("images"):
+                skipped += 1
+                continue
+            # Also skip if we already have downloaded files for this post
+            existing = [f for f in os.listdir(IMAGE_DIR)
+                        if f.startswith(f"{post_id}_")] if post_id and os.path.exists(IMAGE_DIR) else []
+            if existing:
+                skipped += 1
+                continue
+        # Normal mode: skip if we already have images downloaded
+        elif not redownload:
             existing = [f for f in os.listdir(IMAGE_DIR)
                         if f.startswith(f"{post_id}_")] if post_id and os.path.exists(IMAGE_DIR) else []
             if existing:
@@ -462,6 +554,19 @@ def download_media(index, start_num=1, end_num=None, redownload=False):
             continue
 
         extracted = extract_post_content(results[0]["raw_content"], post_id)
+
+        # Fallback: if no images found, try the direct post permalink URL.
+        # SpaceBattles renders spoilered content expanded on permalink pages.
+        if not extracted["images"] and post_id:
+            permalink = f"https://forums.spacebattles.com/posts/{post_id}/"
+            print(f"  No images on page view, trying permalink...")
+            time.sleep(DELAY)
+            perm_results = tavily_extract(permalink)
+            if perm_results:
+                perm_extracted = extract_post_content(perm_results[0]["raw_content"], post_id)
+                if perm_extracted["images"]:
+                    extracted = perm_extracted
+                    print(f"  Found {len(extracted['images'])} image(s) via permalink")
 
         # Update entry with extracted data
         entry["artist"] = extracted["author"]
@@ -488,7 +593,7 @@ def download_media(index, start_num=1, end_num=None, redownload=False):
                 continue
 
             ok = download_image(url, filepath)
-            if ok:
+            if ok is True:
                 entry["images"].append({
                     "url": url,
                     "local_file": filename,
@@ -496,6 +601,14 @@ def download_media(index, start_num=1, end_num=None, redownload=False):
                 })
                 total_images += 1
                 print(f"  Downloaded: {filename}")
+            elif ok == "manual":
+                # Record in index (without local_file) so we don't lose the URL
+                entry["images"].append({
+                    "url": url,
+                    "local_file": None,
+                    "alt_text": img["alt_text"],
+                })
+                manual_needed.append((i, title, url, filename))
             else:
                 print(f"  FAILED: {url[:80]}...")
 
@@ -509,6 +622,17 @@ def download_media(index, start_num=1, end_num=None, redownload=False):
     print(f"\nDone! {success} posts processed, {skipped} skipped, {total_images} images downloaded.")
     if failed:
         print(f"Failed entries ({len(failed)}): {failed}")
+    if manual_needed:
+        print(f"\n{'='*60}")
+        print(f"  {len(manual_needed)} image(s) need manual download")
+        print(f"  (Cloudflare-blocked SB attachments / expired Discord URLs)")
+        print(f"  Open each URL in a browser, save to wiki/build/media/")
+        print(f"{'='*60}")
+        for idx, title, url, filename in manual_needed:
+            print(f"  [{idx}] {title}")
+            print(f"       URL:  {url}")
+            print(f"       Save: wiki/build/media/{filename}")
+            print()
 
 
 # ── Utility ───────────────────────────────────────────────────────────────
@@ -527,6 +651,219 @@ def cmd_build_index():
         json.dump(entries, f, indent=2, ensure_ascii=False)
     print(f"  Saved index to {INDEX_PATH}")
     return entries
+
+
+def cmd_show_manual():
+    """Show images that need manual download (SB attachments, expired Discord)."""
+    if not os.path.exists(INDEX_PATH):
+        print("No index file found. Run without --status first to build it.")
+        return
+
+    with open(INDEX_PATH, encoding="utf-8") as f:
+        index = json.load(f)
+
+    manual = []
+    for entry in index:
+        post_id = entry.get("post_id", "")
+        for img_idx, img in enumerate(entry.get("images", []), 1):
+            url = img.get("url", "")
+            local = img.get("local_file")
+            if not local:
+                ext = guess_extension(url)
+                filename = f"{post_id}_{img_idx}.{ext}"
+                # Check if manually downloaded already
+                filepath = os.path.join(IMAGE_DIR, filename)
+                if os.path.exists(filepath):
+                    continue
+                manual.append((entry["index"], entry["title"], url, filename, entry.get("sb_url", "")))
+
+        # Also check entries with no images at all
+        if not entry.get("images"):
+            manual.append((entry["index"], entry["title"], "", "", entry.get("sb_url", "")))
+
+    if not manual:
+        print("All images are downloaded! Nothing needs manual action.")
+        return
+
+    print(f"{'='*60}")
+    print(f"  {len(manual)} image(s) need attention")
+    print(f"{'='*60}")
+    for idx, title, url, filename, sb_url in manual:
+        print(f"  [{idx}] {title}")
+        if url:
+            print(f"       URL:  {url}")
+            print(f"       Save: wiki/build/media/{filename}")
+        else:
+            print(f"       Post: {sb_url}")
+            print(f"       (no images extracted — may need manual check)")
+        print()
+
+
+def download_sb_attachment_gdl(url, filepath, cookies_path):
+    """Download a SpaceBattles attachment using gallery-dl with cookies."""
+    import subprocess
+    import tempfile
+
+    # gallery-dl config to register SB as a xenforo site
+    config = {
+        "extractor": {
+            "xenforo": {
+                "forums.spacebattles.com": {
+                    "root": "https://forums.spacebattles.com"
+                }
+            }
+        }
+    }
+
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
+        json.dump(config, f)
+        config_path = f.name
+
+    try:
+        # gallery-dl can download XenForo attachments directly
+        # Use -d to set output dir, -f to set filename format
+        cmd = [
+            GALLERY_DL,
+            "--config", config_path,
+            "--cookies", cookies_path,
+            "--directory", os.path.dirname(filepath),
+            "--filename", os.path.basename(filepath),
+            "--no-mtime",
+            url,
+        ]
+        result = subprocess.run(
+            cmd, capture_output=True, text=True, timeout=60,
+        )
+        if result.returncode == 0 and os.path.exists(filepath):
+            return True
+        # gallery-dl might not support bare attachment URLs —
+        # in that case, try using requests from its venv with cookies
+        return download_sb_with_cookies(url, filepath, cookies_path)
+    except FileNotFoundError:
+        print(f"    gallery-dl not found at {GALLERY_DL}")
+        return False
+    except Exception as e:
+        print(f"    gallery-dl error: {e}")
+        return False
+    finally:
+        os.unlink(config_path)
+
+
+def download_sb_with_cookies(url, filepath, cookies_path):
+    """Download an SB attachment using cookies from a Netscape cookie file."""
+    # Parse Netscape cookie file for SB cookies
+    cookies = {}
+    try:
+        with open(cookies_path) as f:
+            for line in f:
+                line = line.strip()
+                if not line or line.startswith("#"):
+                    continue
+                parts = line.split("\t")
+                if len(parts) >= 7 and "spacebattles" in parts[0]:
+                    cookies[parts[5]] = parts[6]
+    except FileNotFoundError:
+        print(f"    Cookie file not found: {cookies_path}")
+        return False
+
+    if not cookies:
+        print(f"    No SpaceBattles cookies found in {cookies_path}")
+        return False
+
+    cookie_header = "; ".join(f"{k}={v}" for k, v in cookies.items())
+    try:
+        req = urllib.request.Request(url, headers={
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+            "Cookie": cookie_header,
+            "Referer": "https://forums.spacebattles.com/",
+        })
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            ct = resp.headers.get("Content-Type", "")
+            data = resp.read()
+            if len(data) < 100:
+                return False
+            if "text/html" in ct:
+                # Got a login page, not an image — cookies may be expired
+                print(f"    Got HTML instead of image — cookies may be expired")
+                return False
+            with open(filepath, "wb") as f:
+                f.write(data)
+            return True
+    except urllib.error.HTTPError as e:
+        print(f"    HTTP {e.code} even with cookies — {url[:60]}...")
+        return False
+    except Exception as e:
+        print(f"    Download with cookies failed: {e}")
+        return False
+
+
+def cmd_grab_sb(cookies_path=None):
+    """Download SB attachment images using gallery-dl + cookies."""
+    if not cookies_path:
+        cookies_path = COOKIES_PATH
+
+    if not os.path.exists(cookies_path):
+        print(f"Cookie file not found: {cookies_path}")
+        print(f"Export your SpaceBattles cookies to this file using a browser extension.")
+        print(f"  Recommended: 'cookies.txt' extension for Chrome/Firefox")
+        print(f"  Save as: {cookies_path}")
+        return
+
+    if not os.path.exists(INDEX_PATH):
+        print("No index file found. Run the scraper first to build it.")
+        return
+
+    with open(INDEX_PATH, encoding="utf-8") as f:
+        index = json.load(f)
+
+    os.makedirs(IMAGE_DIR, exist_ok=True)
+
+    # Find SB attachment images that need downloading
+    sb_images = []
+    for entry in index:
+        post_id = entry.get("post_id", "")
+        for img_idx, img in enumerate(entry.get("images", []), 1):
+            url = img.get("url", "")
+            if "forums.spacebattles.com/attachments/" not in url:
+                continue
+            local = img.get("local_file")
+            ext = guess_extension(url)
+            filename = f"{post_id}_{img_idx}.{ext}"
+            filepath = os.path.join(IMAGE_DIR, filename)
+            # Skip if already downloaded (check by filename or local_file)
+            if local and os.path.exists(os.path.join(IMAGE_DIR, local)):
+                continue
+            if os.path.exists(filepath):
+                continue
+            sb_images.append((entry, img_idx, img, url, filename, filepath))
+
+    if not sb_images:
+        print("No SB attachments need downloading.")
+        return
+
+    print(f"Found {len(sb_images)} SB attachment(s) to download")
+    success = 0
+    failed = 0
+
+    for entry, img_idx, img, url, filename, filepath in sb_images:
+        title = entry.get("title", "")
+        print(f"  [{entry['index']}] {title} — {filename}")
+
+        ok = download_sb_with_cookies(url, filepath, cookies_path)
+        if ok:
+            img["local_file"] = filename
+            success += 1
+            print(f"    OK: {filename}")
+        else:
+            failed += 1
+
+    # Save updated index
+    with open(INDEX_PATH, "w", encoding="utf-8") as f:
+        json.dump(index, f, indent=2, ensure_ascii=False)
+
+    print(f"\nDone! {success} downloaded, {failed} failed.")
+    if failed:
+        print("Failed downloads may have expired cookies. Re-export and try again.")
 
 
 def cmd_status():
@@ -552,18 +889,25 @@ def cmd_status():
         downloaded = len(post_ids)
 
     with_images = sum(1 for e in index if e.get("images"))
+    manual = sum(1 for e in index for img in e.get("images", []) if not img.get("local_file"))
+    empty = sum(1 for e in index if not e.get("images"))
 
     print("=" * 60)
     print("  GHOST IN THE CITY — MEDIA STATUS")
     print("=" * 60)
     print(f"  Media posts in index:   {len(index)}")
     print(f"  Posts with image data:  {with_images}")
+    print(f"  Posts with no images:   {empty}")
     print(f"  Images downloaded:      {total_images}")
     print(f"  Unique posts downloaded:{downloaded}")
+    if manual:
+        print(f"  Need manual download:   {manual}")
     print("=" * 60)
+    if manual or empty:
+        print("  Run --show-manual for details")
 
 
-def cmd_download(start_num=1, end_num=None, redownload=False):
+def cmd_download(start_num=1, end_num=None, redownload=False, retry_empty=False):
     if os.path.exists(INDEX_PATH):
         with open(INDEX_PATH, encoding="utf-8") as f:
             index = json.load(f)
@@ -573,8 +917,11 @@ def cmd_download(start_num=1, end_num=None, redownload=False):
 
     with_urls = sum(1 for e in index if e.get("sb_url"))
     print(f"  {with_urls}/{len(index)} entries have direct URLs")
+    if retry_empty:
+        empty = sum(1 for e in index if not e.get("images"))
+        print(f"  {empty} entries have no images — retrying those")
 
-    download_media(index, start_num, end_num, redownload)
+    download_media(index, start_num, end_num, redownload, retry_empty)
 
 
 # ── Entry point ───────────────────────────────────────────────────────────
@@ -590,11 +937,25 @@ def main():
         cmd_status()
         return
 
+    if "--show-manual" in args:
+        cmd_show_manual()
+        return
+
+    if "--grab-sb" in args:
+        cookies = COOKIES_PATH
+        if "--cookies" in args:
+            ci = args.index("--cookies")
+            if ci + 1 < len(args):
+                cookies = args[ci + 1]
+        cmd_grab_sb(cookies)
+        return
+
     if "--index-only" in args:
         cmd_build_index()
         return
 
     redownload = "--redownload" in args
+    retry_empty = "--retry-empty" in args
 
     start_num = 1
     if "--from" in args:
@@ -608,7 +969,8 @@ def main():
         if idx + 1 < len(args):
             end_num = int(args[idx + 1])
 
-    cmd_download(start_num=start_num, end_num=end_num, redownload=redownload)
+    cmd_download(start_num=start_num, end_num=end_num, redownload=redownload,
+                 retry_empty=retry_empty)
 
 
 if __name__ == "__main__":

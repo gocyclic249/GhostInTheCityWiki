@@ -812,16 +812,21 @@ def build_photomode(media_entries):
             if not images:
                 continue
 
+            # Filter to images that have been downloaded locally
+            local_images = [img for img in images if img.get("local_file")]
+            if not local_images:
+                continue
+
             # Use first image as the card image
-            img = images[0]
+            img = local_images[0]
             local_file = img.get("local_file", "")
-            img_src = f"media/{e(local_file)}" if local_file else ""
+            img_src = f"media/{e(local_file)}"
 
             # Build additional images if more than one
             extra_html = ""
-            if len(images) > 1:
+            if len(local_images) > 1:
                 extra_imgs = []
-                for extra in images[1:]:
+                for extra in local_images[1:]:
                     ef = extra.get("local_file", "")
                     if ef:
                         extra_imgs.append(
