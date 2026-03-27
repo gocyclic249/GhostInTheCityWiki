@@ -14,7 +14,6 @@ Usage:
 """
 
 import urllib.request
-import urllib.error
 import html.parser
 import re
 import os
@@ -34,57 +33,12 @@ BASE_DIR   = os.path.dirname(os.path.abspath(__file__))
 OUTPUT_DIR = os.path.join(BASE_DIR, "sidestories")
 INDEX_PATH = os.path.join(BASE_DIR, "sidestories_index.json")
 
-# Tavily API — used to bypass Cloudflare on SpaceBattles
-TAVILY_API_KEY = os.environ.get("TAVILY_API_KEY", "")
-if not TAVILY_API_KEY:
-    print("ERROR: TAVILY_API_KEY environment variable is required.")
-    print("  Set it with: export TAVILY_API_KEY=your-key-here")
-    sys.exit(1)
-TAVILY_EXTRACT_URL = "https://api.tavily.com/extract"
+from lib.tavily_utils import tavily_extract, get_tavily_key
+
+# Validate key on startup
+get_tavily_key()
 
 DELAY = 1.0  # seconds between Tavily API calls
-
-
-# ── Tavily fetch helper ───────────────────────────────────────────────────
-
-def tavily_extract(urls, extract_depth="advanced"):
-    """Fetch one or more URLs via Tavily Extract API. Returns list of {url, raw_content}."""
-    if isinstance(urls, str):
-        urls = [urls]
-
-    payload = json.dumps({
-        "api_key": TAVILY_API_KEY,
-        "urls": urls,
-        "extract_depth": extract_depth,
-    }).encode("utf-8")
-
-    req = urllib.request.Request(
-        TAVILY_EXTRACT_URL,
-        data=payload,
-        headers={"Content-Type": "application/json"},
-        method="POST",
-    )
-
-    for attempt in range(3):
-        try:
-            with urllib.request.urlopen(req, timeout=60) as resp:
-                data = json.loads(resp.read().decode("utf-8"))
-                results = data.get("results", [])
-                return [
-                    {"url": r.get("url", ""), "raw_content": r.get("raw_content", "")}
-                    for r in results
-                ]
-        except urllib.error.HTTPError as e:
-            body = e.read().decode("utf-8", errors="replace") if e.fp else ""
-            print(f"  Tavily HTTP {e.code}, attempt {attempt+1}: {body[:200]}")
-            if e.code == 429:
-                time.sleep(30 * (attempt + 1))
-            else:
-                time.sleep(5)
-        except Exception as e:
-            print(f"  Tavily error: {e}, attempt {attempt+1}")
-            time.sleep(5)
-    return []
 
 
 # ── Index building ────────────────────────────────────────────────────────

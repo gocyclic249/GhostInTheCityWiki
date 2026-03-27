@@ -4,44 +4,16 @@ index but no local_file. Uses Selenium to navigate directly to each image URL.""
 
 import json
 import os
-import re
-import sys
 import time
-import base64
 
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
+
+from lib.selenium_utils import create_driver
+from lib.image_utils import guess_extension, download_via_canvas, download_via_fetch, save_image
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 IMAGE_DIR = os.path.join(BASE_DIR, "wiki", "build", "media")
 INDEX_PATH = os.path.join(BASE_DIR, "media_index.json")
-CHROMEDRIVER = "/snap/chromium/3390/usr/lib/chromium-browser/chromedriver"
-
-
-def guess_extension(url):
-    path = url.split("?")[0].split("#")[0].rstrip("/")
-    ext_m = re.search(r'\.(png|jpg|jpeg|gif|webp|svg)$', path, re.IGNORECASE)
-    if ext_m:
-        ext = ext_m.group(1).lower()
-        return "jpg" if ext == "jpeg" else ext
-    return "png"
-
-
-def create_driver():
-    opts = Options()
-    opts.binary_location = "/snap/bin/chromium"
-    opts.add_argument("--no-sandbox")
-    opts.add_argument("--disable-dev-shm-usage")
-    opts.add_argument("--disable-gpu")
-    opts.add_argument("--window-size=1920,1080")
-    opts.add_argument("--remote-debugging-port=9223")
-    opts.add_argument("--user-data-dir=/tmp/chrome-external-profile")
-    service = Service(executable_path=CHROMEDRIVER)
-    driver = webdriver.Chrome(service=service, options=opts)
-    driver.set_page_load_timeout(30)
-    return driver
 
 
 def download_image(driver, url, filepath):
@@ -53,67 +25,21 @@ def download_image(driver, url, filepath):
         # Try to get the image via canvas
         try:
             img = driver.find_element(By.TAG_NAME, "img")
-            nat_w = driver.execute_script("return arguments[0].naturalWidth;", img)
-            nat_h = driver.execute_script("return arguments[0].naturalHeight;", img)
-            if nat_w and nat_h and nat_w > 10 and nat_h > 10:
-                script = """
-                var img = arguments[0];
-                var canvas = document.createElement('canvas');
-                canvas.width = img.naturalWidth;
-                canvas.height = img.naturalHeight;
-                var ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0);
-                return canvas.toDataURL('image/png');
-                """
-                result = driver.execute_script(script, img)
-                if result and result.startswith("data:"):
-                    b64_data = result.split(",", 1)[1]
-                    data = base64.b64decode(b64_data)
-                    if len(data) > 500:
-                        # Force .png extension since canvas outputs PNG
-                        fp = os.path.splitext(filepath)[0] + ".png"
-                        os.makedirs(os.path.dirname(fp), exist_ok=True)
-                        with open(fp, "wb") as f:
-                            f.write(data)
-                        print(f"  Saved via canvas: {os.path.basename(fp)} ({len(data)} bytes)")
-                        return os.path.basename(fp)
-        except Exception as e:
+            data = download_via_canvas(driver, img)
+            if data:
+                fp = os.path.splitext(filepath)[0] + ".png"
+                save_image(data, fp)
+                print(f"  Saved via canvas: {os.path.basename(fp)} ({len(data)} bytes)")
+                return os.path.basename(fp)
+        except Exception:
             pass
 
         # Try fetch from same origin
-        try:
-            script = """
-            var callback = arguments[arguments.length - 1];
-            fetch(arguments[0])
-                .then(function(r) {
-                    if (!r.ok) { callback('ERROR:HTTP_' + r.status); return; }
-                    return r.arrayBuffer();
-                })
-                .then(function(buf) {
-                    if (!buf) return;
-                    var bytes = new Uint8Array(buf);
-                    var binary = '';
-                    var cs = 8192;
-                    for (var i = 0; i < bytes.length; i += cs) {
-                        var s = bytes.subarray(i, Math.min(i + cs, bytes.length));
-                        binary += String.fromCharCode.apply(null, s);
-                    }
-                    callback('OK:' + btoa(binary));
-                })
-                .catch(function(e) { callback('ERROR:' + e.toString()); });
-            """
-            driver.set_script_timeout(30)
-            result = driver.execute_async_script(script, url)
-            if result and isinstance(result, str) and result.startswith("OK:"):
-                data = base64.b64decode(result[3:])
-                if len(data) > 500:
-                    os.makedirs(os.path.dirname(filepath), exist_ok=True)
-                    with open(filepath, "wb") as f:
-                        f.write(data)
-                    print(f"  Saved via fetch: {os.path.basename(filepath)} ({len(data)} bytes)")
-                    return os.path.basename(filepath)
-        except Exception:
-            pass
+        data = download_via_fetch(driver, url)
+        if data and len(data) > 500:
+            save_image(data, filepath)
+            print(f"  Saved via fetch: {os.path.basename(filepath)} ({len(data)} bytes)")
+            return os.path.basename(filepath)
 
         print(f"  Failed to download")
         return None
@@ -126,7 +52,6 @@ def main():
     with open(INDEX_PATH, encoding="utf-8") as f:
         index = json.load(f)
 
-    # Find entries with URLs but no local file
     jobs = []
     for entry in index:
         post_id = entry.get("post_id", "")
@@ -134,7 +59,6 @@ def main():
             url = img.get("url", "")
             local = img.get("local_file")
             if url and not local:
-                # Skip SB attachments (handled by main script)
                 if "forums.spacebattles.com/attachments/" in url:
                     continue
                 ext = guess_extension(url)
@@ -150,7 +74,7 @@ def main():
         return
 
     print(f"Downloading {len(jobs)} external image(s)...")
-    driver = create_driver()
+    driver = create_driver(remote_debug_port=9223, user_data_suffix="external")
     success = 0
 
     try:

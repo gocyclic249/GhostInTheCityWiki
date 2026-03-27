@@ -48,65 +48,13 @@ GALLERY_DL = os.path.expanduser("~/.local/gallery-dl-venv/bin/gallery-dl")
 if not os.path.exists(GALLERY_DL):
     GALLERY_DL = "gallery-dl"  # hope it's on PATH
 
-# Tavily API
-TAVILY_API_KEY = os.environ.get("TAVILY_API_KEY", "")
-if not TAVILY_API_KEY:
-    print("ERROR: TAVILY_API_KEY environment variable is required.")
-    print("  Set it with: export TAVILY_API_KEY=your-key-here")
-    sys.exit(1)
-TAVILY_EXTRACT_URL = "https://api.tavily.com/extract"
+from lib.tavily_utils import tavily_extract, get_tavily_key
+from lib.image_utils import is_skip_url
+
+# Validate key on startup
+get_tavily_key()
 
 DELAY = 1.0
-
-# URLs to skip (avatars, forum UI, etc.)
-SKIP_URL_PATTERNS = [
-    r'forums\.spacebattles\.com/data/avatar/',
-    r'forums\.spacebattles\.com/styles/',
-    r'forums\.spacebattles\.com/data/assets/',
-    r'smilies/',
-]
-
-
-# ── Tavily fetch helper ───────────────────────────────────────────────────
-
-def tavily_extract(urls, extract_depth="advanced"):
-    """Fetch one or more URLs via Tavily Extract API."""
-    if isinstance(urls, str):
-        urls = [urls]
-
-    payload = json.dumps({
-        "api_key": TAVILY_API_KEY,
-        "urls": urls,
-        "extract_depth": extract_depth,
-    }).encode("utf-8")
-
-    req = urllib.request.Request(
-        TAVILY_EXTRACT_URL,
-        data=payload,
-        headers={"Content-Type": "application/json"},
-        method="POST",
-    )
-
-    for attempt in range(3):
-        try:
-            with urllib.request.urlopen(req, timeout=60) as resp:
-                data = json.loads(resp.read().decode("utf-8"))
-                results = data.get("results", [])
-                return [
-                    {"url": r.get("url", ""), "raw_content": r.get("raw_content", "")}
-                    for r in results
-                ]
-        except urllib.error.HTTPError as e:
-            body = e.read().decode("utf-8", errors="replace") if e.fp else ""
-            print(f"  Tavily HTTP {e.code}, attempt {attempt+1}: {body[:200]}")
-            if e.code == 429:
-                time.sleep(30 * (attempt + 1))
-            else:
-                time.sleep(5)
-        except Exception as e:
-            print(f"  Tavily error: {e}, attempt {attempt+1}")
-            time.sleep(5)
-    return []
 
 
 # ── Index building ────────────────────────────────────────────────────────
@@ -247,13 +195,6 @@ def fetch_threadmark_index():
 
 
 # ── Post content extraction ───────────────────────────────────────────────
-
-def is_skip_url(url):
-    """Check if URL should be skipped (avatars, smilies, etc.)."""
-    for pattern in SKIP_URL_PATTERNS:
-        if re.search(pattern, url):
-            return True
-    return False
 
 
 def _is_image_url(url):
