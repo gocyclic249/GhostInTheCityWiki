@@ -1,8 +1,0 @@
-# See what happens!
-
-*Source: https://forums.spacebattles.com/threads/ghost-in-the-city-cyberpunk-gamer-si.1046809/page-1824#post-100903633*
-*Words: ~310*
-
----
-
-[O](https://forums.spacebattles.com/members/orc-personal-trainer.424756/)
