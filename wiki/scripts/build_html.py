@@ -762,9 +762,13 @@ def build_sidestories(sidestories):
 
             date_html = f'<span class="ss-date">{e(date)}</span>' if date else ""
 
+            author  = ss.get("author", "")
+            author_html = f'<span class="ss-author">by {e(author)}</span>' if author else ""
+
             items.append(f"""      <li class="ss-entry">
         <span class="ss-num">{e(str(idx).zfill(3))}</span>
         <span class="ss-title">{e(title)}</span>
+        {author_html}
         {wc_html}
         {date_html}
         {link_html}

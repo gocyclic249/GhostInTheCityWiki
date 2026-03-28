@@ -89,7 +89,7 @@ def main():
         # 2. Sidestory threadmarks from SpaceBattles (index only — no downloads)
         run_script(
             "Scraping sidestory index from SpaceBattles",
-            [sys.executable, os.path.join(BASE_DIR, "scrape_sidestories.py"), "--index-only"]
+            [sys.executable, os.path.join(BASE_DIR, "scrape_sidestories.py")]
         )
 
         # 3. Media threadmarks + images from SpaceBattles
