@@ -253,7 +253,7 @@ def build_index(summaries, characters, braindances, sidestories, ch_total):
 """
     out = page_shell("Ghost in the City Wiki", body, active_nav="index.html",
                       description=f"Fan wiki for Ghost in the City — a Cyberpunk 2077 / Ghost in the Shell crossover SI by Seras. {ch_total} chapters, {char_count} character profiles, {ss_count} community side stories.",
-                      canonical_path="index.html")
+                      canonical_path="")
     dest = os.path.join(BUILD_DIR, "index.html")
     with open(dest, "w", encoding="utf-8") as f:
         f.write(out)
@@ -394,28 +394,70 @@ def build_braindances(braindances):
 
 # ── characters/index.html ──────────────────────────────────────────────────
 
-def build_char_index(characters):
-    if not characters:
-        grid_html = '<p class="placeholder-note">[Character profiles pending — no entries in cache yet]</p>'
-    else:
-        cards = []
-        for slug, char in characters.items():
-            name        = char.get("name", slug)
-            role        = char.get("role", "")
-            affil       = char.get("affiliation", "")
-            description = char.get("description", "")
-            icon        = char.get("icon", "&#x25A0;")
-            status      = char.get("status", "Unknown")
+def _build_char_cards(characters, category):
+    """Build card HTML for characters matching the given category."""
+    cards = []
+    for slug, char in characters.items():
+        if char.get("category", "story") != category:
+            continue
+        if slug == "motoko":
+            continue
+        name        = char.get("name", slug)
+        role        = char.get("role", "")
+        affil       = char.get("affiliation", "")
+        description = char.get("description", "")
+        icon        = char.get("icon", "&#x25A0;")
+        status      = char.get("status", "Unknown")
 
-            cards.append(f"""    <a class="char-card" href="{e(slug)}.html">
+        cards.append(f"""    <a class="char-card" href="{e(slug)}.html">
       <span class="char-icon">{icon}</span>
       <span class="char-name">{e(name)}</span>
       <span class="char-role">{e(role)}</span>
       <span class="char-affil">{e(affil)}</span>
       <span class="char-bio-excerpt">{e(description)}</span>
     </a>""")
+    return cards
 
-        grid_html = '<div class="char-grid">\n' + "\n".join(cards) + "\n</div>"
+
+def build_char_index(characters):
+    if not characters:
+        grid_html = '<p class="placeholder-note">[Character profiles pending — no entries in cache yet]</p>'
+    else:
+        # Motoko gets her own card at the top
+        motoko = characters.get("motoko")
+        motoko_html = ""
+        if motoko:
+            motoko_html = f"""<div class="char-grid">
+    <a class="char-card" href="motoko.html">
+      <span class="char-icon">{motoko.get("icon", "&#x25A0;")}</span>
+      <span class="char-name">{e(motoko.get("name", "Motoko"))}</span>
+      <span class="char-role">{e(motoko.get("role", ""))}</span>
+      <span class="char-affil">{e(motoko.get("affiliation", ""))}</span>
+      <span class="char-bio-excerpt">{e(motoko.get("description", ""))}</span>
+    </a>
+</div>"""
+
+        # Story-original characters
+        story_cards = _build_char_cards(characters, "story")
+        story_html = ""
+        if story_cards:
+            story_html = (
+                '<h2 class="char-section-heading">// Story Characters</h2>\n'
+                '<div class="char-grid">\n' + "\n".join(story_cards) + "\n</div>"
+            )
+
+        # Canon CP2077 / Edgerunners characters
+        canon_cards = _build_char_cards(characters, "canon")
+        canon_html = ""
+        if canon_cards:
+            canon_html = (
+                '<h2 class="char-section-heading">// Cyberpunk 2077 &amp; Edgerunners</h2>\n'
+                '<p class="canon-note">Canon characters from the game and anime. '
+                'Bios cover their role in this fanfic only.</p>\n'
+                '<div class="char-grid">\n' + "\n".join(canon_cards) + "\n</div>"
+            )
+
+        grid_html = motoko_html + "\n" + story_html + "\n" + canon_html
 
     body = f"""
       <h1 class="page-title">Characters</h1>
@@ -424,7 +466,7 @@ def build_char_index(characters):
     out = page_shell("Characters", body, css_path="../assets/style.css",
                      active_nav="characters/index.html",
                      description=f"Character profiles for Ghost in the City — bios, stats, and faction details for {len(characters)} characters from the Cyberpunk 2077 / Ghost in the Shell crossover.",
-                     canonical_path="characters/index.html")
+                     canonical_path="characters/")
     dest = os.path.join(CHARS_DIR, "index.html")
     with open(dest, "w", encoding="utf-8") as f:
         f.write(out)
@@ -956,13 +998,13 @@ SITE_BASE = "https://ghostinthecity.neocities.org"
 
 # Pages listed in priority order — character pages are added dynamically
 STATIC_PAGES = [
-    ("index.html",              "1.0"),
+    ("",                        "1.0"),
     ("chapters.html",           "0.9"),
     ("braindances.html",        "0.8"),
     ("rockerboy.html",          "0.8"),
     ("sidestories.html",        "0.8"),
     ("photomode.html",          "0.8"),
-    ("characters/index.html",   "0.8"),
+    ("characters/",             "0.8"),
     ("charsheet.html",          "0.7"),
 ]
 

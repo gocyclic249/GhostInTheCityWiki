@@ -433,6 +433,25 @@ nav a:hover, nav a.active {
   overflow: hidden;
 }
 
+/* ── Character section headings ── */
+.char-section-heading {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 1rem;
+  color: var(--accent-cyan);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin: 2.5rem 0 0.25rem;
+  padding: 0;
+  border: none;
+}
+
+.canon-note {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  font-style: italic;
+  margin: 0 0 0.5rem;
+}
+
 /* ── Character description tagline ── */
 .char-description {
   font-family: 'Share Tech Mono', monospace;

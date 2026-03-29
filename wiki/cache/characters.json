@@ -1,12 +1,13 @@
 {
   "motoko": {
     "name": "Motoko Kusanagi",
+    "category": "story",
     "role": "Netrunner / Assassin",
     "faction": "Section 9",
     "affiliation": "Independent",
     "status": "Active",
     "first_chapter": 1,
-    "icon": "&#x2620;",
+    "icon": "&#x2920;",
     "description": "A gamer from our world reborn in Night City's deadliest body. Founder of Section 9. Kensei swordswoman, master netrunner, and assassin with a kill count that keeps climbing.",
     "physical_description": "Petite and deceptively slight — the body she woke up in was fourteen years old and fresh out of a coma, stripped of cyberware by Scavs. She rebuilt it into something else entirely through obsessive physical grinding. Her hair is dyed purple and cut short: cropped at the nape with long front bangs swept to the side, modelled after the Major from Ghost in the Shell and worn as a deliberate statement. Her eyes are yellow Kiroshi optics — installed early on — capable of seeing in near-darkness, reading net code at a glance, and registering her face as a blur on surveillance. Both arms are chrome, a constant presence in how she moves and fights. By the story's midpoint she carries visible muscle that has no business being on a frame that small.",
     "bio": [
@@ -161,23 +162,9 @@
       ]
     }
   },
-  "jun": {
-    "name": "Junichiro Kusanagi",
-    "role": "Enforcer",
-    "faction": "Tyger Claws",
-    "affiliation": "Tyger Claws",
-    "status": "Active",
-    "first_chapter": 1,
-    "icon": "&#x2694;",
-    "description": "Hot-headed Tyger Claw enforcer and Motoko's self-appointed older brother. Gave her first weapons, first connections, and first cover story — and is usually the last to know what she's actually doing.",
-    "physical_description": "Tall and lanky with the kind of reach that wins fights before they start — Motoko calls them his 'stupid long teenage boy arms' more than once. His hair is a vivid red-orange, worn in a swoopy style that collapses into a mess after a nap. He has progressively replaced most of his body with cyberware across the story: both arms went first after the Maelstrom retribution raid, then chrome legs and subdermal armor plating, until there is more machine than flesh left. He carries an Arasaka katana on his back. The accumulating chrome is a running source of tension — it is also what is slowly pulling him toward cyberpsychosis.",
-    "bio": [
-      "Hot-headed Tyger Claw enforcer who took Motoko in after her rescue, presenting himself as her older brother. Brought her to a cramped Japantown apartment, supplied her first weapons — a Unity handgun and a combat knife — and introduced her to the TC underground shooting range. His connections inside the Tyger Claws gave Motoko her earliest foothold in Night City.",
-      "Fiercely protective and often the last to find out about Motoko's more dangerous operations, Jun occupies an awkward position: loyal to the TCs by career but loyal to Motoko above everything else. The sibling dynamic is genuine even if the blood relation is not, and it creates ongoing tension as Motoko's reputation grows far beyond anything he can quietly cover for."
-    ]
-  },
   "hiromi": {
     "name": "Hiromi",
+    "category": "story",
     "role": "Manager / Fixer",
     "faction": "Section 9",
     "affiliation": "Independent",
@@ -191,8 +178,25 @@
       "Despite her reckless energy, Hiromi's Arasaka bloodline occasionally surfaces in unsettling ways — her mother met Motoko after the Gonzales incident, coldly approved of her willingness to kill to protect her daughter, and transferred 5,000 eddies without a word. Hiromi is among the first to join Section 9 and evolves into its operational backbone: she builds a BD distribution empire through Nox, David Martinez, and the Straight Lane Shooters, manages Stand Alone Complex's music career, handles all negotiations with MSM Records, and closes the deal that gets the band signed — all while never losing the mohawk or the street energy."
     ]
   },
+  "jun": {
+    "name": "Junichiro Kusanagi",
+    "category": "story",
+    "role": "Enforcer",
+    "faction": "Tyger Claws",
+    "affiliation": "Tyger Claws",
+    "status": "Active",
+    "first_chapter": 1,
+    "icon": "&#x2694;",
+    "description": "Hot-headed Tyger Claw enforcer and Motoko's self-appointed older brother. Gave her first weapons, first connections, and first cover story — and is usually the last to know what she's actually doing.",
+    "physical_description": "Tall and lanky with the kind of reach that wins fights before they start — Motoko calls them his 'stupid long teenage boy arms' more than once. His hair is a vivid red-orange, worn in a swoopy style that collapses into a mess after a nap. He has progressively replaced most of his body with cyberware across the story: both arms went first after the Maelstrom retribution raid, then chrome legs and subdermal armor plating, until there is more machine than flesh left. He carries an Arasaka katana on his back. The accumulating chrome is a running source of tension — it is also what is slowly pulling him toward cyberpsychosis.",
+    "bio": [
+      "Hot-headed Tyger Claw enforcer who took Motoko in after her rescue, presenting himself as her older brother. Brought her to a cramped Japantown apartment, supplied her first weapons — a Unity handgun and a combat knife — and introduced her to the TC underground shooting range. His connections inside the Tyger Claws gave Motoko her earliest foothold in Night City.",
+      "Fiercely protective and often the last to find out about Motoko's more dangerous operations, Jun occupies an awkward position: loyal to the TCs by career but loyal to Motoko above everything else. The sibling dynamic is genuine even if the blood relation is not, and it creates ongoing tension as Motoko's reputation grows far beyond anything he can quietly cover for."
+    ]
+  },
   "malcolm": {
     "name": "Malcolm",
+    "category": "story",
     "role": "Gunner / Crew",
     "faction": "Section 9",
     "affiliation": "Independent",
@@ -208,6 +212,7 @@
   },
   "ichi": {
     "name": "Ichi",
+    "category": "story",
     "role": "Tactician / Crew",
     "faction": "Section 9",
     "affiliation": "Independent",
@@ -221,38 +226,25 @@
       "Present from the earliest gigs through the final chapter, Ichi is one of the crew's most reliable constants. He's not flashy about it — by Chapter 240 he's secretly been using the Minotaur combat bot for practice in his own time and broke its ankle joint without telling anyone."
     ]
   },
-  "omaeda": {
-    "name": "Omaeda",
-    "role": "Netrunner",
-    "faction": "Kabuki Crew",
-    "affiliation": "Independent",
-    "status": "Unknown",
-    "first_chapter": 3,
-    "icon": "&#x25C6;",
-    "description": "The netrunner of Hiromi's original Kabuki crew. Present for the early gigs and the H2 loot run, then quietly faded from the story as the crew evolved into something else entirely.",
-    "physical_description": "The story introduces him in one word: chunky. That is the only physical descriptor he ever gets. He is a netrunner, so presumably some basic chrome — a cyberdeck port, maybe cheap optics — but nothing in the narrative ever pauses long enough to describe him properly. He fades before the prose ever gets around to it.",
+  "fujimura": {
+    "name": "Fujimura",
+    "category": "story",
+    "role": "Tyger Claw Lieutenant / Kamikaze Commander",
+    "faction": "Tyger Claws",
+    "affiliation": "Tyger Claws",
+    "status": "Active",
+    "first_chapter": 26,
+    "icon": "&#x2623;",
+    "description": "More chrome than flesh, more authority than patience. Kamikaze unit commander, Jun's superior, and the man who backhanded Motoko across the face and lived to regret the look she gave him.",
+    "physical_description": "Heavily borged to the point where flesh is the minority opinion. A blazing multicolored cybereye dominates one side of his face. His voice carries a robotic edge from vocal chrome. Despite the bulk of military-grade cyberware, he moves with the deliberate precision of someone who chose every piece of chrome for function, not style. Plays piano at his underground bar in Little China, which is the only time anyone sees him do something that isn't terrifying.",
     "bio": [
-      "The netrunner of Hiromi's original Ho-Oh club crew — the fourth member of the small Kabuki gang Motoko met on her first night out. Introduced alongside Ichi and Malcolm as part of the regular set that ran low-level gigs in Kabuki and Japantown. He was present for the early Gonzales incident and arrived with the rest of the crew to haul crates from the H2 Megabuilding scav den after Motoko cleared it.",
-      "After that point the story stops mentioning him. He was never written out, never killed on-page — the narrative simply moved on as the crew shifted toward higher-risk operations and Section 9 began to take shape. Somewhere in Night City, presumably, a slightly chunky netrunner is still running gigs and not entirely sure what became of the people he used to work with."
-    ]
-  },
-  "sam": {
-    "name": "Sam",
-    "role": "Crew Member",
-    "faction": "Kabuki Crew",
-    "affiliation": "Independent",
-    "status": "Deceased",
-    "first_chapter": "?",
-    "icon": "&#x25A1;",
-    "description": "A crew member who died in a Maelstrom drive-by ambush while Malcolm watched. Present somewhere in the early chapters, gone before the story names the loss.",
-    "physical_description": "The story never describes Sam's appearance. He exists only as an absence — the reason Malcolm went home and didn't leave for a long time.",
-    "bio": [
-      "A member of the original Kabuki crew who died in a Maelstrom drive-by ambush sometime during the gang war arc. Malcolm witnessed it — watched him bleed out in the back of a car — and the trauma sent him home for an extended period. He didn't leave his apartment until Motoko came to get him.",
-      "Sam never gets a scene of his own in the story. He is referenced once, in past tense, as the specific weight behind Malcolm's silence. The name is all the story gives him."
+      "Tyger Claw lieutenant and commander of the Kamikaze, the TC's elite cyberpsycho-adjacent assault unit. Fujimura first appears at a ripper clinic where Motoko is recovering, delivering a cold reminder that Jun spent serious favors getting her treated and the Claws expect repayment. He leads Kamikaze raids personally, charges through second-floor windows, and criticizes anyone who takes a wound on what he considers a basic operation.",
+      "His relationship with Motoko started hostile. He backhanded her across the face for costing the Kamikaze resources. She promised to take his hand next time. He accepted the threat without flinching. Over time, respect grew through demonstrated competence. He gave her an Oni menpo mask as proof of TC protection, offered a direct line to his assistant, and eventually moved both siblings into a secure floor of a TC building down the hall from his own apartment. Fujimura pushes people toward ambition whether they want it or not. He told Motoko she lacked it, then quietly kept opening doors until she walked through them."
     ]
   },
   "hayato": {
     "name": "Hayato Nakagawa",
+    "category": "story",
     "role": "Martial Artist / TC Heir",
     "faction": "Tyger Claws",
     "affiliation": "Tyger Claws",
@@ -268,6 +260,7 @@
   },
   "akari": {
     "name": "Akari",
+    "category": "story",
     "role": "Kamikaze Borg",
     "faction": "Tyger Claws",
     "affiliation": "Tyger Claws / Kamikaze",
@@ -283,6 +276,7 @@
   },
   "alice": {
     "name": "Alice Novak",
+    "category": "story",
     "role": "Rockerboy / Guitarist",
     "faction": "Stand Alone Complex",
     "affiliation": "Independent",
@@ -296,8 +290,25 @@
       "When Violent Hemorrhage's guitarist Carmen quits and smashes his DeLuze Orphean on the way out, Alice recruits Motoko as a temp fill-in. What starts as a single gig becomes permanent: Alice makes a direct personal appeal ('This is as serious as it gets for us'), Motoko accepts her and her bandmates Klein and Jared as her backup, and Stand Alone Complex is born. Alice handles main guitar while Motoko takes vocals, synth, and lead; together they play the Electric Orgasm, the 7th Hell, and the MSM skybar. Alice pushes for harder rock in the setlists, handles the electronic vocal sections of Faint, and is enthusiastic about MSM's sponsored chrome upgrades where Motoko flatly refuses. She's here for Jun, for the music, and for the shot at something real — in roughly that order."
     ]
   },
+  "nox": {
+    "name": "Nox",
+    "category": "story",
+    "role": "BD Dealer / Entrepreneur",
+    "faction": "Mox",
+    "affiliation": "Mox / Section 9",
+    "status": "Active",
+    "first_chapter": 23,
+    "icon": "&#x25C8;",
+    "description": "Mox BD hustler who Motoko saved from a beating outside Lizzie's. Turned that rescue into a business empire selling Motoko's combat recordings to every street kid in Night City.",
+    "physical_description": "The story introduces him mid-beating with a sprained ankle and a bag of condom-wrapped BDs. Not much physical description beyond that. He's a hustler who reads as scrappy, resourceful, and perpetually in motion. By the time he has eddies, he buys an internal agent and a car. Still dresses like someone who remembers being broke.",
+    "bio": [
+      "A Mox BD seller Motoko saved from three gonks outside Lizzie's Bar. He dragged her inside on a sprained ankle to thank her, which got Motoko her first introduction to the Mox. He disappeared for a stretch after the kidnapping arc, then resurfaced with a business pitch: record Motoko's merc work as braindances, get Judy Alvarez to edit them, and sell edgerunner-experience BDs to street kids. Motoko fronted 500 eddies and a recording implant. It worked.",
+      "The BD business grew fast. Nox kept meticulous books on cuts owed to Motoko and Judy, pioneered mass distribution through street sellers, and eventually got flush enough to upgrade his own chrome. He's the one who titled Motoko's scav den massacre recording 'The Only Thing They Fear Is You' and sold it uncut. The model he built became the template others copied, including David Martinez selling BDs on the street using the same approach."
+    ]
+  },
   "yuto": {
     "name": "Yuto Gonzales",
+    "category": "story",
     "role": "Ex-Convict",
     "faction": "Tyger Claws (former)",
     "affiliation": "Independent",
@@ -309,6 +320,166 @@
     "bio": [
       "Jun's childhood best friend — released from prison and immediately fixated on murdering TC Lieutenant Kisaru, who allegedly framed him for drugs. He shows up at Jun's apartment with eddies and drugs on the table, trying to call in a favor to recruit Jun for the hit. Motoko puts a knife to his throat and shuts it down: if Jun murders a TC Lieutenant, the retaliation kills him. Yuto backs off. Jun tries to talk him down at a TC bar, offers him legitimate work through Wakako and Fujimura. It doesn't take.",
       "Yuto makes a first attempt on Kisaru and fails. Then a second attempt, this time injuring him. The Oyabun call a full meeting — Moritaka demands Yuto's head and punishment for Jun. Fujimura defends Jun and then hires Section 9 to find and kill Yuto. What follows is a multi-chapter manhunt: Motoko breaches a safehouse in Rancho Coronado, hacks Yuto's NCTV subscription to track his location in real time, chases him by car through Japantown into 6th Street territory, and finally catches him at a second safehouse. Copperhead to the head, then three more shots. 250 XP. Jun adds Yuto to the apartment shrine afterward — a quiet moment of grief for a friend who couldn't be saved."
+    ]
+  },
+  "viktor": {
+    "name": "Viktor Vektor",
+    "category": "canon",
+    "role": "Ripperdoc",
+    "faction": "Independent",
+    "affiliation": "Independent",
+    "status": "Active",
+    "first_chapter": 15,
+    "icon": "&#x2695;",
+    "description": "Night City's most honest ripperdoc. Former boxer. Runs his clinic behind Misty's Esoterica and became Motoko's go-to for every chrome upgrade that matters.",
+    "physical_description": "Former boxer with ripper mods visible on his hands and glasses that never quite sit straight. Operates out of a basement clinic behind Misty's Esoterica. Methodical hands, dry humor, and the kind of steady presence that makes you forget you're lying on a table while someone rewires your nervous system.",
+    "bio": [
+      "Motoko sought him out early, bringing five crates of salvaged scav chrome as a gift to establish a relationship. Vik was impressed by the gesture and the business sense behind it. He became her primary ripperdoc from that point forward, installing her Kiroshi optics, cyberdeck, and running regular maintenance on her increasingly complex chrome loadout.",
+      "More than a service provider, Vik fills a quiet mentor role. He warns Motoko against over-chroming, shows her pictures of people helped by donated cyberware, and keeps his clinic as a neutral ground where mercs like Jackie and Motoko can cross paths without pretense. His integrity is the reason Motoko trusts him with her body, which in Night City is the highest compliment anyone can pay."
+    ]
+  },
+  "rebecca": {
+    "name": "Rebecca",
+    "category": "canon",
+    "role": "Solo / Gunner",
+    "faction": "Maine's Crew / Section 9",
+    "affiliation": "Section 9",
+    "status": "Active",
+    "first_chapter": 135,
+    "icon": "&#x1F52B;",
+    "description": "Tiny, loud, and carrying more firepower than people twice her size. Started in Maine's crew feeling underutilized. Found her place in Section 9 where nobody benches her.",
+    "physical_description": "Eighteen years old and looks younger. The word 'smol' comes up more than once. What she lacks in size she compensates for with heavy ordnance and an enthusiasm for violence that borders on recreational. Working toward bulky quick-change arms for weapon swapping. Small frame, big guns, zero hesitation.",
+    "bio": [
+      "First appeared at Turbo's bar with Maine's crew. Initial tension with Motoko melted into friendship over netrunning discussions and shared frustration with being underestimated. Rebecca's main grievance with Maine's crew was being relegated to distraction and guard duty instead of real combat roles. Motoko saw a fighter being wasted and invited her along for a Section 9 raid.",
+      "The scav power plant raid sealed it. Rebecca got fitted with proper armor, ran a loud assault, and fought like someone finally allowed off the leash. She thanked Motoko afterward for treating her as an equal combatant. From that point she integrated into Section 9 operations as a regular, earning equal pay splits and running jobs alongside Motoko. She teases Motoko about Vik, bickers with everyone, and has never once been told to sit one out."
+    ]
+  },
+  "wakako": {
+    "name": "Wakako Okada",
+    "category": "canon",
+    "role": "Fixer",
+    "faction": "Independent",
+    "affiliation": "Independent",
+    "status": "Active",
+    "first_chapter": 9,
+    "icon": "&#x260E;",
+    "description": "Jig-Jig Street's most powerful fixer. Gave Motoko her first real job at fourteen and has been profiting from her ever since.",
+    "physical_description": "Operates from a pachinko parlor on Jig-Jig Street. The story rarely describes her beyond the impression of someone who doesn't need to look dangerous because everyone already knows she is. Brutally professional, no wasted words, no kind ones either.",
+    "bio": [
+      "Motoko walked into Wakako's pachinko parlor at fourteen with no reputation and asked for work. Wakako gave her a deliberately vague job, stealing an info shard without specifying method, to test whether the kid was reckless or careful. Motoko completed it clean. That test established their working relationship.",
+      "Wakako became Motoko's primary fixer, feeding her progressively higher-tier gigs as her skills developed. She speaks highly of Motoko to other fixers like Regina, approves cross-fixer job sharing, and maintains enough influence to shape Motoko's career trajectory across Night City. As Hayato's grandmother, she also sits at the intersection of Motoko's professional and personal connections to the Tyger Claws."
+    ]
+  },
+  "jackie": {
+    "name": "Jackie Welles",
+    "category": "canon",
+    "role": "Street Merc",
+    "faction": "Independent",
+    "affiliation": "Independent",
+    "status": "Active",
+    "first_chapter": 63,
+    "icon": "&#x1F44A;",
+    "description": "Big heart, bigger fists. Night City's friendliest merc met Motoko through Vik's clinic and called her 'Hermana' before she earned it. She earned it.",
+    "physical_description": "Big guy. Natural talent for boxing that impressed Motoko during rooftop sparring sessions. The kind of physical presence that fills a room without chrome doing the heavy lifting. Carries himself like someone who genuinely likes people, which in Night City is practically a superpower.",
+    "bio": [
+      "Motoko first encountered Jackie lounging in Vik's clinic, flirting with Misty and cracking jokes. Their friendship grew through shared training sessions, rooftop boxing practice where Motoko coached his form, and eventually shared gigs. Jackie initially refused to let a 'kid' back him up on jobs, but Motoko's capability won him over.",
+      "He became a trusted choom and occasional team member for major operations, handling Wakako gigs and backing up Section 9 when muscle was needed. Jackie operates at a different tier than Motoko's usual crew, more heart than chrome, but his reliability and loyalty make him valuable in ways that raw combat stats can't measure."
+    ]
+  },
+  "judy": {
+    "name": "Judy Alvarez",
+    "category": "canon",
+    "role": "BD Editor / Maestro",
+    "faction": "Mox",
+    "affiliation": "Mox",
+    "status": "Active",
+    "first_chapter": 39,
+    "icon": "&#x1F3AC;",
+    "description": "Night City's best braindance editor. Turns Motoko's combat recordings into art, then has to live with what she felt while editing them.",
+    "physical_description": "Young, works out of an underground studio at Lizzie's Bar. The story focuses more on her skill and emotional state than her appearance. By the later chapters she's running on caffeine and wake-me-ups from the sheer volume of BD editing work.",
+    "bio": [
+      "Nox pitched the edgerunner BD project and Judy became the editor. The business relationship started transactional, but editing Motoko's combat recordings is an intimate experience. Judy felt Motoko's perfect calm during kills, her precise control, the sensory data of every fight. It changed her. After editing the scav den massacre BD, she nearly called Rita convinced Motoko was going cyberpsycho. The intensity of the emotions in the recordings hit harder than anything she'd edited before.",
+      "Despite that, she kept editing. Judy became Motoko's primary BD collaborator, a close friend, and one of the few people who understands exactly what Motoko is capable of because she has literally felt it. The Tyger Claws tried recruiting her. She stayed with the Mox, stayed at Lizzie's, and kept turning violence into preem braindances."
+    ]
+  },
+  "rita": {
+    "name": "Rita",
+    "category": "canon",
+    "role": "Bouncer",
+    "faction": "Mox",
+    "affiliation": "Mox",
+    "status": "Active",
+    "first_chapter": 23,
+    "icon": "&#x26A1;",
+    "description": "Lizzie's Bar bouncer with a baseball bat and trust issues. Warmed up to Motoko after realizing they share more trauma than either of them wanted to admit.",
+    "physical_description": "Carries a baseball bat like it's part of her arm. The Mox bouncer aesthetic: tough, visible, and not interested in your explanation. Physical details are sparse beyond the bat and the attitude.",
+    "bio": [
+      "First met Motoko at the door of Lizzie's Bar when Motoko dragged in the injured Nox. Rita was suspicious of the Wraith car and the stranger, but Nox vouched and she grudgingly let Motoko inside. The early relationship was prickly, with Rita confronting Motoko about ghosting Nox after the kidnapping arc.",
+      "The friendship deepened when Rita opened up about shared trauma, specifically forced cyberware installation. That vulnerability shifted the dynamic from suspicious bouncer to genuine choom. Rita became an active participant in Motoko's assassination of Jotaro Shobo, the Devil of Kabuki, helping create an alibi and providing disguise materials. She warns Motoko about the dangers of netrunning and shows genuine concern. A Mox through and through, but Motoko's choom first."
+    ]
+  },
+  "misty": {
+    "name": "Misty Olszewski",
+    "category": "canon",
+    "role": "Shopkeeper / Spiritual Advisor",
+    "faction": "Independent",
+    "affiliation": "Independent",
+    "status": "Active",
+    "first_chapter": 15,
+    "icon": "&#x2606;",
+    "description": "Runs Misty's Esoterica above Vik's clinic. Threads her arm through yours like she's known you forever. Big sister energy in a city that eats sisters alive.",
+    "physical_description": "Warm presence, spiritual aesthetic. The story captures her through actions rather than appearance: fortune readings, threading her arm through Motoko's, guiding people to Vik's clinic with genuine care. She radiates calm in a city that has none.",
+    "bio": [
+      "Motoko first met Misty when bringing salvaged chrome to Viktor's clinic. Misty runs Misty's Esoterica, the shop above Vik's basement operation, and serves as his informal nurse and assistant. She took immediate interest in Motoko, offering spiritual guidance about healing and identity that landed harder than expected.",
+      "Misty fills a role nobody else in Motoko's life occupies: genuine warmth without agenda. She reads fortunes for visitors, worries about people she barely knows, and radiates the kind of big sister energy that Motoko never asked for but clearly needs. Her relationship with Jackie threads through the clinic visits, giving Vik's basement the feeling of an actual community rather than just a chop shop."
+    ]
+  },
+  "panam": {
+    "name": "Panam Palmer",
+    "category": "canon",
+    "role": "Nomad",
+    "faction": "Aldecaldos",
+    "affiliation": "Aldecaldos",
+    "status": "Active",
+    "first_chapter": 51,
+    "icon": "&#x1F698;",
+    "description": "Aldecaldo nomad who met Motoko at a Badlands BBQ and decided she was family. Drives a Thorton Mackinaw and means it when she says call her for anything.",
+    "physical_description": "Drives a massive Thorton Mackinaw truck. The story captures her through motion and energy more than static description. She's a nomad through and through: road dust, road trips, and loyalty you can measure in miles driven.",
+    "bio": [
+      "Motoko met Panam at an Aldecaldo BBQ in the Badlands after saving Scorpion from Raffen Shiv. The Aldecaldos considered it a serious debt. Panam extended genuine hospitality and friendship, eventually telling Motoko to call her for anything. She meant it.",
+      "Their relationship is built on mutual respect and operates outside the usual Night City transactional framework. Panam calls Motoko for escort gigs, road trips to handle Badlands business, and shares personal conversations during long drives. She considers Motoko part of her extended nomad family. In a city full of chooms who'd sell you out for the right price, Panam is the one who drives across the desert to pick you up."
+    ]
+  },
+  "maine": {
+    "name": "Maine",
+    "category": "canon",
+    "role": "Merc Leader",
+    "faction": "Maine's Crew",
+    "affiliation": "Independent",
+    "status": "Active",
+    "first_chapter": 129,
+    "icon": "&#x2693;",
+    "description": "Over-chromed edgerunner running a crew out of the Afterlife. Respects Motoko's skills. Quietly lost his best gunner to Section 9 and took it on the chin.",
+    "physical_description": "Dark shades, rarely removed. Over-chromed but maintaining control. Speaks in rumbles and growls, doesn't waste words. Drinks heavily but stays professional. The kind of presence that takes up space in the Afterlife without trying.",
+    "bio": [
+      "Maine runs an established crew out of the Afterlife: Dorio, Sasha, Rebecca, and Pilar. Motoko first met them at Turbo's bar. Maine observed her with the quiet assessment of a veteran sizing up younger talent. When Rogue let Motoko into the Afterlife, Maine offered a toast and acknowledged her skills.",
+      "The relationship is professional and distant. Maine leads his crew, Motoko leads hers, and they occasionally cross paths on the corporate gig circuit. Rebecca's gradual shift toward Section 9 is the main tension point, though Maine handles it with more grace than ego. He's dealing with Biotechnica heat and keeping his crew together through it. Over-chromed, under-rested, and still in control. For now."
+    ]
+  },
+  "regina": {
+    "name": "Regina Jones",
+    "category": "canon",
+    "role": "Fixer",
+    "faction": "Independent",
+    "affiliation": "Independent",
+    "status": "Active",
+    "first_chapter": 53,
+    "icon": "&#x1F4F0;",
+    "description": "Watson fixer who hired Motoko to kill the Devil of Kabuki. Purely transactional, occasionally frosty, and never short on gigs that need a particular kind of person.",
+    "physical_description": "Operates from an office tower in Watson. The story treats her as a voice and a presence rather than a physical description. Professional, direct, and uninterested in small talk.",
+    "bio": [
+      "Motoko physically infiltrated Regina's office tower to pitch herself as a merc. Regina was intrigued by the boldness and hired her on the spot for a high-profile job: assassinate Jotaro Shobo, the Devil of Kabuki. Motoko executed it clean. The success established their working relationship.",
+      "The relationship runs hot and cold. After Motoko pulled out of a difficult 6th Street infiltration she couldn't complete, Regina went quiet for a stretch. Later gigs resumed through corporate contract channels, including Kang Tao work. Purely business, occasional friction, but Regina keeps calling because Motoko keeps delivering."
     ]
   }
 }
