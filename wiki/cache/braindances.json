@@ -12,7 +12,7 @@
     "title": "Raffen Camp",
     "chapter_number": 47,
     "status": "Released",
-    "description": "Recorded during a Badlands road trip while hunting a serial killer. Motoko bet Jun permanent radio control that she could ghost a Wraith-affiliated Raffen camp at a poppy farm without making a sound. She won. Nine kills by blade in the dark at 2 AM: one Raffen sleeping in a locked car, six more in their tents and sleeping bags, then three around a campfire taken down with thrown knives. Jun never heard a thing from the car. The Aldecaldos were called in afterward to claim the Raffen vehicles.",
+    "description": "Recorded during a Badlands road trip while hunting a serial killer. Motoko bet Jun permanent radio control that she could ghost a Wraith-affiliated Raffen camp at a poppy farm without making a sound. She won. Ten kills by blade in the dark at 2 AM: one Raffen sleeping in a locked car, six more in their tents and sleeping bags, then three outside taken down with knives. Jun never heard a thing from the car. The Aldecaldos were called in afterward to claim the Raffen vehicles.",
     "content_tags": ["combat", "stealth", "badlands", "solo", "blades"]
   },
   {
@@ -44,7 +44,7 @@
     "title": "The Only Thing They Fear Is You",
     "chapter_number": 93,
     "status": "Released",
-    "description": "Megabuilding H11, Floor 37. Eighteen Scavs, just under seven minutes, set to the DOOM Eternal track scratched into the shard. Motoko deployed a looping Weapon Glitch that locked every gun on the network, then moved room to room with the Carnage used as both shotgun and bludgeon, fists through eye sockets, and a looted Cut-o-Matic chainsword mid-fight. A Sandy-equipped Scav punched her across two rooms and cracked her skull before his Sandevistan timed out. Burya into the mouth, head separated in two. Motoko pre-cut the Maelstrom victim encounter from the end before leaving the shard on Judy's desk with the BD name etched into the plastic. Judy could only stay in the virtu for a minute at a time before pulling out. Nox scrolled it and ended up on his back gasping. He told Judy not to tone it down. The only BD in the catalog with a confirmed kill count of eighteen.",
+    "description": "Megabuilding H11. Close to eighteen Scavs, just under seven minutes, set to the DOOM Eternal track scratched into the shard. Motoko deployed a looping Weapon Glitch that locked every gun on the network, then moved room to room with the Carnage used as both shotgun and bludgeon, fists through eye sockets, and a looted Cut-o-Matic chainsword mid-fight. A Sandy-equipped Scav punched her across two rooms and cracked her skull before his Sandevistan timed out. Burya into the mouth, head separated in two. Motoko pre-cut the Maelstrom victim encounter from the end before leaving the shard on Judy's desk with the BD name etched into the plastic. Judy could only stay in the virtu for a minute at a time before pulling out. Nox scrolled it and ended up on his back gasping. He told Judy not to tone it down. The highest body count of any BD in the catalog.",
     "content_tags": ["combat", "scavengers", "solo", "indoor", "melee-heavy", "weapon glitch"]
   },
   {
@@ -52,7 +52,7 @@
     "title": "Inner Universe",
     "chapter_number": 115,
     "status": "Released",
-    "description": "The outlier. No kills, no scavs. A fully live parkour run from the Japanese-styled penthouses above Motoko's Japantown apartment through Night City: lantern wire swing cut with a knife mid-air, bridgeways, chrome-arm slide across concrete rooftops, through a stranger's apartment window mid-stride (ignoring the screaming john), across the Jig-Jig Street rooftops, landing at the Sakura Market ramen stand. Set to Inner Universe from the Ghost in the Shell soundtrack. The BD doesn't end until the taste of broth hits her tongue. Judy did most of the editing but couldn't get all the way through it because of heights. She had Nox jump in as a test dummy to clear the final cut. He called it another preem experience. Both of them ended up craving Sakura Market ramen afterward. David Martinez was selling copies outside Arasaka Tower, pitching it as one of their top sellers.",
+    "description": "The outlier. No kills, no scavs. A fully live parkour run from the Japanese-styled penthouses above Motoko's Japantown apartment through Night City: lantern wire swing cut with a knife, bridgeways, chrome-arm slide across concrete rooftops, through a stranger's apartment window mid-stride (ignoring the screaming john), across the Jig-Jig Street rooftops, landing at the Sakura Market ramen stand. Set to Inner Universe from the Ghost in the Shell soundtrack. The BD doesn't end until the taste of broth hits her tongue. Judy handled editing but the heights made it rough going, same as every BD with rooftops. David Martinez was selling copies outside Arasaka Academy, pitching it as one of their top sellers.",
     "content_tags": ["parkour", "rooftop", "non-combat", "night city", "music"]
   },
   {
@@ -60,7 +60,7 @@
     "title": "Section 9 Scav Raid",
     "chapter_number": 157,
     "status": "Released",
-    "description": "Section 9's raid on an Arroyo power plant converted into a Scav XBD harvest site, clearing the drug labs, killing rooms, and tunnels floor by floor. A full crew op: Motoko on point with netrunning and Carnage, Jun charging ahead with a katana (and catching bullets for it), Malcolm laying down smart rounds from a Shingen, Rebecca going full berserk with an Ajax, and Ichi piloting the Minotaur walker outside to guard the elevator exit. Five Scavs including the netrunner tried to escape up the elevator and ran straight into the Minotaur's HMGs. The first BD to show Section 9 working as a unit. Hiromi grabbed the raw footage with a maniacal cackle and an idea she wouldn't explain.",
+    "description": "Section 9's raid on a power plant converted into a Scav XBD harvest site, clearing the killing rooms, equipment caches, and tunnels floor by floor. A full crew op: Motoko on point with netrunning and a Copperhead, Jun charging ahead recklessly (and catching bullets for it), Malcolm laying down covering fire, Rebecca going full berserk with an Ajax, and Ichi piloting the Minotaur walker outside to guard the elevator exit. Five Scavs including the netrunner tried to escape up the elevator and ran straight into the Minotaur's HMGs. The first BD to show Section 9 working as a unit.",
     "content_tags": ["combat", "scavengers", "team op", "indoor", "power plant"]
   },
   {
@@ -74,9 +74,9 @@
   {
     "bd_id": "BD-010",
     "title": "Don't Steal My Car",
-    "chapter_number": 218,
+    "chapter_number": 219,
     "status": "Released",
-    "description": "Motoko's Quadra Super 640 is stolen outside the Dogtown stadium via car cracker looted from a dead VDB netrunner. She tracks the thief, slits his throat, then finds her car inside a massive Scav construction site, fifty-plus strong. The Onryo ghost daemon spreads through their network first, turning every optic into a haunted house. Then she hacks the Scav heavy Dmitri Agapov's Biomon, flips his calming chemicals to full adrenaline, and watches ex-SovOil special forces go full cyberpsycho on his own squad. Upper floors cleared with Sandy and katana, room by room. The boss Daniil Antonov flees across a drawbridge and pulls a weapon-glitched Burya that doesn't fire. Motoko shoots it out of his bloodied hand, then pulls the trigger again. 1000 XP. She frames the car through her fingers: Don't steal my car. David Martinez got a copy from Hiromi, scrolled it, and called it the best shit he'd ever seen. He showed up at school asking to join Motoko's crew.",
+    "description": "Motoko's Quadra Super 640 is stolen outside the Dogtown stadium via car cracker looted from a dead VDB netrunner. She tracks the thief, opens his throat, then finds her car inside a massive Scav construction site, fifty-plus strong. The Onryo ghost daemon spreads through their network first, turning every optic into a haunted house. Then she hacks the Scav heavy Dmitri Agapov's Biomon, flips his calming chemicals to full adrenaline, and watches ex-SovOil special forces go full cyberpsycho on his own squad. Upper floors cleared with Sandy and katana, room by room. The boss flees across a drawbridge and pulls a weapon-glitched Burya that doesn't fire. Motoko shoots it out of his bloodied hand, then pulls the trigger again. She frames the car through her fingers: Don't steal my car. David Martinez got a copy from Hiromi, scrolled it, and called it nova. He showed up at school asking to do more than just sell BDs.",
     "content_tags": ["combat", "scavengers", "solo", "indoor", "multi-floor", "vehicle", "dogtown", "onryo"]
   },
   {
@@ -84,7 +84,7 @@
     "title": "Unnamed",
     "chapter_number": 239,
     "status": "Released",
-    "description": "Recorded at a Valentino-run rooftop fight club after a frustrating MSM studio session. Fifty eddies for a ticket. The reigning champion, American Devil, a 6th Street boxer with an armored skull and chrome fists, threw a beer cup in Motoko's face. She jumped in the ring and won by wall-running up the side of the emptied pool, launching off a spectator's crotch, and aerial-punching him unconscious. Then kicked him in the nuts for good measure. When 6th Street drew weapons she deployed Mass Weapon Glitch. Her own song, This Fffire, started playing on the radio. She double-donkey-kicked the first gonk off the roof, knife to the jugular on the second, thrown knife to the chest on the third, confiscated pistol for the fourth, and rode the gang leader off the building edge with her feet on his chest. Judy cleaned the XBD of identifying markers before distribution. Through Judy's editing POV, every blow Motoko took registered as delight, not pain. The BD ends with the leader crying as he realizes they're both falling.",
+    "description": "Recorded at a Valentino-run rooftop fight club after a frustrating MSM studio session. Fifty eddies for a ticket. The reigning champion, American Devil, a 6th Street boxer with an armored skull and chrome fists, threw a beer cup in Motoko's face. She jumped in the ring and won by wall-running up the side of the emptied pool, launching off a spectator's crotch, and aerial-punching him unconscious. Then kicked him in the nuts for good measure. When 6th Street drew weapons she deployed Mass Weapon Glitch. Her own song, This Fffire, started playing on the radio. What followed was a knife-and-fists cleanup of every 6th Street gonk on the roof, ending with Motoko surfing the last one off the building edge. Judy cleaned the XBD of identifying markers before distribution. Through Judy's editing POV, every blow Motoko took registered as delight, not pain. The BD ends with the gonk crying as he realizes they're both falling.",
     "content_tags": ["combat", "fight club", "rooftop", "solo", "XBD", "street gang", "valentino"]
   }
 ]
