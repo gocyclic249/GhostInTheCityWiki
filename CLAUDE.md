@@ -20,10 +20,13 @@ wiki/
     cleanup_summaries.py       # AI pattern removal (safety net)
     upload.py                  # Neocities uploader
 lib/                           # Shared Python utilities
+scripts/debug/                 # Debug & fallback image-recovery scripts
 threadmarks_index.json         # Chapter metadata index
 sidestories_index.json         # Side story metadata index
+media_index.json               # Media threadmark index + image metadata
 update_wiki.py                 # Full pipeline orchestrator
 scrape.py                      # AO3 chapter scraper
+scrape_media.py                # SpaceBattles media scraper (images)
 scrape_sidestories.py          # SpaceBattles side story index scraper
 ```
 
@@ -89,13 +92,20 @@ To resolve chapter number -> chapter_id: read `threadmarks_index.json` (array of
 
 ## Pipeline
 
+### Automated (runs via `update_wiki.py` or cron)
 1. `scrape.py --update` downloads new chapters from AO3
 2. `scrape_sidestories.py` refreshes side story index from SpaceBattles
-3. `/process-chapter N` generates summaries for new chapters
-4. `/fact-check N` verifies summary accuracy against source text
-5. `cleanup_summaries.py` strips any remaining AI patterns (safety net)
-6. `build.py --build` renders JSON cache to static HTML
-7. `build.py --all` or `upload.py` deploys to Neocities
+3. `scrape_media.py` refreshes media index + downloads new images
+4. `build.py --build` renders JSON cache to static HTML
+5. `build.py --all` or `upload.py` deploys to Neocities
+
+### Manual (requires Claude session for new chapters)
+6. `/process-chapter N` generates summaries for new chapters
+7. `/fact-check N` verifies summary accuracy against source text
+8. Review new chapters for braindance entries (`braindances.json`)
+9. Review new chapters for rockerboy performances (`rockerboy.json`)
+10. `cleanup_summaries.py` strips any remaining AI patterns (safety net)
+11. Rebuild + upload after manual updates
 
 ## Writing Style Guide
 

@@ -11,8 +11,8 @@ Usage:
   python3 update_wiki.py --dry-run    # show what would change, don't upload
 
 Requires environment variables:
-  TAVILY_API_KEY     — for SpaceBattles scraping
   NEOCITIES_API_KEY  — for Neocities upload
+  TAVILY_API_KEY     — optional, improves SpaceBattles media image extraction
 """
 
 import json
@@ -61,16 +61,13 @@ def main():
     build_only = "--build" in args
 
     # Check environment
-    missing_env = []
-    if not build_only:
-        if not os.environ.get("TAVILY_API_KEY"):
-            missing_env.append("TAVILY_API_KEY")
-    if not os.environ.get("NEOCITIES_API_KEY"):
-        missing_env.append("NEOCITIES_API_KEY")
-    if missing_env:
-        print(f"ERROR: Missing environment variables: {', '.join(missing_env)}")
+    if not os.environ.get("NEOCITIES_API_KEY") and not dry_run and not scrape_only:
+        print("ERROR: Missing NEOCITIES_API_KEY environment variable")
         print("  Run: source .env")
         sys.exit(1)
+
+    if not build_only and not os.environ.get("TAVILY_API_KEY"):
+        print("  Note: TAVILY_API_KEY not set. Media scraper will use direct HTTP (works fine for index + most images).")
 
     # ── Snapshot before counts ────────────────────────────────────────
     ch_before = count_index(THREADMARKS_INDEX)
