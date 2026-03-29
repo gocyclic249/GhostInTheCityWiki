@@ -939,8 +939,24 @@ def build_photomode(media_entries):
             + "\n</div>"
         )
 
-    media_count = len([m for m in media_entries if m.get("images")])
-    total_images = sum(len(m.get("images", [])) for m in media_entries)
+    total_threadmarks = len(media_entries)
+    shown = len([m for m in media_entries
+                 if any(img.get("local_file") for img in m.get("images", []))])
+    broken_links = sum(1 for m in media_entries
+                       if m.get("images")
+                       and not any(img.get("local_file") for img in m.get("images", [])))
+    no_images = sum(1 for m in media_entries if not m.get("images"))
+    total_local = sum(
+        sum(1 for img in m.get("images", []) if img.get("local_file"))
+        for m in media_entries
+    )
+
+    stats_parts = [f"{e(str(total_threadmarks))} threadmarks"]
+    if broken_links:
+        stats_parts.append(f"{e(str(broken_links))} broken links")
+    if no_images:
+        stats_parts.append(f"{e(str(no_images))} non-image posts")
+    stats_line = " &#x2022; ".join(stats_parts)
 
     body = f"""
       <h1 class="page-title">Photomode</h1>
@@ -951,13 +967,13 @@ def build_photomode(media_entries):
         Click any image to view full size.
       </p>
       <p>
-        {e(str(media_count))} posts, {e(str(total_images))} images.
+        {stats_line} &#x2022; {e(str(shown))} posts shown, {e(str(total_local))} images.
       </p>
       {gallery_html}
 """
     out = page_shell("Photomode", body,
                      active_nav="photomode.html",
-                     description=f"Fan art gallery for Ghost in the City — {media_count} posts with {total_images} images from the SpaceBattles community.",
+                     description=f"Fan art gallery for Ghost in the City — {shown} posts with {total_local} images from the SpaceBattles community.",
                      canonical_path="photomode.html")
     dest = os.path.join(BUILD_DIR, "photomode.html")
     with open(dest, "w", encoding="utf-8") as f:

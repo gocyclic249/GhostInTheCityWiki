@@ -31,9 +31,13 @@ import time
 import json
 import sys
 
+import requests
+from bs4 import BeautifulSoup
+
 # ── Config ────────────────────────────────────────────────────────────────
 
-SB_THREAD = "https://forums.spacebattles.com/threads/ghost-in-the-city-cyberpunk-gamer-si.1046809"
+SB_BASE = "https://forums.spacebattles.com"
+SB_THREAD = f"{SB_BASE}/threads/ghost-in-the-city-cyberpunk-gamer-si.1046809"
 MEDIA_CATEGORY = 10
 THREADMARKS_URL = f"{SB_THREAD}/threadmarks?threadmark_category={MEDIA_CATEGORY}"
 PER_PAGE = 25
@@ -43,155 +47,114 @@ IMAGE_DIR  = os.path.join(BASE_DIR, "wiki", "build", "media")
 INDEX_PATH = os.path.join(BASE_DIR, "media_index.json")
 COOKIES_PATH = os.path.join(BASE_DIR, "cookies-sb.txt")
 
+HEADERS = {
+    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
+                  "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+}
+
 # gallery-dl binary — check venv first, fall back to system
 GALLERY_DL = os.path.expanduser("~/.local/gallery-dl-venv/bin/gallery-dl")
 if not os.path.exists(GALLERY_DL):
     GALLERY_DL = "gallery-dl"  # hope it's on PATH
 
-from lib.tavily_utils import tavily_extract, get_tavily_key
-from lib.image_utils import is_skip_url
+# Tavily is optional — only needed for post content extraction (image finding)
+try:
+    from lib.tavily_utils import tavily_extract, get_tavily_key
+    get_tavily_key()
+    HAS_TAVILY = True
+except (Exception, SystemExit):
+    HAS_TAVILY = False
+    print("  Note: Tavily unavailable, using direct HTTP for all fetches.")
 
-# Validate key on startup
-get_tavily_key()
+from lib.image_utils import is_skip_url
 
 DELAY = 1.0
 
 
 # ── Index building ────────────────────────────────────────────────────────
 
-def parse_threadmark_entries(text):
-    """Parse threadmark titles, word counts, and dates from Tavily-extracted text."""
-    entries = []
+def fetch_index_page(page_num):
+    """Fetch a single threadmarks index page via direct HTML parsing."""
+    url = f"{THREADMARKS_URL}&per_page={PER_PAGE}&page={page_num}"
 
-    marker_idx = text.find("Reader mode")
-    if marker_idx == -1:
-        marker_idx = text.find("Per page:")
-    if marker_idx == -1:
-        marker_idx = 0
-    listing = text[marker_idx:]
-
-    lines = [l.strip() for l in listing.split("\n") if l.strip()]
-
-    i = 0
-    while i < len(lines) - 1:
-        line = lines[i]
-
-        # Look ahead for "Words" line, skipping award badge lines
-        words_offset = None
-        for peek in range(1, 4):
-            if i + peek >= len(lines):
-                break
-            if lines[i + peek].startswith("Words "):
-                words_offset = peek
-                break
-            if "![Image" not in lines[i + peek] and "Award" not in lines[i + peek]:
-                break
-
-        if words_offset:
-            raw_title = line
-            word_line = lines[i + words_offset]
-            date_idx = i + words_offset + 1
-            date_line = lines[date_idx] if date_idx < len(lines) else ""
-
-            skip_titles = {
-                "Next", "Prev", "Last", "First", "Go", "Per page:",
-                "Reader mode", "RSS", "Threadmarks", "Loading…",
-                "Statistics", "Remove this ad space",
-            }
-            if raw_title in skip_titles or raw_title.startswith("Image "):
-                i += 1
-                continue
-
-            link_m = re.search(
-                r'\[(.+)\]\((https://forums\.spacebattles\.com/[^)]+)\)$',
-                raw_title
-            )
-            if link_m:
-                title = link_m.group(1).strip()
-                sb_url = link_m.group(2).strip()
-                post_m = re.search(r'(?:post-|#post-)(\d+)', sb_url)
-                post_id = post_m.group(1) if post_m else None
+    for attempt in range(3):
+        try:
+            r = requests.get(url, headers=HEADERS, timeout=30)
+            r.raise_for_status()
+            break
+        except requests.RequestException as e:
+            print(f"  Attempt {attempt + 1} failed for page {page_num}: {e}")
+            if attempt < 2:
+                time.sleep(5 * (attempt + 1))
             else:
-                if "Image" in raw_title or "Award" in raw_title:
-                    i += 1
-                    continue
-                title = raw_title.lstrip("* \t")
-                sb_url = None
-                post_id = None
+                print(f"  ERROR: Could not fetch page {page_num}")
+                return [], 1
 
-            if not title or "Award" in title or title.startswith("!["):
-                i += 1
-                continue
+    soup = BeautifulSoup(r.text, "lxml")
 
-            wc_m = re.search(r'Words\s+([\d.,]+k?)', word_line)
-            word_count = wc_m.group(1) if wc_m else "?"
+    # Detect total pages from pagination
+    total_pages = 1
+    page_nav = soup.select_one(".pageNav-main")
+    if page_nav:
+        page_links = page_nav.select("a")
+        if page_links:
+            last = page_links[-1].text.strip()
+            if last.isdigit():
+                total_pages = int(last)
 
-            date = date_line if re.match(r'[A-Z][a-z]{2}\s+\d', date_line) else ""
-
-            entries.append({
-                "title": title,
-                "word_count": word_count,
-                "date": date,
-                "sb_url": sb_url,
-                "post_id": post_id,
-            })
-            i += words_offset + (2 if date else 1)
+    # Parse threadmark entries
+    entries = []
+    for item in soup.select(".structItem--threadmark"):
+        title_el = item.select_one(".structItem-title a")
+        if not title_el:
             continue
 
-        i += 1
+        title = title_el.text.strip()
+        href = title_el.get("href", "")
+        if href and not href.startswith("http"):
+            href = SB_BASE + href
 
-    return entries
+        author = item.get("data-content-author", "")
+
+        post_m = re.search(r"#post-(\d+)", href)
+        post_id = post_m.group(1) if post_m else None
+
+        wc_el = item.select_one(".structItem-cell--meta dd")
+        word_count = wc_el.text.strip() if wc_el else ""
+
+        date_el = item.select_one(".structItem-cell--latest time")
+        date = date_el.get("data-date-string", "") if date_el else ""
+
+        entries.append({
+            "title": title,
+            "sb_url": href,
+            "post_id": post_id,
+            "author": author,
+            "word_count": word_count,
+            "date": date,
+        })
+
+    return entries, total_pages
 
 
 def fetch_threadmark_index():
-    """Fetch all media threadmark index pages."""
+    """Fetch all media threadmark index pages via direct HTML parsing."""
     print("Fetching media threadmarks index...")
 
-    results = tavily_extract(f"{THREADMARKS_URL}&per_page={PER_PAGE}&page=1")
-    if not results:
-        print("ERROR: Could not fetch first threadmarks page")
-        sys.exit(1)
+    entries, total_pages = fetch_index_page(1)
+    print(f"  Page 1/{total_pages}: {len(entries)} entries")
 
-    text = results[0]["raw_content"]
-
-    pages_m = re.search(r'(\d+)\s+of\s+(\d+)', text)
-    total_pages = int(pages_m.group(2)) if pages_m else 1
-    print(f"  Found {total_pages} pages of threadmarks")
-
-    all_entries = parse_threadmark_entries(text)
-    print(f"  Page 1/{total_pages}: {len(all_entries)} entries")
-
-    for batch_start in range(2, total_pages + 1, 5):
-        batch_end = min(batch_start + 5, total_pages + 1)
-        urls = [
-            f"{THREADMARKS_URL}&per_page={PER_PAGE}&page={p}"
-            for p in range(batch_start, batch_end)
-        ]
-        print(f"  Fetching pages {batch_start}-{batch_end - 1}...")
+    for page_num in range(2, total_pages + 1):
         time.sleep(DELAY)
+        page_entries, _ = fetch_index_page(page_num)
+        print(f"  Page {page_num}/{total_pages}: {len(page_entries)} entries")
+        entries.extend(page_entries)
 
-        results = tavily_extract(urls)
-        for r in results:
-            entries = parse_threadmark_entries(r["raw_content"])
-            page_num = re.search(r'page=(\d+)', r["url"])
-            pn = page_num.group(1) if page_num else "?"
-            print(f"    Page {pn}: {len(entries)} entries")
-            all_entries.extend(entries)
-
-    # Deduplicate by title
-    seen = set()
-    unique = []
-    for entry in all_entries:
-        key = entry["title"]
-        if key not in seen:
-            seen.add(key)
-            unique.append(entry)
-
-    for i, entry in enumerate(unique, 1):
+    for i, entry in enumerate(entries, 1):
         entry["index"] = i
 
-    print(f"\n  Total unique media threadmarks: {len(unique)}")
-    return unique
+    print(f"\n  Total media threadmarks: {len(entries)}")
+    return entries
 
 
 # ── Post content extraction ───────────────────────────────────────────────
@@ -370,6 +333,103 @@ def extract_post_content(raw_content, post_id):
     }
 
 
+def fetch_post_content_direct(url, post_id):
+    """Fetch a SpaceBattles post via direct HTTP and extract images from HTML."""
+    try:
+        r = requests.get(url, headers=HEADERS, timeout=30)
+        r.raise_for_status()
+    except requests.RequestException as e:
+        print(f"  Request failed: {e}")
+        return None
+
+    soup = BeautifulSoup(r.text, "lxml")
+
+    # Find the specific post by ID
+    post_el = None
+    if post_id:
+        post_el = soup.find("article", {"data-content": f"post-{post_id}"})
+        if not post_el:
+            # Try finding by id attribute
+            post_el = soup.find(id=f"js-post-{post_id}")
+
+    # If we can't find the specific post, use the whole page
+    if not post_el:
+        post_el = soup
+
+    # Extract author
+    author = "Unknown"
+    author_el = post_el.select_one("[data-author]") if post_el != soup else None
+    if author_el:
+        author = author_el.get("data-author", "Unknown")
+    elif post_el != soup:
+        parent = post_el
+        a_attr = parent.get("data-author", "")
+        if a_attr:
+            author = a_attr
+
+    # Extract images from the post body
+    body_el = post_el.select_one(".message-body .bbWrapper") if post_el != soup else post_el
+    if not body_el:
+        body_el = post_el
+
+    images = []
+    for img in body_el.select("img"):
+        src = img.get("src", "") or img.get("data-src", "")
+        if not src:
+            continue
+        if src.startswith("//"):
+            src = "https:" + src
+        elif src.startswith("/"):
+            src = SB_BASE + src
+        alt = img.get("alt", "")
+
+        # Skip avatars, smilies, and UI elements
+        if any(skip in src for skip in ["/smilies/", "/avatars/", "data/assets/", "styles/"]):
+            continue
+        if is_skip_url(src):
+            continue
+
+        if not any(i["url"] == src for i in images):
+            images.append({"url": src, "alt_text": alt})
+
+    # Also check for linked images (lightbox links)
+    for a_tag in body_el.select("a.js-lbImage, a[data-fancybox]"):
+        href = a_tag.get("href", "")
+        if href and not href.startswith("http"):
+            href = SB_BASE + href
+        if href and re.search(r'\.(png|jpg|jpeg|gif|webp)', href, re.IGNORECASE):
+            if not any(i["url"] == href for i in images):
+                images.append({"url": href, "alt_text": ""})
+
+    # Extract text context
+    context = ""
+    if body_el:
+        text = body_el.get_text(separator=" ", strip=True)
+        text = re.sub(r'\s+', ' ', text).strip()
+        if len(text) > 500:
+            text = text[:497] + "..."
+        context = text
+
+    return {
+        "author": author,
+        "images": images,
+        "context": context,
+    }
+
+
+def fetch_post_content(url, post_id):
+    """Fetch post content, trying Tavily first (if available), then direct HTTP."""
+    if HAS_TAVILY:
+        try:
+            results = tavily_extract(url)
+            if results:
+                return extract_post_content(results[0]["raw_content"], post_id)
+        except Exception as e:
+            print(f"  Tavily failed ({e}), falling back to direct fetch...")
+
+    return fetch_post_content_direct(url, post_id)
+
+
 # ── Image downloading ─────────────────────────────────────────────────────
 
 def guess_extension(url, content_type=""):
@@ -488,13 +548,11 @@ def download_media(index, start_num=1, end_num=None, redownload=False, retry_emp
         print(f"[{i}/{total}] {title}")
         time.sleep(DELAY)
 
-        results = tavily_extract(sb_url)
-        if not results:
+        extracted = fetch_post_content(sb_url, post_id)
+        if not extracted:
             print(f"  FAILED to fetch")
             failed.append(i)
             continue
-
-        extracted = extract_post_content(results[0]["raw_content"], post_id)
 
         # Fallback: if no images found, try the direct post permalink URL.
         # SpaceBattles renders spoilered content expanded on permalink pages.
@@ -502,12 +560,10 @@ def download_media(index, start_num=1, end_num=None, redownload=False, retry_emp
             permalink = f"https://forums.spacebattles.com/posts/{post_id}/"
             print(f"  No images on page view, trying permalink...")
             time.sleep(DELAY)
-            perm_results = tavily_extract(permalink)
-            if perm_results:
-                perm_extracted = extract_post_content(perm_results[0]["raw_content"], post_id)
-                if perm_extracted["images"]:
-                    extracted = perm_extracted
-                    print(f"  Found {len(extracted['images'])} image(s) via permalink")
+            perm_extracted = fetch_post_content(permalink, post_id)
+            if perm_extracted and perm_extracted["images"]:
+                extracted = perm_extracted
+                print(f"  Found {len(extracted['images'])} image(s) via permalink")
 
         # Update entry with extracted data
         entry["artist"] = extracted["author"]
