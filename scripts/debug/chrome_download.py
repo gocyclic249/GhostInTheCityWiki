@@ -15,6 +15,8 @@ import sys
 import time
 import base64
 
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -23,7 +25,7 @@ from lib.selenium_utils import create_driver, wait_cloudflare
 from lib.spacebattles_utils import login_sb
 from lib.image_utils import is_skip_url, guess_extension, download_via_canvas, download_via_fetch, save_image
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..")
 IMAGE_DIR = os.path.join(BASE_DIR, "wiki", "build", "media")
 INDEX_PATH = os.path.join(BASE_DIR, "media_index.json")
 

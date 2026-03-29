@@ -4,7 +4,10 @@ Uses Selenium to visit each post, expand spoilers, and download visible images."
 
 import json
 import os
+import sys
 import time
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 
 from selenium.webdriver.common.by import By
 
@@ -15,7 +18,7 @@ from lib.image_utils import (
     download_via_fetch, download_via_urllib, save_image,
 )
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..")
 IMAGE_DIR = os.path.join(BASE_DIR, "wiki", "build", "media")
 INDEX_PATH = os.path.join(BASE_DIR, "media_index.json")
 

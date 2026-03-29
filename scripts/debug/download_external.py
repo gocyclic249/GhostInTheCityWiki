@@ -4,14 +4,17 @@ index but no local_file. Uses Selenium to navigate directly to each image URL.""
 
 import json
 import os
+import sys
 import time
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 
 from selenium.webdriver.common.by import By
 
 from lib.selenium_utils import create_driver
 from lib.image_utils import guess_extension, download_via_canvas, download_via_fetch, save_image
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..")
 IMAGE_DIR = os.path.join(BASE_DIR, "wiki", "build", "media")
 INDEX_PATH = os.path.join(BASE_DIR, "media_index.json")
 
