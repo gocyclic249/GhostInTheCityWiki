@@ -2,6 +2,10 @@
 
 Fan wiki for *Ghost in the City*, a Cyberpunk 2077 / Ghost in the Shell crossover SI fanfic by **Seras** on SpaceBattles and AO3.
 
+## Project Overview
+
+This is a fan wiki project (Neocities-hosted). The main workflow is: scrape/update data → rebuild wiki pages → deploy to Neocities. Always confirm which branch and which script version before running anything.
+
 ## Project Layout
 
 ```
@@ -106,6 +110,14 @@ To resolve chapter number -> chapter_id: read `threadmarks_index.json` (array of
 9. Review new chapters for rockerboy performances (`rockerboy.json`)
 10. `cleanup_summaries.py` strips any remaining AI patterns (safety net)
 11. Rebuild + upload after manual updates
+
+## Deployment
+
+When deploying to Neocities, always verify the deployed files match the local build output. Stale deployed files have caused bugs before.
+
+## Scripts & Scrapers
+
+When running scrapers or build scripts, ask which specific script and branch the user wants before executing. Do NOT run download/scrape operations when the user only asks for index/metadata generation.
 
 ## Writing Style Guide
 

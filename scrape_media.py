@@ -644,6 +644,25 @@ def sanitize_filename(s):
 
 def cmd_build_index():
     entries = fetch_threadmark_index()
+
+    # Merge with existing index so we don't clobber images/artist/context
+    # for posts we've already scraped.
+    preserved_fields = ("images", "artist", "context")
+    if os.path.exists(INDEX_PATH):
+        with open(INDEX_PATH, encoding="utf-8") as f:
+            existing = json.load(f)
+        by_post = {e.get("post_id"): e for e in existing if e.get("post_id")}
+        merged_count = 0
+        for entry in entries:
+            old = by_post.get(entry.get("post_id"))
+            if not old:
+                continue
+            for field in preserved_fields:
+                if field in old:
+                    entry[field] = old[field]
+            merged_count += 1
+        print(f"  Preserved data for {merged_count} existing entries")
+
     with open(INDEX_PATH, "w", encoding="utf-8") as f:
         json.dump(entries, f, indent=2, ensure_ascii=False)
     print(f"  Saved index to {INDEX_PATH}")
@@ -905,12 +924,10 @@ def cmd_status():
 
 
 def cmd_download(start_num=1, end_num=None, redownload=False, retry_empty=False):
-    if os.path.exists(INDEX_PATH):
-        with open(INDEX_PATH, encoding="utf-8") as f:
-            index = json.load(f)
-        print(f"Loaded index with {len(index)} media entries.")
-    else:
-        index = cmd_build_index()
+    # Always refresh the threadmark index first so new posts are picked up.
+    # cmd_build_index merges with existing data, preserving images/artist/context.
+    index = cmd_build_index()
+    print(f"Loaded index with {len(index)} media entries.")
 
     with_urls = sum(1 for e in index if e.get("sb_url"))
     print(f"  {with_urls}/{len(index)} entries have direct URLs")

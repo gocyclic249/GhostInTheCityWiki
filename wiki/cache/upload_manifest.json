@@ -18,10 +18,10 @@
   "characters/alice.html": "e5573007701ca73281ee00455bad708d231afb04",
   "charsheet.html": "35653fc2a02c400edbba0255b39d35c86a3ee523",
   "search.html": "a827ea1d9634553fe9255e27e09eacfaa98a3be8",
-  "sitemap.xml": "f9c19f3fa7e9ba3b1388a08ca0896ab74bcf2e4a",
+  "sitemap.xml": "3320db05fe7c7d7f9d64eb5a2c5d38ce0c90493e",
   "sidestories.html": "90d755f3df3b9287baebccdb88ae1cb0e2255ac9",
   "robots.txt": "fd8524560b71f8ed8613ed52f54c4f6dc7fdd8a6",
-  "photomode.html": "59401ca7cb6ccffa14b338e62c8e1509cc2cc255",
+  "photomode.html": "c6e0a8fdc7a86c060eb13020d73fb33fefe261f3",
   "media/87980792_1.jpg": "2bdf1f98e7d8b316cb3351400100d0f0b67eb271",
   "media/91534014_1.png": "20002faf28adfd94ca98cf6ced46f14334b53684",
   "media/92203908_2.jpg": "e6ee1f5077edc13cab7c73f2445a67db00d4b398",
@@ -154,5 +154,7 @@
   "characters/rita.html": "6023fcaf8f472242578be9fec2189065d39c31e1",
   "characters/regina.html": "2c83d5237223fa193f4f7ca192bb79915ba91ce7",
   "characters/fujimura.html": "f155583221a16b9ed3900e71f1f2dd9706dbb9c3",
-  "characters/viktor.html": "765ada3e7f1c746a4b1aa6e25967ec615f7f60b3"
+  "characters/viktor.html": "765ada3e7f1c746a4b1aa6e25967ec615f7f60b3",
+  "media/93323676_1.jpg": "e846c693a844f3030c00a2ce8629113d4a182127",
+  "media/88063252_1.jpg": "42e0940ecb101f0a4db158a8123ece8beaad0ce5"
 }
