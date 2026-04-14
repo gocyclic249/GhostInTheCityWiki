@@ -318,8 +318,8 @@ def cmd_update():
         return
 
     print(f"Found {len(new_chapters)} new chapter(s):")
-    for ch in new_chapters:
-        print(f"  Ch.{fresh.index(ch) + 1}  {ch['title']}  ({ch['date']})")
+    for i, ch in enumerate(new_chapters):
+        print(f"  Ch.{len(existing) + i + 1}  {ch['title']}  ({ch['date']})")
 
     # Update the index file
     updated = existing + new_chapters

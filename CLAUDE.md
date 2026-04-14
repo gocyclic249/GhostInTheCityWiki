@@ -111,6 +111,14 @@ To resolve chapter number -> chapter_id: read `threadmarks_index.json` (array of
 10. `cleanup_summaries.py` strips any remaining AI patterns (safety net)
 11. Rebuild + upload after manual updates
 
+## Manual Image Workflow
+
+Some media images can't be scraped automatically: dead imgur URLs that return placeholder PNGs (fake-success downloads), SB-served logo fallbacks, parser misses, Discord CDN expirations, and Cloudflare-blocked SB attachments. The recovery procedure lives in [`docs/manual-images.md`](docs/manual-images.md). Quick commands:
+
+- `python3 scrape_media.py --show-manual` — list every image needing attention
+- `python3 scrape_media.py --mark-manual POST_ID [--count N]` — flag a post for manual replacement (creates placeholders if the post has no images yet)
+- `python3 scrape_media.py --unmark-manual POST_ID` — clear the flag once a real file is in `wiki/build/media/`
+
 ## Deployment
 
 When deploying to Neocities, always verify the deployed files match the local build output. Stale deployed files have caused bugs before.
@@ -137,9 +145,10 @@ Seras writes first-person present-tense with these patterns:
 
 Summaries translate Seras's voice into third-person past-tense recaps:
 - Match Seras's punchy, dry energy. Street slang, no literary filler.
-- **NO em-dashes**. They read as AI-generated. Use periods, commas, or sentence breaks instead.
+- **Tone vocabulary** for "punchy, dry": short sentences, action verbs first, minimal adjectives, no hedging, no editorializing.
+- **NO em-dashes** (`—` or ` — `). They read as AI-generated. Use periods, commas, or sentence breaks instead. Cleanup script strips them automatically; the goal is zero hits.
 - Summaries should feel like Motoko would approve of how they read.
-- Use Seras's slang naturally: "preem chrome", "chipped in", "eddies", "chooms".
+- **Slang density**: at least one piece of Night City slang per summary, no more than two per paragraph. Use "preem", "choom", "chrome", "eddies", "chipped in", "gonk", "nova", "delta", "scop". If a slang word feels forced, drop it.
 - Keep the dark humor. If the chapter is funny, the summary should be too.
 - **Never include**: XP values, stat numbers, level-up announcements, perk names, "Meanwhile", "However", "Furthermore", "Additionally".
 - When a game mechanic matters to the plot, describe the capability gained, not the number.

@@ -166,7 +166,7 @@ def page_shell(title, body, css_path="assets/style.css", active_nav="",
     <header class="site-header">
       <div class="site-title" style="display:flex;align-items:center;justify-content:space-between;">
         <a href="{nav_href('index.html')}">&#x2588; Ghost in the City // Wiki</a>
-        <form class="search-float" style="display:flex;gap:0;margin:0;" action="{nav_href('search.html')}" method="GET">
+        <form class="search-float" style="display:flex;gap:0;margin:0;" onsubmit="var q=this.q.value.trim();if(q)window.open('https://www.google.com/search?q='+encodeURIComponent('site:ghostinthecity.neocities.org '+q),'_blank');return false;">
           <input type="text" name="q" placeholder="// search" aria-label="Search">
           <button type="submit">&#x25B6;</button>
         </form>
@@ -981,33 +981,6 @@ def build_photomode(media_entries):
     print(f"  Wrote {dest}")
 
 
-# ── search.html ───────────────────────────────────────────────────────────
-
-def build_search():
-    body = """
-      <h1 class="page-title">Search Results</h1>
-      <script async src="https://cse.google.com/cse.js?cx=d4dfaaef6c88f4085"></script>
-      <div class="gcse-searchresults-only"></div>
-      <script>
-        // Read ?q= param and feed it to Google CSE once it loads
-        var q = new URLSearchParams(window.location.search).get('q');
-        if (q) {
-          var wait = setInterval(function() {
-            var el = google.search.cse.element.getElement('searchresults-only0');
-            if (el) { el.execute(q); clearInterval(wait); }
-          }, 100);
-        }
-      </script>
-"""
-    out = page_shell("Search", body, active_nav="",
-                      description="Search the Ghost in the City wiki — find chapters, characters, braindances, and side stories.",
-                      canonical_path="search.html")
-    dest = os.path.join(BUILD_DIR, "search.html")
-    with open(dest, "w", encoding="utf-8")as f:
-        f.write(out)
-    print(f"  Wrote {dest}")
-
-
 # ── sitemap.xml ───────────────────────────────────────────────────────────
 
 SITE_BASE = "https://ghostinthecity.neocities.org"
@@ -1097,7 +1070,6 @@ def main():
     build_photomode(media)
     build_char_index(characters)
     build_charsheet(characters)
-    build_search()
 
     for slug, char in characters.items():
         build_char_page(slug, char)

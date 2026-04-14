@@ -177,6 +177,29 @@ def vary_then_transitions(text):
     return re.sub(r',\s+then\s+', replacer, text)
 
 
+def strip_em_dashes(text):
+    """Replace em-dashes with periods. CLAUDE.md forbids them outright."""
+    if '—' not in text and '–' not in text:
+        return text
+    text = re.sub(r'\s*[—–]\s*', '. ', text)
+    text = re.sub(r'(\.\s+)([a-z])', lambda m: m.group(1) + m.group(2).upper(), text)
+    return text
+
+
+def strip_forbidden_transitions(text):
+    """Drop sentence-leading 'Meanwhile', 'However', 'Furthermore', 'Additionally'.
+
+    These read as AI essay-mode. CLAUDE.md forbids them. We strip the word
+    plus its trailing comma; the next sentence stands on its own.
+    """
+    text = re.sub(
+        r'(^|(?<=[.!?]\s))(Meanwhile|However|Furthermore|Additionally)\s*,?\s*([a-z])',
+        lambda m: m.group(1) + m.group(3).upper(),
+        text
+    )
+    return text
+
+
 def collapse_whitespace(text):
     """Clean up double-spaces, leading/trailing whitespace, orphaned punctuation."""
     text = re.sub(r'  +', ' ', text)
@@ -202,6 +225,8 @@ def cleanup_paragraph(text, para_index):
     text = vary_motoko_opener(text, para_index)
     text = reduce_semicolons(text)
     text = vary_then_transitions(text)
+    text = strip_em_dashes(text)
+    text = strip_forbidden_transitions(text)
     text = collapse_whitespace(text)
     return text
 

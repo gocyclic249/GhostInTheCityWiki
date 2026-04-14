@@ -58,8 +58,8 @@ def download_via_canvas(driver, img_element):
             data = base64.b64decode(b64)
             if len(data) > 1000:
                 return data
-    except Exception:
-        pass
+    except Exception as e:
+        print(f"    canvas download failed: {e}")
     return None
 
 
@@ -95,8 +95,10 @@ def download_via_fetch(driver, url):
         result = driver.execute_async_script(script, url)
         if result and isinstance(result, str) and result.startswith("OK:"):
             return base64.b64decode(result[3:])
-    except Exception:
-        pass
+        if isinstance(result, str) and result.startswith("ERROR:"):
+            print(f"    fetch download failed: {result[6:]}")
+    except Exception as e:
+        print(f"    fetch download failed: {e}")
     return None
 
 
@@ -110,8 +112,8 @@ def download_via_urllib(url):
             data = resp.read()
             if len(data) > 500:
                 return data
-    except Exception:
-        pass
+    except Exception as e:
+        print(f"    urllib download failed: {e}")
     return None
 
 

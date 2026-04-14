@@ -24,7 +24,7 @@
     <header class="site-header">
       <div class="site-title" style="display:flex;align-items:center;justify-content:space-between;">
         <a href="index.html">&#x2588; Ghost in the City // Wiki</a>
-        <form class="search-float" style="display:flex;gap:0;margin:0;" action="search.html" method="GET">
+        <form class="search-float" style="display:flex;gap:0;margin:0;" onsubmit="var q=this.q.value.trim();if(q)window.open('https://www.google.com/search?q='+encodeURIComponent('site:ghostinthecity.neocities.org '+q),'_blank');return false;">
           <input type="text" name="q" placeholder="// search" aria-label="Search">
           <button type="submit">&#x25B6;</button>
         </form>

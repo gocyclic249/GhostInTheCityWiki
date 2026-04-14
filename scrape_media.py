@@ -5,15 +5,23 @@ Uses the Tavily Extract API to bypass Cloudflare protection.
 Downloads media threadmarks, extracts image URLs, and saves images locally.
 
 Usage:
-  python3 scrape_media.py                     # build index + download all (skips existing)
-  python3 scrape_media.py --index-only         # just build/refresh the threadmark index
-  python3 scrape_media.py --from N             # start downloading from entry N
-  python3 scrape_media.py --from N --to M      # download entries N to M
-  python3 scrape_media.py --redownload         # force re-download of all
-  python3 scrape_media.py --retry-empty        # re-fetch only posts with no images found
-  python3 scrape_media.py --show-manual        # list images needing manual browser download
-  python3 scrape_media.py --grab-sb            # download SB attachments via gallery-dl + cookies
-  python3 scrape_media.py --status             # show index stats
+  python3 scrape_media.py                          # build index + download all (skips existing)
+  python3 scrape_media.py --index-only             # just build/refresh the threadmark index
+  python3 scrape_media.py --from N                 # start downloading from entry N
+  python3 scrape_media.py --from N --to M          # download entries N to M
+  python3 scrape_media.py --redownload             # force re-download of all
+  python3 scrape_media.py --retry-empty            # re-fetch only posts with no images found
+  python3 scrape_media.py --show-manual            # list images needing manual download
+  python3 scrape_media.py --list-manual            # alias for --show-manual
+  python3 scrape_media.py --mark-manual POST_ID    # flag a post's images as needing manual replacement
+  python3 scrape_media.py --mark-manual POST_ID --count 2  # also for posts with multiple images
+  python3 scrape_media.py --unmark-manual POST_ID  # clear the manual flag after dropping a replacement
+  python3 scrape_media.py --grab-sb                # download SB attachments via gallery-dl + cookies
+  python3 scrape_media.py --status                 # show index stats
+
+Manual image workflow: see docs/manual-images.md for the full procedure
+(when an imgur URL dies, when SB shows its logo placeholder, when the
+parser misses an image entirely, etc.).
 
 SB attachment downloads require gallery-dl with browser cookies:
   1. Install: pip install gallery-dl (or use the venv at ~/.local/gallery-dl-venv/)
@@ -62,7 +70,7 @@ try:
     from lib.tavily_utils import tavily_extract, get_tavily_key
     get_tavily_key()
     HAS_TAVILY = True
-except (Exception, SystemExit):
+except Exception:
     HAS_TAVILY = False
     print("  Note: Tavily unavailable, using direct HTTP for all fetches.")
 
@@ -463,16 +471,22 @@ def guess_extension(url, content_type=""):
 
 
 def download_image(url, filepath):
-    """Download an image from a URL to a local file."""
+    """Download an image from a URL to a local file.
+
+    Return values:
+      True              — downloaded successfully
+      False             — download failed for an unknown reason
+      ("manual", src)   — known-bad source; needs manual replacement (src is the manual_source tag)
+    """
     # SpaceBattles attachments are behind Cloudflare — can't download directly
     if "forums.spacebattles.com/attachments/" in url:
-        print(f"    SB attachment (Cloudflare-blocked) — needs manual download")
-        return "manual"
+        print(f"    SB attachment (Cloudflare-blocked) — flagging for manual download")
+        return ("manual", "sb_attachment")
 
     # Discord CDN URLs expire and return 404
     if re.search(r'(cdn|media)\.discord(app)?\.com/', url):
-        print(f"    Discord CDN URL (expired) — skipping")
-        return False
+        print(f"    Discord CDN URL (expired) — flagging for manual download")
+        return ("manual", "discord")
 
     try:
         req = urllib.request.Request(url, headers={
@@ -598,12 +612,14 @@ def download_media(index, start_num=1, end_num=None, redownload=False, retry_emp
                 })
                 total_images += 1
                 print(f"  Downloaded: {filename}")
-            elif ok == "manual":
-                # Record in index (without local_file) so we don't lose the URL
+            elif isinstance(ok, tuple) and ok[0] == "manual":
+                # Record placeholder so the user knows where to drop a replacement
                 entry["images"].append({
                     "url": url,
-                    "local_file": None,
+                    "local_file": filename,
                     "alt_text": img["alt_text"],
+                    "needs_manual": True,
+                    "manual_source": ok[1],
                 })
                 manual_needed.append((i, title, url, filename))
             else:
@@ -670,7 +686,13 @@ def cmd_build_index():
 
 
 def cmd_show_manual():
-    """Show images that need manual download (SB attachments, expired Discord)."""
+    """Show images that need manual attention.
+
+    Picks up three failure modes:
+      1. needs_manual: true        — explicitly flagged (Discord, SB attachment, fake-success replacement)
+      2. local_file missing/null   — scraper recorded the URL but couldn't save the file
+      3. no images array at all    — parser missed the image(s); user must add them by hand
+    """
     if not os.path.exists(INDEX_PATH):
         print("No index file found. Run without --status first to build it.")
         return
@@ -681,38 +703,158 @@ def cmd_show_manual():
     manual = []
     for entry in index:
         post_id = entry.get("post_id", "")
-        for img_idx, img in enumerate(entry.get("images", []), 1):
+        images = entry.get("images") or []
+
+        for img_idx, img in enumerate(images, 1):
             url = img.get("url", "")
             local = img.get("local_file")
+            flagged = bool(img.get("needs_manual"))
+            source = img.get("manual_source", "")
+
+            if flagged:
+                filename = local or f"{post_id}_{img_idx}.{guess_extension(url)}"
+                manual.append((entry["index"], entry["title"], url, filename,
+                               entry.get("sb_url", ""), f"flagged: {source or 'manual'}"))
+                continue
+
             if not local:
                 ext = guess_extension(url)
                 filename = f"{post_id}_{img_idx}.{ext}"
-                # Check if manually downloaded already
                 filepath = os.path.join(IMAGE_DIR, filename)
                 if os.path.exists(filepath):
                     continue
-                manual.append((entry["index"], entry["title"], url, filename, entry.get("sb_url", "")))
+                manual.append((entry["index"], entry["title"], url, filename,
+                               entry.get("sb_url", ""), "no local file"))
 
-        # Also check entries with no images at all
-        if not entry.get("images"):
-            manual.append((entry["index"], entry["title"], "", "", entry.get("sb_url", "")))
+        if not images:
+            manual.append((entry["index"], entry["title"], "", "",
+                           entry.get("sb_url", ""), "parser miss — no images extracted"))
 
     if not manual:
-        print("All images are downloaded! Nothing needs manual action.")
+        print("All images are downloaded and unflagged. Nothing needs manual action.")
         return
 
     print(f"{'='*60}")
     print(f"  {len(manual)} image(s) need attention")
     print(f"{'='*60}")
-    for idx, title, url, filename, sb_url in manual:
-        print(f"  [{idx}] {title}")
+    for idx, title, url, filename, sb_url, reason in manual:
+        print(f"  [{idx}] {title}  ({reason})")
         if url:
             print(f"       URL:  {url}")
             print(f"       Save: wiki/build/media/{filename}")
         else:
             print(f"       Post: {sb_url}")
-            print(f"       (no images extracted — may need manual check)")
+            print(f"       (use --mark-manual {{post_id}} to create a placeholder)")
         print()
+    print(f"  See docs/manual-images.md for the recovery workflow.")
+
+
+def cmd_mark_manual(post_id, count=1, source="manual"):
+    """Flag a post's images as needing manual replacement.
+
+    Use cases:
+      1. Fake-success: scraper saved an imgur 404 placeholder. Mark it manual,
+         drop a real file at wiki/build/media/{post_id}_{N}.{ext}, then unmark.
+      2. Parser miss: post has no images in the index. Mark with --count N
+         to create N placeholder entries.
+    """
+    if not os.path.exists(INDEX_PATH):
+        print("No index file found.")
+        return
+
+    with open(INDEX_PATH, encoding="utf-8") as f:
+        index = json.load(f)
+
+    target = next((e for e in index if e.get("post_id") == post_id), None)
+    if not target:
+        print(f"No entry found for post_id {post_id}")
+        return
+
+    images = target.setdefault("images", [])
+    title = target.get("title", "")
+
+    def stamp(img):
+        """Record current file size so --unmark-manual can detect a real replacement."""
+        local = img.get("local_file")
+        if local:
+            fp = os.path.join(IMAGE_DIR, local)
+            img["manual_baseline_size"] = os.path.getsize(fp) if os.path.exists(fp) else 0
+        else:
+            img["manual_baseline_size"] = 0
+
+    if not images:
+        for n in range(1, count + 1):
+            filename = f"{post_id}_{n}.png"
+            img = {
+                "url": "",
+                "local_file": filename,
+                "alt_text": "",
+                "needs_manual": True,
+                "manual_source": source,
+            }
+            stamp(img)
+            images.append(img)
+        print(f"  Created {count} placeholder image(s) on post {post_id} ({title})")
+    else:
+        for img in images:
+            img["needs_manual"] = True
+            img.setdefault("manual_source", source)
+            stamp(img)
+        print(f"  Flagged {len(images)} image(s) on post {post_id} ({title})")
+
+    with open(INDEX_PATH, "w", encoding="utf-8") as f:
+        json.dump(index, f, indent=2, ensure_ascii=False)
+    print(f"  Drop replacement file(s) at: wiki/build/media/{post_id}_*.{{ext}}")
+    print(f"  Then run: python3 scrape_media.py --unmark-manual {post_id}")
+
+
+def cmd_unmark_manual(post_id):
+    """Clear the needs_manual flag on a post once a replacement has been dropped.
+
+    Verifies the local file exists before clearing, so we don't accidentally
+    clear a flag that still has no real image behind it.
+    """
+    if not os.path.exists(INDEX_PATH):
+        print("No index file found.")
+        return
+
+    with open(INDEX_PATH, encoding="utf-8") as f:
+        index = json.load(f)
+
+    target = next((e for e in index if e.get("post_id") == post_id), None)
+    if not target:
+        print(f"No entry found for post_id {post_id}")
+        return
+
+    cleared = 0
+    skipped = 0
+    for img in target.get("images", []):
+        if not img.get("needs_manual"):
+            continue
+        local = img.get("local_file")
+        if not local:
+            skipped += 1
+            continue
+        filepath = os.path.join(IMAGE_DIR, local)
+        if not os.path.exists(filepath):
+            print(f"  Skipping {local}: file not found at {filepath}")
+            skipped += 1
+            continue
+        baseline = img.get("manual_baseline_size", 0)
+        current = os.path.getsize(filepath)
+        if current == baseline:
+            print(f"  Skipping {local}: file size unchanged ({current} bytes) — drop a real replacement first")
+            skipped += 1
+            continue
+        img["needs_manual"] = False
+        img.pop("manual_source", None)
+        img.pop("manual_baseline_size", None)
+        cleared += 1
+
+    if cleared:
+        with open(INDEX_PATH, "w", encoding="utf-8") as f:
+            json.dump(index, f, indent=2, ensure_ascii=False)
+    print(f"  Cleared {cleared} flag(s), skipped {skipped} (file missing).")
 
 
 def download_sb_attachment_gdl(url, filepath, cookies_path):
@@ -951,8 +1093,30 @@ def main():
         cmd_status()
         return
 
-    if "--show-manual" in args:
+    if "--show-manual" in args or "--list-manual" in args:
         cmd_show_manual()
+        return
+
+    if "--mark-manual" in args:
+        idx = args.index("--mark-manual")
+        if idx + 1 >= len(args):
+            print("ERROR: --mark-manual requires a POST_ID argument")
+            sys.exit(1)
+        post_id = args[idx + 1]
+        count = 1
+        if "--count" in args:
+            ci = args.index("--count")
+            if ci + 1 < len(args):
+                count = int(args[ci + 1])
+        cmd_mark_manual(post_id, count=count)
+        return
+
+    if "--unmark-manual" in args:
+        idx = args.index("--unmark-manual")
+        if idx + 1 >= len(args):
+            print("ERROR: --unmark-manual requires a POST_ID argument")
+            sys.exit(1)
+        cmd_unmark_manual(args[idx + 1])
         return
 
     if "--grab-sb" in args:

@@ -34,7 +34,7 @@ For each chapter number:
    **MODERATE errors** (misleading):
    - **Wrong sequence**: Events described in a different order, implying wrong causation
    - **Conflated scenes**: Two separate events merged into one in a way that changes meaning
-   - **Missing context**: A described event is technically correct but omits crucial context that changes its meaning
+   - **Missing context**: A described event is technically correct but omits context such that a reader would draw a different conclusion about a character's motive or the chapter's outcome. Threshold: if removing the omitted detail flips the reader's understanding of *why* something happened or *who is responsible*, flag MODERATE; otherwise it's MINOR.
 
    **MINOR errors** (imprecise):
    - **Imprecise wording**: Description is close but not quite right (e.g., "sword" when it was a "knife")
@@ -46,10 +46,11 @@ For each chapter number:
 4. **Check kill_notes**: Verify the kill_notes accurately describe what happened.
 
 5. **Style check** (non-blocking, just note):
-   - Em-dashes present? (should not be)
-   - XP values or stat numbers? (should not be)
+   - Em-dashes (`—` or ` — `) present? (must not be — #1 AI tell)
+   - XP values, stat numbers, perk names? (should not be)
    - Starts every paragraph with "Motoko"? (should vary)
-   - Uses "Meanwhile", "However", "Furthermore"? (should not)
+   - Uses "Meanwhile", "However", "Furthermore", "Additionally"? (should not)
+   - Slang consistency: if the source chapter is heavy with Night City slang and the summary uses zero slang, flag as MINOR style mismatch.
 
 ### For Braindances (--braindances)
 

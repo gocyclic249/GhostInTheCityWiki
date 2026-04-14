@@ -15,6 +15,9 @@ import sys
 import urllib.error
 import urllib.request
 
+if sys.version_info < (3, 8):
+    sys.exit("upload.py requires Python 3.8+ (uses walrus operator).")
+
 # ── Paths ──────────────────────────────────────────────────────────────────
 
 WIKI_DIR      = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

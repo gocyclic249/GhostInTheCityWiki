@@ -51,13 +51,22 @@ Read the full chapter text carefully, then write a summary following these rules
 
 **Voice (from CLAUDE.md style guide):**
 - Punchy, dry, street-level. Match the energy of the reference summaries above.
-- Use Seras's slang naturally: "preem", "choom", "chrome", "eddies", "chipped in"
-- Keep dark humor when the chapter has it
-- NO em-dashes. Use periods, commas, or sentence breaks.
-- NO: "Meanwhile", "However", "Furthermore", "Additionally"
-- NO: XP values, stat numbers, level-up announcements, perk names
-- When a game mechanic matters, describe the capability, not the number
-- Vary paragraph openers. Not every one starts with "Motoko".
+- Tone vocabulary for "punchy, dry": short sentences, action verbs first, minimal adjectives, no hedging, no editorializing.
+- Slang density: at least one piece of Night City slang per summary, no more than two per paragraph. Use "preem", "choom", "chrome", "eddies", "chipped in", "gonk", "nova", "delta", "scop". If it feels forced, drop it.
+- Keep dark humor when the chapter has it.
+- NO: XP values, stat numbers, level-up announcements, perk names.
+- NO: "Meanwhile", "However", "Furthermore", "Additionally" (transition words read as AI).
+- When a game mechanic matters, describe the capability, not the number.
+
+> **CRITICAL: NO EM-DASHES.** Em-dashes (`—` or ` — `) are the #1 AI-tell and the cleanup script does strip them, but the goal is zero hits. Use periods, commas, or sentence breaks instead. This rule has zero exceptions.
+
+**Paragraph openers — vary across the summary. Acceptable patterns:**
+- "Motoko" (use sparingly, never twice in a row)
+- "She" / "Her"
+- A verb-first sentence ("Walked into the bar..." / "Took the shard...")
+- A location ("In Japantown...")
+- A character other than Motoko ("Jun-Nii...", "Hiromi...")
+- A dialogue beat or quoted line
 
 **Kill counting:**
 - Count only kills Motoko directly causes

@@ -739,7 +739,10 @@
       {
         "url": "https://i.imgur.com/Ddc956A.png",
         "local_file": "91534014_1.png",
-        "alt_text": "Image 23"
+        "alt_text": "Image 23",
+        "needs_manual": true,
+        "manual_source": "manual",
+        "manual_baseline_size": 503
       }
     ],
     "artist": "steamrick",
@@ -1561,7 +1564,10 @@
       {
         "url": "https://i.imgur.com/1N7vNbl.png",
         "local_file": "100875358_1.png",
-        "alt_text": "Image 7"
+        "alt_text": "Image 7",
+        "needs_manual": true,
+        "manual_source": "manual",
+        "manual_baseline_size": 1059491
       }
     ],
     "artist": "RavensDagger",
@@ -1744,6 +1750,15 @@
     "index": 89,
     "artist": "Unknown",
     "context": "Motoko awesome painting!NewMalcolm and IchiHiromi(Toga) design!Hiromi thinking of suited up MotokoMotoko Kusanagi as an adultOnryo HackLaughing Man Motoko art![](https://forums.spacebattles.com/threads/ghost-in-the-city-cyberpunk-gamer-si.1046809/page-2533) Informational View all 51 threadmarks * * * Reader mode * * * Motoko Songs by Genre. (up to Chapter 205)Martial Arts, and Panzer FaustRules for LitRPGPerk list with description (Fan Made! Great job!)Why 2077 will not go the same in GitCBar...",
-    "images": []
+    "images": [
+      {
+        "url": "",
+        "local_file": "121039077_1.png",
+        "alt_text": "",
+        "needs_manual": true,
+        "manual_source": "manual",
+        "manual_baseline_size": 0
+      }
+    ]
   }
 ]
