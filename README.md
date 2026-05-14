@@ -46,13 +46,20 @@ A gamer flatlines in the real world and wakes up in Night City, 2075 — jacked 
 
 ```
 GhostInTheCityWiki/
-├── chapters/              # Downloaded chapter markdown files (AO3)
-├── sidestories/           # Downloaded side story markdown files (SpaceBattles)
+├── chapters/              # Downloaded chapter markdown files (AO3, gitignored)
+├── sidestories/           # Downloaded side story markdown files (SpaceBattles, gitignored)
+├── docs/
+│   └── manual-images.md   # Manual image recovery procedure
 ├── lib/                   # Shared Python utilities
 │   ├── selenium_utils.py  # Chrome driver creation, Cloudflare handling
 │   ├── spacebattles_utils.py  # SpaceBattles login
 │   ├── tavily_utils.py    # Tavily Extract API helper
 │   └── image_utils.py     # Image download (canvas, fetch, urllib)
+├── scripts/
+│   └── debug/             # Fallback image-recovery scripts (Selenium)
+│       ├── grab_remaining.py     # Selenium image grabber
+│       ├── chrome_download.py    # Cloudflare-protected image downloader
+│       └── download_external.py  # External image downloader (imgur, etc.)
 ├── wiki/
 │   ├── cache/             # JSON data files (edit these!)
 │   │   ├── characters.json
@@ -61,16 +68,19 @@ GhostInTheCityWiki/
 │   │   └── chapter_summaries.json
 │   ├── build/             # Generated HTML (don't edit)
 │   └── scripts/
-│       ├── build.py       # Build orchestrator
-│       ├── build_html.py  # HTML renderer
-│       └── upload.py      # Neocities uploader
+│       ├── build.py             # Build orchestrator
+│       ├── build_html.py        # HTML renderer
+│       ├── cleanup_summaries.py # AI-pattern cleanup safety net
+│       └── upload.py            # Neocities uploader
 ├── scrape.py              # AO3 chapter scraper
 ├── scrape_media.py        # SpaceBattles media/fan art scraper
 ├── scrape_sidestories.py  # SpaceBattles side story scraper
-├── grab_remaining.py      # Selenium image grabber (fallback)
-├── chrome_download.py     # Cloudflare-protected image downloader
-├── download_external.py   # External image downloader (imgur, etc.)
 ├── update_wiki.py         # Full pipeline orchestrator
+├── threadmarks_index.json # Chapter metadata index
+├── sidestories_index.json # Side story metadata index
+├── media_index.json       # Media threadmark index + image metadata
+├── requirements.txt       # Python dependencies
+├── LICENSE                # AGPL-3.0
 └── .env.example           # Environment variable template
 ```
 
@@ -79,17 +89,22 @@ GhostInTheCityWiki/
 ## Setup
 
 1. Clone the repo
-2. Copy `.env.example` to `.env` and fill in your keys:
+2. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+3. Copy `.env.example` to `.env` and fill in your keys:
    ```bash
    cp .env.example .env
    # Edit .env with your actual credentials
    source .env
    ```
-3. Required environment variables:
+4. Required environment variables:
    - `NEOCITIES_API_KEY` — for deploying to Neocities
-   - `TAVILY_API_KEY` — for scraping SpaceBattles (Cloudflare bypass)
    - `SB_USER` / `SB_PASS` — SpaceBattles login (for image downloads)
-4. Optional: set `CHROMEDRIVER_PATH` and `CHROMIUM_PATH` to override auto-detection
+5. Optional environment variables:
+   - `TAVILY_API_KEY` — improves SpaceBattles image extraction; falls back to direct HTTP if unset
+   - `CHROMEDRIVER_PATH` / `CHROMIUM_PATH` — override Chrome auto-detection (debug scripts only)
 
 ---
 
@@ -215,7 +230,10 @@ Validate your JSON at [jsonlint.com](https://jsonlint.com) before rebuilding.
 Full pipeline (scrape + build + upload):
 ```bash
 source .env
-python3 update_wiki.py
+python3 update_wiki.py            # full update: scrape + build + upload
+python3 update_wiki.py --scrape   # scrape only (no build/upload)
+python3 update_wiki.py --build    # build + upload only (no scraping)
+python3 update_wiki.py --dry-run  # show what would change, don't upload
 ```
 
 Build and upload only (no scraping):
@@ -229,4 +247,26 @@ Build only (no upload):
 python3 wiki/scripts/build.py --build
 ```
 
-Requires Python 3 (stdlib only for build/upload — Selenium needed for image scrapers).
+Requires Python 3. Build/upload and the AO3 scraper use the standard library only;
+the SpaceBattles scrapers need the packages in `requirements.txt`. Selenium is only
+needed for the optional debug recovery scripts in `scripts/debug/`.
+
+---
+
+## Manual Image Workflow
+
+Some media images can't be scraped automatically (dead imgur URLs, SB-served logo
+fallbacks, parser misses, Discord CDN expirations, Cloudflare-blocked SB attachments).
+The full recovery procedure is in [`docs/manual-images.md`](docs/manual-images.md).
+Quick commands:
+
+- `python3 scrape_media.py --show-manual` — list every image needing attention
+- `python3 scrape_media.py --mark-manual POST_ID [--count N]` — flag a post for manual replacement
+- `python3 scrape_media.py --unmark-manual POST_ID` — clear the flag once a real file is in `wiki/build/media/`
+
+---
+
+## License
+
+Code is licensed under AGPL-3.0 — see [`LICENSE`](LICENSE). Story content belongs to
+Seras; chapter and side-story text is gitignored and not redistributed in this repo.
