@@ -20,14 +20,14 @@
       },
       {
         "url": "https://forums.spacebattles.com/attachments/ghost-in-the-shell-sac_2045-episode-8-motoko-charming-jpg.82726/",
-        "local_file": "87702034_3.jpg",
+        "local_file": null,
         "alt_text": "",
         "needs_manual": true,
         "manual_source": "sb_attachment"
       },
       {
         "url": "https://forums.spacebattles.com/attachments/dd94yrr-6682d7b6-a54d-44de-90e6-c38fbaa03f2c-jpg.82729/",
-        "local_file": "87702034_4.jpg",
+        "local_file": null,
         "alt_text": "",
         "needs_manual": true,
         "manual_source": "sb_attachment"
@@ -539,60 +539,60 @@
     "images": [
       {
         "url": "https://forums.spacebattles.com/data/attachments/85/85394-7ad73b870f09a5b7fe968c96fd7dc8ab.jpg",
-        "local_file": "89590898_1.jpg",
+        "local_file": "89590898_1.png",
         "alt_text": "Image 12: editphotomode_10012023_210825.png"
       },
       {
         "url": "https://forums.spacebattles.com/data/attachments/85/85400-51c72cd88449bd08c650ef58f889e206.jpg",
-        "local_file": "89590898_2.jpg",
+        "local_file": "89590898_2.png",
         "alt_text": "Image 14: Editphotomode_10012023_210018.png"
       },
       {
         "url": "https://forums.spacebattles.com/data/attachments/85/85397-67613aac168d8e98a0faf01ef39232fd.jpg",
-        "local_file": "89590898_3.jpg",
+        "local_file": "89590898_3.png",
         "alt_text": "Image 16: editphotomode_10012023_210752.png"
       },
       {
         "url": "https://forums.spacebattles.com/data/attachments/85/85403-458e3e4dbba695a8d5ff62fc8d088618.jpg",
-        "local_file": "89590898_4.jpg",
+        "local_file": "89590898_4.png",
         "alt_text": "Image 18: editphotomode_10012023_210250.png"
       },
       {
         "url": "https://forums.spacebattles.com/data/attachments/85/85406-aa0a4965c02624fb69ef5509488621fd.jpg",
-        "local_file": "89590898_5.jpg",
+        "local_file": "89590898_5.png",
         "alt_text": "Image 20: editphotomode_10012023_210432.png"
       },
       {
         "url": "https://forums.spacebattles.com/attachments/editphotomode_10012023_210825-png.86681/",
-        "local_file": "89590898_6.png",
+        "local_file": null,
         "alt_text": "",
         "needs_manual": true,
         "manual_source": "sb_attachment"
       },
       {
         "url": "https://forums.spacebattles.com/attachments/editphotomode_10012023_210018-png.86687/",
-        "local_file": "89590898_7.png",
+        "local_file": null,
         "alt_text": "",
         "needs_manual": true,
         "manual_source": "sb_attachment"
       },
       {
         "url": "https://forums.spacebattles.com/attachments/editphotomode_10012023_210752-png.86684/",
-        "local_file": "89590898_8.png",
+        "local_file": null,
         "alt_text": "",
         "needs_manual": true,
         "manual_source": "sb_attachment"
       },
       {
         "url": "https://forums.spacebattles.com/attachments/editphotomode_10012023_210250-png.86690/",
-        "local_file": "89590898_9.png",
+        "local_file": null,
         "alt_text": "",
         "needs_manual": true,
         "manual_source": "sb_attachment"
       },
       {
         "url": "https://forums.spacebattles.com/attachments/editphotomode_10012023_210432-png.86693/",
-        "local_file": "89590898_10.png",
+        "local_file": null,
         "alt_text": "",
         "needs_manual": true,
         "manual_source": "sb_attachment"
@@ -813,21 +813,21 @@
     "images": [
       {
         "url": "https://cdn.discordapp.com/attachments/1091084385987612744/1096541324196446339/alexdoan_teenage_girl_young_cute_beautiful_14_years_old_teenage_cef311c6-7b85-45b3-b238-e757d1dfcf82.png",
-        "local_file": "91754121_1.png",
+        "local_file": null,
         "alt_text": "Image 10",
         "needs_manual": true,
         "manual_source": "discord"
       },
       {
         "url": "https://cdn.discordapp.com/attachments/1091084385987612744/1096529711414395072/alexdoan_Motoko_Kusanagi_Jackie_young_14_years_old_teenager_leo_78382bd1-9178-4149-a96b-0d6eb4c9adfc.png",
-        "local_file": "91754121_2.png",
+        "local_file": null,
         "alt_text": "Image 12",
         "needs_manual": true,
         "manual_source": "discord"
       },
       {
         "url": "https://cdn.discordapp.com/attachments/1091084385987612744/1096535755586797769/alexdoan_Motoko_Kusanagi_very_young_cute_beautiful_14_years_old_f1720324-4dc5-464a-944b-46161cb82302.png",
-        "local_file": "91754121_3.png",
+        "local_file": null,
         "alt_text": "Image 14",
         "needs_manual": true,
         "manual_source": "discord"
@@ -847,28 +847,28 @@
     "images": [
       {
         "url": "https://cdn.discordapp.com/attachments/1091084385987612744/1096555140686823494/alexdoan_Motoko_Kusanagi_teenage_girl_young_cute_teenager_weari_ac1c4599-f413-4cd5-ae35-7d8ee82a064b.png",
-        "local_file": "91755993_1.png",
+        "local_file": "91755993_1.jpg",
         "alt_text": "Image 8",
-        "needs_manual": true,
-        "manual_source": "discord"
+        "needs_manual": false,
+        "manual_source": null
       },
       {
         "url": "https://cdn.discordapp.com/attachments/1091084385987612744/1096554941155381308/alexdoan_Motoko_Kusanagi_teenage_girl_young_cute_teenager_weari_01fee1ac-6927-4acd-81f6-f875ec3251bd.png",
-        "local_file": "91755993_2.png",
+        "local_file": null,
         "alt_text": "Image 10",
         "needs_manual": true,
         "manual_source": "discord"
       },
       {
         "url": "https://cdn.discordapp.com/attachments/1091084385987612744/1096562663946997900/alexdoan_Motoko_Kusanagi_teenage_girl_young_cute_teenager_weari_2285477b-8710-415e-a011-6988013bd800.png",
-        "local_file": "91755993_3.png",
+        "local_file": null,
         "alt_text": "Image 12",
         "needs_manual": true,
         "manual_source": "discord"
       },
       {
         "url": "https://cdn.discordapp.com/attachments/1091084385987612744/1096559839360065659/alexdoan_Motoko_Kusanagi_teenage_girl_young_cute_teenager_weari_6f19d71b-4240-4f4c-8e6a-d1853b0df9c1.png",
-        "local_file": "91755993_4.png",
+        "local_file": null,
         "alt_text": "Image 14",
         "needs_manual": true,
         "manual_source": "discord"
@@ -888,21 +888,21 @@
     "images": [
       {
         "url": "https://cdn.discordapp.com/attachments/1091084385987612744/1096663443748159568/alexdoan_Motoko_Kusanagi_young_short_teenage_girl_wearing_black_6fd184c2-a937-482d-b2ad-e8cc8ab55d1b.png",
-        "local_file": "91765497_1.png",
+        "local_file": null,
         "alt_text": "Image 30",
         "needs_manual": true,
         "manual_source": "discord"
       },
       {
         "url": "https://cdn.discordapp.com/attachments/1091084385987612744/1096664578554859581/alexdoan_Motoko_Kusanagi_young_short_teenage_girl_worried_weari_f00fdd2f-b6b6-4f40-b8ca-5bc891fef78e.png",
-        "local_file": "91765497_2.png",
+        "local_file": null,
         "alt_text": "Image 32",
         "needs_manual": true,
         "manual_source": "discord"
       },
       {
         "url": "https://cdn.discordapp.com/attachments/1091084385987612744/1096675121600659596/alexdoan_Motoko_Kusanagi_young_short_teenage_girl_worried_weari_f81b42e6-a8cf-452a-8eae-a77c4daa9528.png",
-        "local_file": "91765497_3.png",
+        "local_file": null,
         "alt_text": "Image 34",
         "needs_manual": true,
         "manual_source": "discord"
@@ -955,28 +955,28 @@
     "images": [
       {
         "url": "https://cdn.discordapp.com/attachments/1091084385987612744/1097002428613787728/alexdoan_Motoko_Kusanagi_a_young_short_teenage_girl_looking_wor_300c2be2-aa5d-404f-916b-85b4e306908d.png",
-        "local_file": "91788975_1.png",
+        "local_file": null,
         "alt_text": "Image 14",
         "needs_manual": true,
         "manual_source": "discord"
       },
       {
         "url": "https://cdn.discordapp.com/attachments/1091084385987612744/1096994140094480424/alexdoan_Motoko_Kusanagi_a_young_short_teenage_girl_looking_wor_294d5c59-816d-43fd-b387-cbdba11037de.png",
-        "local_file": "91788975_2.png",
+        "local_file": null,
         "alt_text": "Image 16",
         "needs_manual": true,
         "manual_source": "discord"
       },
       {
         "url": "https://cdn.discordapp.com/attachments/1091084385987612744/1096998001546907678/alexdoan_Motoko_Kusanagi_a_young_short_teenage_girl_looking_wor_7c75bd45-613f-444e-a39a-3df05093c7cf.png",
-        "local_file": "91788975_3.png",
+        "local_file": null,
         "alt_text": "Image 18",
         "needs_manual": true,
         "manual_source": "discord"
       },
       {
         "url": "https://cdn.discordapp.com/attachments/1091084385987612744/1097217954216673401/alexdoan_Motoko_Kusanagi_a_young_short_teenage_girl_with_purple_b6ead5a0-8def-4fc9-b4e6-2b2f851c4c0e.png",
-        "local_file": "91788975_4.png",
+        "local_file": null,
         "alt_text": "Image 20",
         "needs_manual": true,
         "manual_source": "discord"
@@ -1138,7 +1138,7 @@
     "images": [
       {
         "url": "https://cdn.discordapp.com/attachments/1109528929510903942/1109528994841370674/IMG_20230521_010953.jpg",
-        "local_file": "92611121_1.jpg",
+        "local_file": null,
         "alt_text": "Image 22",
         "needs_manual": true,
         "manual_source": "discord"
@@ -1349,36 +1349,36 @@
     "images": [
       {
         "url": "https://forums.spacebattles.com/data/attachments/94/94894-6505c33507729bb47fa85c04606d3a60.jpg",
-        "local_file": "94907719_1.jpg",
+        "local_file": "94907719_1.png",
         "alt_text": "Image 17: photomode_27082023_202027sdasd.png"
       },
       {
         "url": "https://forums.spacebattles.com/data/attachments/94/94903-85046ec7ce185008e417f26ca264a0fd.jpg",
-        "local_file": "94907719_2.jpg",
+        "local_file": "94907719_2.png",
         "alt_text": "Image 19: photomode_27082023_2022asdsdsd16.png"
       },
       {
         "url": "https://forums.spacebattles.com/data/attachments/94/94900-f3e55115b47881eae811ace574a978fc.jpg",
-        "local_file": "94907719_3.jpg",
+        "local_file": "94907719_3.png",
         "alt_text": "Image 21: photomode_270820asdsds23_202248.png"
       },
       {
         "url": "https://forums.spacebattles.com/attachments/photomode_27082023_202027sdasd-png.96178/",
-        "local_file": "94907719_4.png",
+        "local_file": null,
         "alt_text": "",
         "needs_manual": true,
         "manual_source": "sb_attachment"
       },
       {
         "url": "https://forums.spacebattles.com/attachments/photomode_27082023_2022asdsdsd16-png.96187/",
-        "local_file": "94907719_5.png",
+        "local_file": null,
         "alt_text": "",
         "needs_manual": true,
         "manual_source": "sb_attachment"
       },
       {
         "url": "https://forums.spacebattles.com/attachments/photomode_270820asdsds23_202248-png.96184/",
-        "local_file": "94907719_6.png",
+        "local_file": null,
         "alt_text": "",
         "needs_manual": true,
         "manual_source": "sb_attachment"
@@ -1421,7 +1421,7 @@
       },
       {
         "url": "https://forums.spacebattles.com/attachments/motoko-resize-jpg.97030/",
-        "local_file": "95362525_2.jpg",
+        "local_file": null,
         "alt_text": "",
         "needs_manual": true,
         "manual_source": "sb_attachment"

@@ -13,6 +13,7 @@ import json
 import os
 import sys
 import urllib.error
+import urllib.parse
 import urllib.request
 
 if sys.version_info < (3, 8):
@@ -159,7 +160,6 @@ def neocities_delete(nc_paths, api_key):
         f"filenames[]={urllib.parse.quote(p)}"
         for p in nc_paths
     )
-    import urllib.parse  # noqa (already imported via urllib)
     body = params.encode()
     ctype = "application/x-www-form-urlencoded"
     result = api_request("delete", method="POST", body=body,
@@ -174,8 +174,6 @@ def neocities_info(api_key):
 # ── Main upload logic ──────────────────────────────────────────────────────
 
 def run_upload(dry_run=False):
-    import urllib.parse  # ensure available
-
     api_key  = get_api_key()
     manifest = load_manifest()
     local    = scan_build_dir()
@@ -251,7 +249,6 @@ def run_status():
 
 
 if __name__ == "__main__":
-    import urllib.parse
     if "--dry-run" in sys.argv:
         run_upload(dry_run=True)
     elif "--status" in sys.argv:

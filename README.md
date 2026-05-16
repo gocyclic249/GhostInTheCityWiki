@@ -89,10 +89,20 @@ GhostInTheCityWiki/
 ## Setup
 
 1. Clone the repo
-2. Install dependencies:
+2. Install Python dependencies:
    ```bash
    pip install -r requirements.txt
    ```
+   The SpaceBattles scrapers (`scrape_media.py`, `scrape_sidestories.py`) need:
+   - `requests` — HTTP client
+   - `beautifulsoup4` — HTML parsing
+   - `lxml` — fast parser backend for BeautifulSoup
+
+   Build/upload and the AO3 scraper use the Python standard library only.
+
+   Optional packages (commented out in `requirements.txt`):
+   - `tavily-python` — improves SpaceBattles image extraction; falls back to direct HTTP if absent
+   - `selenium` — only needed for the debug recovery scripts in `scripts/debug/`
 3. Copy `.env.example` to `.env` and fill in your keys:
    ```bash
    cp .env.example .env
