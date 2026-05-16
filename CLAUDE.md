@@ -1,10 +1,47 @@
-# Ghost in the City Wiki
+# CLAUDE.md
 
-Fan wiki for *Ghost in the City*, a Cyberpunk 2077 / Ghost in the Shell crossover SI fanfic by **Seras** on SpaceBattles and AO3.
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Project Overview
 
-This is a fan wiki project (Neocities-hosted). The main workflow is: scrape/update data → rebuild wiki pages → deploy to Neocities. Always confirm which branch and which script version before running anything.
+Fan wiki for *Ghost in the City*, a Cyberpunk 2077 / Ghost in the Shell crossover SI fanfic by **Seras** on SpaceBattles and AO3. Neocities-hosted. The main workflow is: scrape/update data → rebuild wiki pages → deploy to Neocities. Always confirm which branch and which script version before running anything.
+
+## Common Commands
+
+```bash
+source .env                                 # load NEOCITIES_API_KEY, SB_USER, SB_PASS
+
+# Full pipeline orchestrator (calls scrape → build → upload)
+python3 update_wiki.py                      # full update
+python3 update_wiki.py --scrape             # scrape only
+python3 update_wiki.py --build              # build + upload only
+python3 update_wiki.py --dry-run            # preview, no upload
+
+# Individual scrapers
+python3 scrape.py --update                  # pull new AO3 chapters
+python3 scrape.py --from N [--to M]         # re-scrape a range
+python3 scrape_sidestories.py               # refresh SB side story index
+python3 scrape_media.py                     # refresh media + download images
+
+# Build / deploy (no scraping)
+python3 wiki/scripts/build.py --status      # cache completeness + kill count
+python3 wiki/scripts/build.py --build       # render JSON cache → HTML
+python3 wiki/scripts/build.py --all         # build + upload to Neocities
+
+# Maintenance
+python3 wiki/scripts/cleanup_summaries.py   # strip AI patterns from summaries (em-dashes etc.)
+```
+
+Build/upload and the AO3 scraper are stdlib-only. Only the SpaceBattles scrapers need `pip install -r requirements.txt`. Selenium is only for the optional debug recovery scripts in `scripts/debug/`.
+
+## Environment Variables
+
+Required (set in `.env`, then `source .env`):
+- `NEOCITIES_API_KEY` — deploys to Neocities
+- `SB_USER` / `SB_PASS` — SpaceBattles login (for media + side story scrapers)
+
+Optional:
+- `CHROMEDRIVER_PATH` / `CHROMIUM_PATH` — override auto-detection for debug recovery scripts only
 
 ## Project Layout
 
