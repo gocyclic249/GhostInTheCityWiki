@@ -14,3 +14,4 @@ lxml
 # Optional: Selenium-based fallback image recovery (scripts/debug/*).
 # Only needed if you run the manual recovery scripts.
 # selenium
+selenium==4.44.0  # added by depgen 2026-05-23
