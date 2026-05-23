@@ -327,5 +327,15 @@
       }
     ],
     "notes": "Rockerboy maxes at Level 10. Force of Personality perk acquired. MSM dangles a movie soundtrack pitch."
+  },
+  {
+    "event_id": "RB-013",
+    "chapter_number": 245,
+    "venue": "Morro Rock (Battle of the Bands)",
+    "location": "Night City",
+    "type": "Radio / Media",
+    "band": "Stand Alone Complex",
+    "context": "MSM-pushed slot in Morro Rock's battle of the bands, a middling venue with a paid crowd and live radio plus TV broadcast carrying the real ratings. Stand Alone Complex played 'Heathens' again instead of new material on Hiromi's call to push the upcoming album. Motoko walked out in sharp stage makeup with the Orphean humming and ran every trick Rockerboy 10 and Force of Personality gave her on the opening line. Carmen SinCity's basically-solo band took the contest, clearly bought, but Alice's live-broadcast heckle of 'Fuck you Carmen! You suck!' pulled real laughter past the paid crowd. Alex revealed afterward MSM never expected a win — the play was visibility, and post-contest chatter pegged Stand Alone Complex as one of three bands the public thought should have taken the top spot.",
+    "outcome": "Lost the contest by ratings, won the visibility play. Album hype boost."
   }
 ]

@@ -16,7 +16,7 @@
     ],
     "cp_stats": {
       "game": "Cyberpunk 2077 (pre-Update 2.0)",
-      "as_of": "Chapter 242",
+      "as_of": "Chapter 245",
       "level": 30,
       "attributes": {
         "Body": 10,
@@ -481,6 +481,54 @@
     "bio": [
       "Motoko physically infiltrated Regina's office tower to pitch herself as a merc. Regina was intrigued by the boldness and hired her on the spot for a high-profile job: assassinate Jotaro Shobo, the Devil of Kabuki. Motoko executed it clean. The success established their working relationship.",
       "The relationship runs hot and cold. After Motoko pulled out of a difficult 6th Street infiltration she couldn't complete, Regina went quiet for a stretch. Later gigs resumed through corporate contract channels, including Kang Tao work. Purely business, occasional friction, but Regina keeps calling because Motoko keeps delivering."
+    ]
+  },
+  "david": {
+    "name": "David Martinez",
+    "category": "canon",
+    "role": "Arasaka Academy Student",
+    "faction": "Arasaka Academy",
+    "affiliation": "Independent",
+    "status": "Active",
+    "first_chapter": 148,
+    "icon": "&#x26A1;",
+    "description": "Street kid scraping by at Arasaka Academy on his mother's dream. Picked up by Malcolm somewhere along the line and dragged into Section 9's orbit as a friendly puppy with no street instincts.",
+    "physical_description": "Skinny teenager who looks the part of a corpo academy student in over his head. Wears the cheap end of the corpo-kid wardrobe and earns it. When Malcolm drags him into gun training he shows up in a basic bulletproof vest and a crappy helmet Malcolm scrounged for him.",
+    "bio": [
+      "Motoko first met David as the BD-pushing kid in front of Arasaka Academy, selling Nox's stock to other students out of a tablet and pocketing change for himself. A street kid living a corpo-kid life, working hard not to get crushed between the two worlds, with a mother who poured everything into getting him into the Academy.",
+      "By chapter 244 he is part of Malcolm's orbit, picked up at some point and brought along when the crew needs a fourth body. Motoko runs him through gun-tag training in an abandoned warehouse and lectures him on aiming his pistol properly instead of imitating gangoons. He panics through a terrible alibi when his Mama calls him at Lizzie's mid-meal — Motoko's read on him is that he is a moron with no street survival reflexes, but Malcolm covers for him and Hiromi quietly tells him to stop listening to Katsuo at school. Motoko privately worries his Arasaka trajectory ends with him dead in someone's office politics, or dying in a blaze of glory if he ever leaves."
+    ]
+  },
+  "carmen": {
+    "name": "Carmen SinCity",
+    "category": "story",
+    "role": "Rockerboy / Frontman",
+    "faction": "Outerscope Records",
+    "affiliation": "Outerscope Records",
+    "status": "Active",
+    "first_chapter": 231,
+    "icon": "&#x1F3A4;",
+    "description": "Bio-sculpted former frontman of Violent Hemorrhage who walked to Outerscope Records and left Alice, Klein, and Jared holding the wreckage. Recurring antagonist to Stand Alone Complex.",
+    "physical_description": "Everything about him is fake: bio-sculpted face, fake voice, outrageous outfits. Walks with a groupie under one arm and a tantrum on standby.",
+    "bio": [
+      "Originally the frontman of Violent Hemorrhage with Alice Novak, Klein, and Jared. He left the band for a solo push at Outerscope Records, and the band collapsed without him before re-forming around Motoko as Stand Alone Complex. Carmen has nursed the grudge ever since.",
+      "By chapter 245 he is making a habit of showing up at Stand Alone Complex's gigs to mock them as coattail riders. At Morro Rock's battle of the bands he confronts Alice and Motoko in the green room until Alex politely throws him out and Alice flings a water bottle after him screaming 'traitor bitch.' His basically-solo band wins the contest, almost certainly bought by Outerscope's wallet, but Alice's heckle of 'Fuck you Carmen! You suck!' bleeds onto the live broadcast loud enough to land real laughter. Motoko spends a real moment running the math on a bullet through him before talking herself down — for now."
+    ]
+  },
+  "alex": {
+    "name": "Alex Angelopoulos",
+    "category": "story",
+    "role": "MSM Records Suit",
+    "faction": "MSM Records",
+    "affiliation": "MSM Records",
+    "status": "Active",
+    "first_chapter": 237,
+    "icon": "&#x1F454;",
+    "description": "Smug MSM Records suit attached to Stand Alone Complex. Charming on the surface, eddies-first underneath. Knows how to handle Alice and Hiromi, knows better than to handle Motoko directly.",
+    "physical_description": "Permanent corporate smile that makes Motoko want to punch him. Dresses the MSM Records suit role and inhabits it without friction.",
+    "bio": [
+      "Introduced himself to Motoko on her first visit to MSM as her label contact. Has since attached to Stand Alone Complex's career and pushed every angle that benefits MSM, from album scheduling to brand-deal tie-ins. Motoko reads his charm as greed-with-good-manners and keeps him at arm's length.",
+      "By chapter 243 he is dangling movie-soundtrack bonuses in front of her at the studio while making sure to mention he is looping Hiromi in regardless of Motoko's input. In chapter 245 he plays handler at Morro Rock's battle of the bands, politely ejecting Carmen from the green room, calming Alice after the loss, and revealing on the ride home that MSM never expected Stand Alone Complex to win — the whole gig was a visibility play for the upcoming album. The next morning he rides along to the Militech Showroom recon, working his agent the whole way and making Hiromi pounce on an Orca-boots brand deal."
     ]
   }
 }
