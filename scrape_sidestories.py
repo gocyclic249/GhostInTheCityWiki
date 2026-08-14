@@ -6,6 +6,7 @@ Fetches the threadmarks index pages directly and extracts title, URL, and author
 Usage:
   python3 scrape_sidestories.py                # build/refresh the sidestory index
   python3 scrape_sidestories.py --status       # show index stats
+  python3 scrape_sidestories.py --force        # write even if the index shrinks
 """
 
 import json
@@ -16,6 +17,8 @@ import time
 
 import requests
 from bs4 import BeautifulSoup
+
+from lib.safe_index import write_index_guarded
 
 # ── Config ────────────────────────────────────────────────────────────────
 
@@ -127,13 +130,15 @@ def fetch_all_threadmarks():
 
 # ── Commands ──────────────────────────────────────────────────────────────
 
-def cmd_build_index():
-    """Build or refresh the sidestory index."""
-    entries = fetch_all_threadmarks()
+def cmd_build_index(force=False):
+    """Build or refresh the sidestory index.
 
-    with open(INDEX_PATH, "w", encoding="utf-8") as f:
-        json.dump(entries, f, indent=2, ensure_ascii=False)
-    print(f"  Saved index to {INDEX_PATH}")
+    Returns the entries on success, or None if the guard refused the write.
+    """
+    entries = fetch_all_threadmarks()
+    if not write_index_guarded(INDEX_PATH, entries, force=force):
+        return None
+    print(f"  Saved index to {INDEX_PATH} ({len(entries)} entries)")
     return entries
 
 
@@ -172,14 +177,14 @@ def main():
 
     if "--help" in args or "-h" in args:
         print(__doc__)
-        return
+        return 0
 
     if "--status" in args:
         cmd_status()
-        return
+        return 0
 
-    cmd_build_index()
+    return 0 if cmd_build_index(force="--force" in args) is not None else 2
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
