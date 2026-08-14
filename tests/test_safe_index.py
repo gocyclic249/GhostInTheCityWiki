@@ -2,6 +2,7 @@
 
 import json
 import os
+import stat
 import sys
 import tempfile
 import unittest
@@ -109,3 +110,19 @@ class TestWriteIndexGuarded(unittest.TestCase):
     def test_rejects_bad_min_ratio(self):
         with self.assertRaises(ValueError):
             write_index_guarded(self.path, make_entries(50), min_ratio=0)
+
+    def test_preserves_file_mode_on_update(self):
+        # Existing file starts at 0o644
+        os.chmod(self.path, 0o644)
+        original_mode = stat.S_IMODE(os.stat(self.path).st_mode)
+        self.assertEqual(original_mode, 0o644)
+        # After guarded write, mode should still be 0o644
+        write_index_guarded(self.path, make_entries(120))
+        new_mode = stat.S_IMODE(os.stat(self.path).st_mode)
+        self.assertEqual(new_mode, 0o644)
+
+    def test_new_file_gets_default_mode(self):
+        fresh = os.path.join(self.tmp.name, "new.json")
+        write_index_guarded(fresh, make_entries(5))
+        mode = stat.S_IMODE(os.stat(fresh).st_mode)
+        self.assertEqual(mode, 0o644)

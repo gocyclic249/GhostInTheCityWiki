@@ -10,6 +10,7 @@ Standard library only: scrape.py and upload.py must stay dependency-free.
 import json
 import os
 import shutil
+import stat
 import sys
 import tempfile
 
@@ -51,6 +52,12 @@ def write_index_atomic(path, data):
             json.dump(data, f, indent=2, ensure_ascii=False)
             f.flush()
             os.fsync(f.fileno())
+        # Preserve target file's mode, or use 0o644 for new files
+        if os.path.exists(path):
+            target_mode = stat.S_IMODE(os.stat(path).st_mode)
+        else:
+            target_mode = 0o644
+        os.chmod(tmp_path, target_mode)
         os.replace(tmp_path, path)
     except BaseException:
         if os.path.exists(tmp_path):
