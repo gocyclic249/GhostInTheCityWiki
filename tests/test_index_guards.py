@@ -55,3 +55,58 @@ class TestSidestoriesGuard(unittest.TestCase):
         self.set_scrape_result([])
         self.assertEqual(sidestories.cmd_build_index(force=True), [])
         self.assertEqual(self.current(), [])
+
+
+media = load_script("scrape_media.py", "scrape_media_under_test")
+
+
+class TestMediaGuard(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.path = os.path.join(self.tmp.name, "media_index.json")
+        self.good = [
+            {"post_id": str(i), "title": f"Post {i}",
+             "images": [{"local_file": f"{i}_1.png"}]}
+            for i in range(1, 101)
+        ]
+        with open(self.path, "w", encoding="utf-8") as f:
+            json.dump(self.good, f)
+
+        self.original_index_path = media.INDEX_PATH
+        self.original_fetch = media.fetch_threadmark_index
+        media.INDEX_PATH = self.path
+        self.addCleanup(self.restore)
+
+    def restore(self):
+        media.INDEX_PATH = self.original_index_path
+        media.fetch_threadmark_index = self.original_fetch
+
+    def set_scrape_result(self, entries):
+        media.fetch_threadmark_index = lambda: entries
+
+    def current(self):
+        with open(self.path, encoding="utf-8") as f:
+            return json.load(f)
+
+    def test_empty_scrape_is_refused(self):
+        self.set_scrape_result([])
+        self.assertIsNone(media.cmd_build_index())
+        self.assertEqual(len(self.current()), 100)
+
+    def test_large_drop_is_refused(self):
+        self.set_scrape_result([{"post_id": str(i)} for i in range(1, 51)])
+        self.assertIsNone(media.cmd_build_index())
+        self.assertEqual(len(self.current()), 100)
+
+    def test_written_scrape_preserves_image_metadata(self):
+        fresh = [{"post_id": str(i), "title": f"Post {i}"} for i in range(1, 101)]
+        self.set_scrape_result(fresh)
+        returned = media.cmd_build_index()
+        self.assertEqual(len(returned), 100)
+        self.assertEqual(self.current()[0]["images"], [{"local_file": "1_1.png"}])
+
+    def test_returns_a_list_for_cmd_download(self):
+        # cmd_download does len() on this return value — a bool would raise.
+        self.set_scrape_result([{"post_id": str(i)} for i in range(1, 101)])
+        self.assertIsInstance(media.cmd_build_index(), list)
