@@ -66,9 +66,15 @@ GALLERY_DL = os.path.expanduser("~/.local/gallery-dl-venv/bin/gallery-dl")
 if not os.path.exists(GALLERY_DL):
     GALLERY_DL = "gallery-dl"  # hope it's on PATH
 
-# Tavily is optional — only needed for post content extraction (image finding)
+# Tavily is optional — only needed for post content extraction (image finding).
+# get_tavily_key() calls sys.exit(1) when the key is missing, which raises
+# SystemExit (a BaseException, not an Exception) and would escape this guard
+# and kill the whole script at import time. So check the environment directly
+# first and only call get_tavily_key() when we already know it will succeed.
 try:
     from lib.tavily_utils import tavily_extract, get_tavily_key
+    if not os.environ.get("TAVILY_API_KEY"):
+        raise RuntimeError("TAVILY_API_KEY not set")
     get_tavily_key()
     HAS_TAVILY = True
 except Exception:

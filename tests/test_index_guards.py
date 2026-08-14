@@ -4,6 +4,7 @@ import json
 import os
 import tempfile
 import unittest
+from unittest import mock
 
 from tests.helpers import load_script
 
@@ -110,3 +111,17 @@ class TestMediaGuard(unittest.TestCase):
         # cmd_download does len() on this return value — a bool would raise.
         self.set_scrape_result([{"post_id": str(i)} for i in range(1, 101)])
         self.assertIsInstance(media.cmd_build_index(), list)
+
+
+class TestMediaTavilyOptional(unittest.TestCase):
+    """get_tavily_key() calls sys.exit(1) when TAVILY_API_KEY is unset. That's
+    a SystemExit, not an Exception, so it must never escape scrape_media's
+    module-level probe — Tavily is documented as optional with a direct-HTTP
+    fallback, and the module must stay importable without the key.
+    """
+
+    def test_imports_with_has_tavily_false_when_key_absent(self):
+        with mock.patch.dict(os.environ, {}, clear=False):
+            os.environ.pop("TAVILY_API_KEY", None)
+            module = load_script("scrape_media.py", "scrape_media_no_tavily_key")
+        self.assertFalse(module.HAS_TAVILY)
