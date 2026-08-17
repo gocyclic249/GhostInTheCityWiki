@@ -27,6 +27,37 @@ MANIFEST_PATH = os.path.join(WIKI_DIR, "cache", "upload_manifest.json")
 
 NEOCITIES_API = "https://neocities.org/api"
 
+SITE_BASE = "https://ghostinthecity.neocities.org"
+
+# Paths under these prefixes exist only on Neocities — wiki/build/media/ is
+# gitignored, so a fresh clone has none of them locally. Deleting them because
+# they are "missing" would wipe the fan art off the live site.
+PROTECTED_PREFIXES = ("media/",)
+
+
+def is_protected(rel_path):
+	"""True if rel_path must never be deleted from the live site."""
+	if not isinstance(rel_path, str):
+		raise TypeError(f"rel_path must be str, got {type(rel_path).__name__}")
+	return rel_path.startswith(PROTECTED_PREFIXES)
+
+
+def compute_changes(manifest, local_hashes):
+	"""Diff the manifest against local files.
+
+	Returns (to_upload, to_delete, missing_protected). Protected paths that are
+	missing locally are reported, never deleted.
+	"""
+	if not isinstance(manifest, dict) or not isinstance(local_hashes, dict):
+		raise TypeError("manifest and local_hashes must both be dicts")
+
+	to_upload = sorted(rel for rel, sha in local_hashes.items()
+	                   if manifest.get(rel) != sha)
+	missing = [rel for rel in manifest if rel not in local_hashes]
+	to_delete = sorted(rel for rel in missing if not is_protected(rel))
+	missing_protected = sorted(rel for rel in missing if is_protected(rel))
+	return to_upload, to_delete, missing_protected
+
 
 # ── Credentials ───────────────────────────────────────────────────────────
 
@@ -181,15 +212,15 @@ def run_upload(dry_run=False):
     # Compute SHA1 for every local file
     local_hashes = {rel: sha1_file(path) for rel, path in local.items()}
 
-    to_upload = []
-    for rel, sha1 in local_hashes.items():
-        if manifest.get(rel) != sha1:
-            to_upload.append(rel)
-
-    to_delete = [rel for rel in manifest if rel not in local_hashes]
+    to_upload, to_delete, missing_protected = compute_changes(manifest, local_hashes)
 
     print(f"  Files to upload: {len(to_upload)}")
     print(f"  Files to delete: {len(to_delete)}")
+    if missing_protected:
+        print(f"  Protected from deletion: {len(missing_protected)} media file(s)"
+              " missing locally", file=sys.stderr)
+        print("  Run: python3 wiki/scripts/upload.py --restore-media",
+              file=sys.stderr)
 
     if not to_upload and not to_delete:
         print("  Nothing to do — site is up to date.")
