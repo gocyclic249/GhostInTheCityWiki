@@ -4,165 +4,140 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Fan wiki for *Ghost in the City*, a Cyberpunk 2077 / Ghost in the Shell crossover SI fanfic by **Seras** on SpaceBattles and AO3. Neocities-hosted. The main workflow is: scrape/update data → rebuild wiki pages → deploy to Neocities. Always confirm which branch and which script version before running anything.
+Fan wiki for *Ghost in the City*, a Cyberpunk 2077 / Ghost in the Shell crossover SI fanfic by **Seras** on SpaceBattles and AO3. Static site, Neocities-hosted. Workflow: scrape → hand-write summaries into JSON caches → build HTML → upload.
+
+Always confirm which branch and which script the user wants before running anything. Never run a download/scrape when the user only asked for index/metadata generation (`scrape_media.py --index-only` is the index-only path).
+
+## Architecture
+
+It is a single-pass static site generator with no framework, no templates, and no test suite. Data flows one direction:
+
+```
+AO3 / SpaceBattles ──scrapers──> root *_index.json  ─┐
+                                                     ├─> build_html.py ──> wiki/build/*.html ──upload.py──> Neocities
+Claude (manual summaries) ──> wiki/cache/*.json  ────┘
+```
+
+- **Scrapers write indexes, never HTML.** `scrape.py` → `threadmarks_index.json` + `chapters/*.md`; `scrape_sidestories.py` → `sidestories_index.json`; `scrape_media.py` → `media_index.json` + `wiki/build/media/`.
+- **`wiki/cache/*.json` is the hand-authored layer.** Summaries, characters, braindances, and rockerboy entries are written by Claude/the user, not scraped. This is the only content you should ever edit by hand.
+- **`build_html.py` is the whole renderer** (~1100 lines, stdlib only). One `build_*()` function per page, all wrapped by `page_shell()`, all called from `main()`. HTML strings are built inline; escape through `e()` and route every href through `safe_url()`.
+- **`build.py` is a thin CLI** that loads `build_html.py` and `upload.py` via `importlib.util.spec_from_file_location` rather than importing them — they are scripts, not a package.
+- **`wiki/build/` is 100% generated.** Every file there is overwritten on build; never edit it directly.
+- All scripts resolve paths from `__file__`, so they run from any cwd, but `wiki/` must stay a sibling of the root `*_index.json` files.
+
+### Which file drives which page
+
+| Source | Page |
+|---|---|
+| `wiki/cache/chapter_summaries.json` | `chapters.html` + the kill counter on `index.html` |
+| `wiki/cache/characters.json` | `characters/index.html`, `characters/<slug>.html`, `charsheet.html` (from Motoko's `cp_stats`) |
+| `wiki/cache/braindances.json` | `braindances.html` |
+| `wiki/cache/rockerboy.json` | `rockerboy.html` |
+| `sidestories_index.json` (repo root) | `sidestories.html` |
+| `media_index.json` (repo root) | `photomode.html` |
+| `threadmarks_index.json` (repo root) | chapter totals / progress percentages |
+
+To add a page: write `build_<page>()`, call it from `main()`, and add the path to `STATIC_PAGES` in `build_html.py` so it lands in the sitemap.
 
 ## Common Commands
 
 ```bash
-source .env                                 # load NEOCITIES_API_KEY, SB_USER, SB_PASS
+source .env                                 # NEOCITIES_API_KEY, SB_USER, SB_PASS, TAVILY_API_KEY
 
-# Full pipeline orchestrator (calls scrape → build → upload)
+# Full pipeline orchestrator (scrape → build → upload, then prints a manual-TODO list)
 python3 update_wiki.py                      # full update
 python3 update_wiki.py --scrape             # scrape only
 python3 update_wiki.py --build              # build + upload only
-python3 update_wiki.py --dry-run            # preview, no upload
+python3 update_wiki.py --dry-run            # build, no upload
 
 # Individual scrapers
-python3 scrape.py --update                  # pull new AO3 chapters
-python3 scrape.py --from N [--to M]         # re-scrape a range
-python3 scrape_sidestories.py               # refresh SB side story index
-python3 scrape_media.py                     # refresh media + download images
+python3 scrape.py --update                  # pull new AO3 chapters (incremental; 3s/request)
+python3 scrape.py --from N [--to M] [--redownload]
+python3 scrape.py --restore [--from N --to M]   # rebuild missing/damaged chapters
+python3 scrape_sidestories.py [--status] [--force]   # refresh SB side story index
+python3 scrape_media.py [--index-only] [--force]    # media index (+ images unless --index-only)
 
-# Build / deploy (no scraping)
-python3 wiki/scripts/build.py --status      # cache completeness + kill count
-python3 wiki/scripts/build.py --build       # render JSON cache → HTML
-python3 wiki/scripts/build.py --all         # build + upload to Neocities
+# Build / deploy
+python3 wiki/scripts/build.py --status      # cache completeness, kill count, character/BD list
+python3 wiki/scripts/build.py --build       # render JSON caches → HTML
+python3 wiki/scripts/build.py --upload --dry-run
+python3 wiki/scripts/build.py --all         # build + upload
+python3 wiki/scripts/build.py --restore-media       # pull media back from Neocities
 
 # Maintenance
-python3 wiki/scripts/cleanup_summaries.py   # strip AI patterns from summaries (em-dashes etc.)
+python3 wiki/scripts/cleanup_summaries.py   # strip AI patterns (em-dashes, XP numbers, "However")
+python3 -m unittest discover -s tests -v    # test suite (stdlib, no env vars needed)
 ```
 
-Build/upload and the AO3 scraper are stdlib-only. Only the SpaceBattles scrapers need `pip install -r requirements.txt`. Selenium is only for the optional debug recovery scripts in `scripts/debug/`.
+Prefer `build.py --status` over counting files: chapter/summary/kill totals change constantly and any number written into docs goes stale fast.
 
-## Environment Variables
+Build/upload and the AO3 scraper are stdlib-only. The SpaceBattles scrapers need `requirements.txt` (`requests`, `beautifulsoup4`, `lxml`); `selenium` is only used by `scripts/debug/`. `install-deps.sh` (depgen-maintained) installs everything.
 
-Required (set in `.env`, then `source .env`):
-- `NEOCITIES_API_KEY` — deploys to Neocities
-- `SB_USER` / `SB_PASS` — SpaceBattles login (for media + side story scrapers)
+## Content Durability
 
-Optional:
-- `CHROMEDRIVER_PATH` / `CHROMIUM_PATH` — override auto-detection for debug recovery scripts only
+Story text and fan art are deliberately kept out of git — chapter text is not redistributed, and the artists asked to stay out of a public GitHub repo. Neither GitHub nor the local disk is the store of record for that content, so each type has an external source and a restore command:
 
-## Project Layout
+| Content | Store of record | Restore |
+|---|---|---|
+| `wiki/build/media/` | Neocities | `python3 wiki/scripts/upload.py --restore-media` |
+| `chapters/*.md` | AO3 | `python3 scrape.py --restore` |
 
-```
-chapters/                      # Raw chapter markdown from AO3 (242 chapters)
-sidestories/                   # Side story markdown from SpaceBattles
-wiki/
-  cache/                       # JSON data caches (edit these for wiki content)
-    chapter_summaries.json     # Chapter recaps + kill counts
-    braindances.json           # BD catalog
-    characters.json            # Character profiles
-    rockerboy.json             # Music performances
-  build/                       # Generated HTML (do not edit directly)
-  scripts/
-    build.py                   # Build orchestrator
-    build_html.py              # HTML renderer
-    cleanup_summaries.py       # AI pattern removal (safety net)
-    upload.py                  # Neocities uploader
-lib/                           # Shared Python utilities
-scripts/debug/                 # Debug & fallback image-recovery scripts
-threadmarks_index.json         # Chapter metadata index
-sidestories_index.json         # Side story metadata index
-media_index.json               # Media threadmark index + image metadata
-update_wiki.py                 # Full pipeline orchestrator
-scrape.py                      # AO3 chapter scraper
-scrape_media.py                # SpaceBattles media scraper (images)
-scrape_sidestories.py          # SpaceBattles side story index scraper
-```
+Media cannot use the AO3-style re-scrape path: its original sources include dead imgur URLs, expired Discord CDN links, Cloudflare-blocked SB attachments, and hand-placed manual replacements. Neocities holds the only complete copy. Chapters are the reverse — AO3 always has them, and republishing them on Neocities would be the redistribution the project avoids.
 
-## Chapter File Convention
+Guarantees the tooling now enforces:
 
-Chapter files: `chapters/{NNNN}_{N}._Chapter_{N}.md`
-- NNNN is zero-padded to 4 digits, N is the chapter number
-- Example: Chapter 42 -> `chapters/0042_42._Chapter_42.md`
+- **`upload.py` never deletes `media/`.** Paths under `PROTECTED_PREFIXES` are excluded from the delete set even when missing locally, and `run_upload` restores them from Neocities before diffing. Downloads are verified against the SHA1 from `/api/list` and rejected unless the `Content-Type` is an image, so a 404 page cannot land as a broken file. Restoring all 126 images takes about 75 seconds.
+- **Scrapers never blank an index.** `scrape_sidestories.py` and `scrape_media.py` write through `lib/safe_index.py`, which refuses a zero-entry result or a shrink beyond 10% and exits 2. Pass `--force` when a drop is real. Writes are atomic with a `.bak` copy and preserve the file's mode.
+- **`scrape.py --restore`** re-downloads missing chapters and re-fetches damaged ones (under 500 bytes, or missing the `# ` title line), bounded by `--from` / `--to`.
 
-To resolve chapter number -> chapter_id: read `threadmarks_index.json` (array of objects with `chapter_id`, `title`, `date`, `ao3_url`). The array index + 1 = chapter number.
+Run `python3 -m unittest discover -s tests -v` after touching any of this — it needs no environment variables. After deploying, verify the deployed files match the local build; stale deployed files have caused bugs before.
+
+## Repo Layout Notes
+
+- `chapters/` and `sidestories/` are **gitignored** (copyrighted story text) and usually near-empty in a checkout. `/process-chapter` and `/fact-check` need the raw chapter file present, so restore first: `scrape.py --restore` for everything, or `scrape.py --restore --from N --to M` for a range.
+- Chapter files: `chapters/{NNNN}_{N}._Chapter_{N}.md` — `NNNN` zero-padded to 4 digits (Chapter 42 → `chapters/0042_42._Chapter_42.md`).
+- Chapter number → `chapter_id`: index into `threadmarks_index.json` (array position + 1 = chapter number); `chapter_id` is the AO3 chapter id and is the key used in `chapter_summaries.json`.
+- `wiki/cache/ss_batch_*.json` hold side-story summaries that nothing in the build reads — they are dormant data, not build inputs.
+- `.bak` files (`chapter_summaries.json.bak`, `media_index.json.bak`) are written automatically by `cleanup_summaries.py` / the media scraper.
+- Slash commands live in `.claude/commands/` (`process-chapter.md`, `fact-check.md`); `lib/` holds shared scraper helpers (Selenium, SB login, Tavily, image download).
 
 ## JSON Schemas
 
-### chapter_summaries.json
+Field-by-field docs for `characters.json`, `braindances.json`, and `rockerboy.json` are in README.md ("How to Edit Wiki Content"). The one not documented there:
+
+### chapter_summaries.json — keyed by `chapter_id` (string)
 ```json
 {
-  "chapter_id_string": {
+  "12345678": {
     "chapter_num": 1,
     "title": "1. Chapter 1",
     "date": "2022-10-15",
-    "summary": [
-      "Paragraph 1...",
-      "Paragraph 2...",
-      "Paragraph 3..."
-    ],
+    "summary": ["Paragraph 1...", "Paragraph 2...", "Paragraph 3..."],
     "kills": 0,
     "kill_notes": "No kills -- description of what happened"
   }
 }
 ```
 
-### braindances.json
-```json
-[
-  {
-    "bd_id": "BD-001",
-    "title": "Kamikaze Raid",
-    "chapter_number": 40,
-    "status": "Released",
-    "description": "Narrative description...",
-    "content_tags": ["combat", "stealth"]
-  }
-]
-```
+A chapter counts as unsummarized when its `chapter_id` is absent *or* `summary` is empty — that is what `build.py --status` and `update_wiki.py` report on.
 
-### characters.json
-```json
-{
-  "slug": {
-    "name": "Full Name",
-    "role": "Role",
-    "faction": "Faction",
-    "affiliation": "Allegiance",
-    "status": "Active",
-    "first_chapter": 1,
-    "icon": "&#x2620;",
-    "description": "One-line summary",
-    "physical_description": "Appearance paragraph",
-    "bio": ["Background paragraph 1", "Background paragraph 2"]
-  }
-}
-```
+## Manual Steps After a Scrape
 
-## Pipeline
+`update_wiki.py` automates steps 1–5 and then prints what is left:
 
-### Automated (runs via `update_wiki.py` or cron)
-1. `scrape.py --update` downloads new chapters from AO3
-2. `scrape_sidestories.py` refreshes side story index from SpaceBattles
-3. `scrape_media.py` refreshes media index + downloads new images
-4. `build.py --build` renders JSON cache to static HTML
-5. `build.py --all` or `upload.py` deploys to Neocities
-
-### Manual (requires Claude session for new chapters)
-6. `/process-chapter N` generates summaries for new chapters
-7. `/fact-check N` verifies summary accuracy against source text
-8. Review new chapters for braindance entries (`braindances.json`)
-9. Review new chapters for rockerboy performances (`rockerboy.json`)
-10. `cleanup_summaries.py` strips any remaining AI patterns (safety net)
-11. Rebuild + upload after manual updates
+1. `/process-chapter N` — generate summaries for new chapters (kill counts do not move until this runs)
+2. `/fact-check N` — verify summaries against source text
+3. Review new chapters for braindance entries (`braindances.json`) and rockerboy performances (`rockerboy.json`)
+4. `cleanup_summaries.py` — AI-pattern safety net
+5. `python3 wiki/scripts/build.py --all` — rebuild + redeploy
 
 ## Manual Image Workflow
 
-Some media images can't be scraped automatically: dead imgur URLs that return placeholder PNGs (fake-success downloads), SB-served logo fallbacks, parser misses, Discord CDN expirations, and Cloudflare-blocked SB attachments. The recovery procedure lives in [`docs/manual-images.md`](docs/manual-images.md). Quick commands:
+Some media images can't be scraped: dead imgur URLs returning placeholder PNGs (fake-success downloads), SB-served logo fallbacks, parser misses, Discord CDN expirations, Cloudflare-blocked SB attachments. Full procedure in [`docs/manual-images.md`](docs/manual-images.md).
 
-- `python3 scrape_media.py --show-manual` — list every image needing attention
-- `python3 scrape_media.py --mark-manual POST_ID [--count N]` — flag a post for manual replacement (creates placeholders if the post has no images yet)
-- `python3 scrape_media.py --unmark-manual POST_ID` — clear the flag once a real file is in `wiki/build/media/`
-
-## Deployment
-
-When deploying to Neocities, always verify the deployed files match the local build output. Stale deployed files have caused bugs before.
-
-## Scripts & Scrapers
-
-When running scrapers or build scripts, ask which specific script and branch the user wants before executing. Do NOT run download/scrape operations when the user only asks for index/metadata generation.
+- `python3 scrape_media.py --show-manual` — list images needing attention
+- `python3 scrape_media.py --mark-manual POST_ID [--count N]` — flag a post (creates placeholders if it has no images yet)
+- `python3 scrape_media.py --unmark-manual POST_ID` — clear once a real file is in `wiki/build/media/`
 
 ## Writing Style Guide
 
@@ -170,7 +145,7 @@ Derived from Seras's own prose (sampled across chapters 1, 50, 100, 200, 242).
 
 ### Seras's Voice
 
-Seras writes first-person present-tense with these patterns:
+First-person present-tense with these patterns:
 - Short punchy fragments as standalone beats: "No thanks." / "Good enough." / "That wasn't my voice."
 - Self-interrupting internal monologue: "I mean friends!" / "I definitely didn't cry though. Fuck you."
 - Casual Night City slang: "preem", "choom", "chrome", "eddies", "chipped in", "gonk", "nova", "delta"
@@ -183,7 +158,7 @@ Seras writes first-person present-tense with these patterns:
 Summaries translate Seras's voice into third-person past-tense recaps:
 - Match Seras's punchy, dry energy. Street slang, no literary filler.
 - **Tone vocabulary** for "punchy, dry": short sentences, action verbs first, minimal adjectives, no hedging, no editorializing.
-- **NO em-dashes** (`—` or ` — `). They read as AI-generated. Use periods, commas, or sentence breaks instead. Cleanup script strips them automatically; the goal is zero hits.
+- **NO em-dashes** (`—` or ` — `). They read as AI-generated. Use periods, commas, or sentence breaks instead. The cleanup script strips them automatically; the goal is zero hits.
 - Summaries should feel like Motoko would approve of how they read.
 - **Slang density**: at least one piece of Night City slang per summary, no more than two per paragraph. Use "preem", "choom", "chrome", "eddies", "chipped in", "gonk", "nova", "delta", "scop". If a slang word feels forced, drop it.
 - Keep the dark humor. If the chapter is funny, the summary should be too.

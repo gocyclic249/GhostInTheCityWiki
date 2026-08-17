@@ -43,6 +43,9 @@ import sys
 import requests
 from bs4 import BeautifulSoup
 
+from lib.image_utils import is_skip_url
+from lib.safe_index import write_index_atomic, write_index_guarded
+
 # ── Config ────────────────────────────────────────────────────────────────
 
 SB_BASE = "https://forums.spacebattles.com"
@@ -80,9 +83,6 @@ try:
 except Exception:
     HAS_TAVILY = False
     print("  Note: Tavily unavailable, using direct HTTP for all fetches.")
-
-from lib.image_utils import is_skip_url
-from lib.safe_index import write_index_atomic, write_index_guarded
 
 DELAY = 1.0
 
