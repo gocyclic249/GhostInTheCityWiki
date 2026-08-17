@@ -2,7 +2,7 @@
 
 Fan wiki for **Ghost in the City** by Seras — a *Cyberpunk 2077 / Ghost in the Shell* crossover SI.
 
-A gamer flatlines in the real world and wakes up in Night City, 2075 — jacked into the body of fourteen-year-old Motoko Kusanagi, stripped of chrome by Scavs, fresh out of a year-long coma, and running on fumes. But the corpo gods left a gift in the wreckage: a shard labelled "Gema / Gamer" that boots a full stat screen behind her Kiroshi optics. 242 chapters of Motoko clawing her way from a zeroed-out nobody to Night City legend.
+A gamer flatlines in the real world and wakes up in Night City, 2075 — jacked into the body of fourteen-year-old Motoko Kusanagi, stripped of chrome by Scavs, fresh out of a year-long coma, and running on fumes. But the corpo gods left a gift in the wreckage: a shard labelled "Gema / Gamer" that boots a full stat screen behind her Kiroshi optics. Hundreds of chapters of Motoko clawing her way from a zeroed-out nobody to Night City legend.
 
 **Read the story:** [AO3](https://archiveofourown.org/works/42385683) | [SpaceBattles](https://forums.spacebattles.com/threads/ghost-in-the-city-cyberpunk-gamer-si.1046809/)
 
@@ -15,30 +15,19 @@ A gamer flatlines in the real world and wakes up in Night City, 2075 — jacked 
 | Page | Description | Link |
 |------|-------------|------|
 | Home | Story summary, kill counter, and stats | [Home](https://ghostinthecity.neocities.org/index.html) |
-| Chapters | All 242 chapter summaries with kill tracking | [Chapters](https://ghostinthecity.neocities.org/chapters.html) |
+| Chapters | Every chapter summary, with kill tracking | [Chapters](https://ghostinthecity.neocities.org/chapters.html) |
 | Braindances | Full BD catalog — combat, stealth, and emotional recordings | [Braindances](https://ghostinthecity.neocities.org/braindances.html) |
 | Rockerboy | Music timeline, venues, setlists, and YouTube links | [Rockerboy](https://ghostinthecity.neocities.org/rockerboy.html) |
-| Jig Jig Street | 916 community side stories | [Side Stories](https://ghostinthecity.neocities.org/sidestories.html) |
+| Jig Jig Street | Community side stories from the SB thread | [Side Stories](https://ghostinthecity.neocities.org/sidestories.html) |
 | Photomode | Fan art and media from the SpaceBattles thread | [Photomode](https://ghostinthecity.neocities.org/photomode.html) |
 | Characters | Character dossiers and profiles | [Characters](https://ghostinthecity.neocities.org/characters/index.html) |
 | Gonk Stats | Motoko's full character sheet and skill tree | [Gonk Stats](https://ghostinthecity.neocities.org/charsheet.html) |
-| Search | Full-text search across all wiki content | [Search](https://ghostinthecity.neocities.org/search.html) |
+
+Every page header carries a search box that runs a Google `site:` query against the wiki.
 
 ### Character Profiles
 
-| Character | Role | Link |
-|-----------|------|------|
-| Motoko Kusanagi | Netrunner / Assassin | [Profile](https://ghostinthecity.neocities.org/characters/motoko.html) |
-| Junichiro Kusanagi | Tyger Claw / Brother | [Profile](https://ghostinthecity.neocities.org/characters/jun.html) |
-| Hiromi | Manager / Arasaka Academy | [Profile](https://ghostinthecity.neocities.org/characters/hiromi.html) |
-| Malcolm | Crew Member | [Profile](https://ghostinthecity.neocities.org/characters/malcolm.html) |
-| Ichi | Crew Leader | [Profile](https://ghostinthecity.neocities.org/characters/ichi.html) |
-| Omaeda | Netrunner | [Profile](https://ghostinthecity.neocities.org/characters/omaeda.html) |
-| Sam | Section 9 | [Profile](https://ghostinthecity.neocities.org/characters/sam.html) |
-| Hayato Nakagawa | Tyger Claw Heir | [Profile](https://ghostinthecity.neocities.org/characters/hayato.html) |
-| Akari | Section 9 | [Profile](https://ghostinthecity.neocities.org/characters/akari.html) |
-| Alice Novak | Rockerboy / Band | [Profile](https://ghostinthecity.neocities.org/characters/alice.html) |
-| Yuto Gonzales | Section 9 | [Profile](https://ghostinthecity.neocities.org/characters/yuto.html) |
+Every profile is listed on the [Characters index](https://ghostinthecity.neocities.org/characters/index.html), and each one gets its own page at `characters/<slug>.html`. The roster is whatever `wiki/cache/characters.json` contains — run `python3 wiki/scripts/build.py --status` for the current list rather than trusting a copy pasted here.
 
 ---
 
@@ -47,10 +36,11 @@ A gamer flatlines in the real world and wakes up in Night City, 2075 — jacked 
 ```
 GhostInTheCityWiki/
 ├── chapters/              # Downloaded chapter markdown files (AO3, gitignored)
-├── sidestories/           # Downloaded side story markdown files (SpaceBattles, gitignored)
 ├── docs/
 │   └── manual-images.md   # Manual image recovery procedure
+├── tests/                 # Test suite (stdlib unittest, no env vars needed)
 ├── lib/                   # Shared Python utilities
+│   ├── safe_index.py      # Guarded, atomic index writes (stdlib only)
 │   ├── selenium_utils.py  # Chrome driver creation, Cloudflare handling
 │   ├── spacebattles_utils.py  # SpaceBattles login
 │   ├── tavily_utils.py    # Tavily Extract API helper
@@ -80,9 +70,14 @@ GhostInTheCityWiki/
 ├── sidestories_index.json # Side story metadata index
 ├── media_index.json       # Media threadmark index + image metadata
 ├── requirements.txt       # Python dependencies
+├── install-deps.sh        # Dependency installer (apt/dnf/pacman/brew)
 ├── LICENSE                # AGPL-3.0
 └── .env.example           # Environment variable template
 ```
+
+Note there is no `sidestories/` directory. Side stories are indexed but never
+downloaded — `sidestories_index.json` holds title, author, word count, and a
+link back to the SpaceBattles post.
 
 ---
 
@@ -257,9 +252,77 @@ Build only (no upload):
 python3 wiki/scripts/build.py --build
 ```
 
+Individual scrapers:
+```bash
+python3 scrape.py --update                # pull new AO3 chapters
+python3 scrape_sidestories.py             # refresh the side story index
+python3 scrape_sidestories.py --status    # index stats, no network
+python3 scrape_media.py                   # media index + download images
+python3 scrape_media.py --index-only      # index only, no downloads
+```
+
+Both SpaceBattles scrapers accept `--force` to override the shrink guard
+described under [Content Recovery](#content-recovery).
+
 Requires Python 3. Build/upload and the AO3 scraper use the standard library only;
 the SpaceBattles scrapers need the packages in `requirements.txt`. Selenium is only
 needed for the optional debug recovery scripts in `scripts/debug/`.
+
+---
+
+## Content Recovery
+
+Chapter text and fan art are deliberately kept out of git — the story text is not
+redistributed, and the artists asked not to have their work sitting in a public
+repo. So a fresh clone starts without either. Each has an external store of
+record and a one-command restore:
+
+| Content | Store of record | Restore |
+|---|---|---|
+| `wiki/build/media/` | Neocities | `python3 wiki/scripts/upload.py --restore-media` |
+| `chapters/*.md` | AO3 | `python3 scrape.py --restore` |
+
+```bash
+source .env
+python3 wiki/scripts/upload.py --restore-media   # ~126 images, about 75 seconds
+python3 scrape.py --restore                      # all missing chapters, 3s each
+python3 scrape.py --restore --from 200 --to 246  # or bound the range
+```
+
+Media cannot be re-scraped from its original sources — many are dead imgur links,
+expired Discord CDN URLs, or Cloudflare-blocked attachments — so Neocities holds
+the only complete copy. Each download is checked against the SHA1 the Neocities
+API reports and discarded unless it is really an image, so a 404 page can never
+land as a broken file. `upload.py` also refuses to delete anything under
+`media/`, even when the local copy is missing.
+
+`scrape.py --restore` re-downloads chapters that are missing and re-fetches ones
+that look damaged (under 500 bytes, or missing their title line).
+
+### Failed scrapes cannot blank an index
+
+`scrape_sidestories.py` and `scrape_media.py` write through `lib/safe_index.py`,
+which refuses a zero-entry result or a shrink of more than 10% and exits 2. If a
+scrape is blocked or rate-limited, the existing index survives untouched:
+
+```
+  REFUSED: scrape returned 0 entries; existing index has 960.
+  sidestories_index.json left untouched. Re-run when the source is reachable, or pass --force.
+```
+
+Pass `--force` when a drop is genuine. Writes are atomic and leave a `.bak` copy.
+
+---
+
+## Tests
+
+```bash
+python3 -m unittest discover -s tests -v
+```
+
+Standard-library `unittest`, no third-party packages, and no environment
+variables or API keys required. The suite covers the index guards, the media
+protection and restore logic, and chapter classification.
 
 ---
 
