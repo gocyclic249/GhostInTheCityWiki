@@ -67,6 +67,12 @@ REMOTE_LISTING = [
     {"path": "media/art2.jpg", "is_directory": False, "sha1_hash": "ccc"},
 ]
 
+REMOTE_LISTING_UNSORTED = [
+    {"path": "media/zebra.png", "is_directory": False, "sha1_hash": "zzz"},
+    {"path": "media/apple.png", "is_directory": False, "sha1_hash": "aaa"},
+    {"path": "media/monkey.jpg", "is_directory": False, "sha1_hash": "mmm"},
+]
+
 
 class TestPlanRestore(unittest.TestCase):
     def test_plans_only_missing_media(self):
@@ -84,6 +90,11 @@ class TestPlanRestore(unittest.TestCase):
     def test_nothing_to_do_when_all_present(self):
         plan = upload.plan_restore(REMOTE_LISTING, {"media/art1.png", "media/art2.jpg"})
         self.assertEqual(plan, [])
+
+    def test_returns_sorted_paths(self):
+        plan = upload.plan_restore(REMOTE_LISTING_UNSORTED, set())
+        paths = [p for p, _ in plan]
+        self.assertEqual(paths, ["media/apple.png", "media/monkey.jpg", "media/zebra.png"])
 
 
 class TestVerifyDownload(unittest.TestCase):
@@ -112,3 +123,10 @@ class TestVerifyDownload(unittest.TestCase):
 
     def test_accepts_when_remote_reports_no_sha1(self):
         self.assertTrue(upload.verify_download(self.content, "image/jpeg", ""))
+
+    def test_rejects_str_content_as_not_bytes(self):
+        with self.assertRaises(TypeError):
+            upload.verify_download("fake string", "image/png", "")
+
+    def test_rejects_missing_content_type_header(self):
+        self.assertFalse(upload.verify_download(self.content, "", ""))

@@ -87,7 +87,7 @@ def verify_download(content, content_type, expected_sha1):
     A Neocities miss returns an HTML error page. Writing that to media/foo.png
     would look like a successful restore and render as a broken image.
     """
-    if content is None:
+    if not isinstance(content, bytes):
         raise TypeError("content must be bytes")
     if not content:
         return False
