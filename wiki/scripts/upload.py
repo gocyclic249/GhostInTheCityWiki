@@ -59,6 +59,46 @@ def compute_changes(manifest, local_hashes):
     return to_upload, to_delete, missing_protected
 
 
+def plan_restore(remote_files, local_paths):
+    """Which protected files exist remotely but not locally.
+
+    remote_files: the "files" list from GET /api/list.
+    Returns a sorted list of (path, sha1_hash) tuples.
+    """
+    if not isinstance(remote_files, list):
+        raise TypeError(f"remote_files must be a list, got {type(remote_files).__name__}")
+
+    wanted = []
+    for entry in remote_files:
+        path = entry.get("path", "")
+        if entry.get("is_directory"):
+            continue
+        if not path or not is_protected(path):
+            continue
+        if path in local_paths:
+            continue
+        wanted.append((path, entry.get("sha1_hash", "")))
+    return sorted(wanted)
+
+
+def verify_download(content, content_type, expected_sha1):
+    """True if content is a real image matching the remote hash.
+
+    A Neocities miss returns an HTML error page. Writing that to media/foo.png
+    would look like a successful restore and render as a broken image.
+    """
+    if content is None:
+        raise TypeError("content must be bytes")
+    if not content:
+        return False
+    mime = content_type.split(";")[0].strip().lower()
+    if not mime.startswith("image/"):
+        return False
+    if expected_sha1 and hashlib.sha1(content).hexdigest() != expected_sha1:
+        return False
+    return True
+
+
 # ── Credentials ───────────────────────────────────────────────────────────
 
 def get_api_key():
