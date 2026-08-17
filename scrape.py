@@ -10,6 +10,11 @@ Usage:
   python3 scrape.py --from N          # start from chapter N
   python3 scrape.py --from N --to M   # download chapters N to M
   python3 scrape.py --redownload      # force re-download of all chapters
+  python3 scrape.py --restore         # re-download missing/damaged chapters
+  python3 scrape.py --restore --from 100   # bound the restore range
+
+chapters/ is gitignored (story text is not redistributed), so AO3 is the store
+of record: --restore rebuilds the directory on a new machine.
 """
 
 import urllib.request
@@ -305,6 +310,29 @@ def get_chapter_index():
     return index
 
 
+MIN_CHAPTER_BYTES = 500
+
+
+def classify_chapter(filepath):
+    """Classify a chapter file as present, missing, or suspect.
+
+    Suspect means the file exists but looks like a truncated or failed
+    download — too small, or missing the markdown title line write_chapter
+    always emits.
+    """
+    if not filepath:
+        raise ValueError("filepath must be non-empty")
+    if not os.path.exists(filepath):
+        return "missing"
+    if os.path.getsize(filepath) <= MIN_CHAPTER_BYTES:
+        return "suspect"
+    with open(filepath, encoding="utf-8") as f:
+        first_line = f.readline()
+    if not first_line.startswith("# "):
+        return "suspect"
+    return "present"
+
+
 def chapter_filename(chapter_num, chapter):
     """The on-disk filename for a chapter: 0042_42._Chapter_42.md"""
     if chapter_num < 1:
@@ -399,6 +427,56 @@ def cmd_update():
     print("  2. Run: python3 wiki/scripts/build.py --all")
 
 
+def cmd_restore(start_num=1, end_num=None):
+    """Re-download every missing or damaged chapter. Returns the failure count.
+
+    chapters/ is gitignored, so a new machine starts empty. AO3 is the store of
+    record — this rebuilds the directory without ever storing story text in git.
+    """
+    if start_num < 1:
+        raise ValueError(f"start_num must be >= 1, got {start_num}")
+    index = get_chapter_index()
+    if not index:
+        print("ERROR: no chapter index. Run scrape.py --update first.", file=sys.stderr)
+        return 1
+
+    os.makedirs(OUTPUT_DIR, exist_ok=True)
+
+    todo = []
+    present = 0
+    for i, chapter in enumerate(index, start=1):
+        if i < start_num or (end_num and i > end_num):
+            continue
+        filepath = os.path.join(OUTPUT_DIR, chapter_filename(i, chapter))
+        state = classify_chapter(filepath)
+        if state == "present":
+            present += 1
+        else:
+            todo.append((i, chapter, filepath, state))
+
+    scope = f"{start_num}-{end_num}" if end_num else f"{start_num}-{len(index)}"
+    print(f"Index: {len(index)} chapters. Range {scope}: "
+          f"{present} present, {len(todo)} to restore.")
+    if not todo:
+        print("Nothing to restore.")
+        return 0
+
+    failed = []
+    for n, (i, chapter, filepath, state) in enumerate(todo, start=1):
+        label = "re-fetching damaged" if state == "suspect" else "fetching missing"
+        print(f"[{n}/{len(todo)}] Ch.{i} ({label}): {chapter['title']}")
+        if not write_chapter(i, chapter, filepath):
+            failed.append(i)
+        time.sleep(DELAY)
+
+    print(f"\nRestored {len(todo) - len(failed)}/{len(todo)} chapters.")
+    if failed:
+        print(f"Failed: {failed}", file=sys.stderr)
+        print(f"Retry with: python3 scrape.py --restore --from {min(failed)}",
+              file=sys.stderr)
+    return len(failed)
+
+
 def sanitize_filename(s):
     s = re.sub(r'[^\w\s\-\.]', '', s)
     s = re.sub(r'\s+', '_', s.strip())
@@ -406,14 +484,6 @@ def sanitize_filename(s):
 
 
 def main():
-    if "--update" in sys.argv:
-        cmd_update()
-        return
-
-    os.makedirs(OUTPUT_DIR, exist_ok=True)
-
-    # Parse args
-    redownload = "--redownload" in sys.argv
     start_num = 1
     if "--from" in sys.argv:
         idx = sys.argv.index("--from")
@@ -424,6 +494,17 @@ def main():
         idx = sys.argv.index("--to")
         if idx + 1 < len(sys.argv):
             end_num = int(sys.argv[idx + 1])
+
+    if "--update" in sys.argv:
+        cmd_update()
+        return 0
+
+    if "--restore" in sys.argv:
+        return 0 if cmd_restore(start_num, end_num) == 0 else 1
+
+    os.makedirs(OUTPUT_DIR, exist_ok=True)
+
+    redownload = "--redownload" in sys.argv
 
     index = get_chapter_index()
     total = len(index)
@@ -464,7 +545,8 @@ def main():
         print(f"Failed chapters: {failed}")
         print("Re-run with --from N to retry from a specific chapter.")
     print(f"Output directory: {OUTPUT_DIR}")
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
