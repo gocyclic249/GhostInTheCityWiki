@@ -36,27 +36,27 @@ PROTECTED_PREFIXES = ("media/",)
 
 
 def is_protected(rel_path):
-	"""True if rel_path must never be deleted from the live site."""
-	if not isinstance(rel_path, str):
-		raise TypeError(f"rel_path must be str, got {type(rel_path).__name__}")
-	return rel_path.startswith(PROTECTED_PREFIXES)
+    """True if rel_path must never be deleted from the live site."""
+    if not isinstance(rel_path, str):
+        raise TypeError(f"rel_path must be str, got {type(rel_path).__name__}")
+    return rel_path.startswith(PROTECTED_PREFIXES)
 
 
 def compute_changes(manifest, local_hashes):
-	"""Diff the manifest against local files.
+    """Diff the manifest against local files.
 
-	Returns (to_upload, to_delete, missing_protected). Protected paths that are
-	missing locally are reported, never deleted.
-	"""
-	if not isinstance(manifest, dict) or not isinstance(local_hashes, dict):
-		raise TypeError("manifest and local_hashes must both be dicts")
+    Returns (to_upload, to_delete, missing_protected). Protected paths that are
+    missing locally are reported, never deleted.
+    """
+    if not isinstance(manifest, dict) or not isinstance(local_hashes, dict):
+        raise TypeError("manifest and local_hashes must both be dicts")
 
-	to_upload = sorted(rel for rel, sha in local_hashes.items()
-	                   if manifest.get(rel) != sha)
-	missing = [rel for rel in manifest if rel not in local_hashes]
-	to_delete = sorted(rel for rel in missing if not is_protected(rel))
-	missing_protected = sorted(rel for rel in missing if is_protected(rel))
-	return to_upload, to_delete, missing_protected
+    to_upload = sorted(rel for rel, sha in local_hashes.items()
+                       if manifest.get(rel) != sha)
+    missing = [rel for rel in manifest if rel not in local_hashes]
+    to_delete = sorted(rel for rel in missing if not is_protected(rel))
+    missing_protected = sorted(rel for rel in missing if is_protected(rel))
+    return to_upload, to_delete, missing_protected
 
 
 # ── Credentials ───────────────────────────────────────────────────────────
