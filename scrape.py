@@ -305,6 +305,60 @@ def get_chapter_index():
     return index
 
 
+def chapter_filename(chapter_num, chapter):
+    """The on-disk filename for a chapter: 0042_42._Chapter_42.md"""
+    if chapter_num < 1:
+        raise ValueError(f"chapter_num must be >= 1, got {chapter_num}")
+    title = chapter.get("title", "")
+    if not title:
+        raise ValueError(f"chapter {chapter_num} has no title")
+    return f"{chapter_num:04d}_{sanitize_filename(title)}.md"
+
+
+def write_chapter(chapter_num, chapter, filepath):
+    """Fetch one chapter from AO3 and write it as markdown. True on success."""
+    if not filepath:
+        raise ValueError("filepath must be non-empty")
+    title = chapter["title"]
+    ao3_url = chapter["ao3_url"]
+
+    html_content = fetch(ao3_url)
+    if not html_content:
+        print("  FAILED — could not fetch", file=sys.stderr)
+        return False
+
+    chapter_html = extract_chapter_content(html_content)
+    if not chapter_html:
+        print("  WARNING: could not extract chapter content", file=sys.stderr)
+        return False
+
+    notes_before = extract_author_notes(html_content, "before")
+    notes_after = extract_author_notes(html_content, "after")
+    chapter_md = html_to_markdown(chapter_html)
+
+    lines = [f"# {title}\n"]
+    lines.append(f"*Source: {ao3_url}*")
+    if chapter.get("date"):
+        lines.append(f"*Published: {chapter['date']}*")
+    if chapter.get("sb_url"):
+        lines.append(f"*SpaceBattles: {chapter['sb_url']}*")
+    lines.append("\n---\n")
+    if notes_before:
+        lines.append("**Author's Note:**\n")
+        lines.append(f"> {html_to_markdown(notes_before)}\n")
+        lines.append("---\n")
+    lines.append(chapter_md)
+    if notes_after:
+        lines.append("\n\n---\n")
+        lines.append("**Author's End Note:**\n")
+        lines.append(f"> {html_to_markdown(notes_after)}")
+
+    with open(filepath, "w", encoding="utf-8") as f:
+        f.write("\n".join(lines) + "\n")
+    print(f"  Saved: {os.path.basename(filepath)} (~{len(chapter_md.split())} words)")
+    return True
+
+
 def cmd_update():
     """Check AO3 for new chapters, download any that are missing."""
     existing = get_chapter_index()
@@ -331,46 +385,9 @@ def cmd_update():
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     for ch in new_chapters:
         i = next(j + 1 for j, c in enumerate(updated) if c["chapter_id"] == ch["chapter_id"])
-        title = ch["title"]
-        ao3_url = ch["ao3_url"]
-        filename = f"{i:04d}_{sanitize_filename(title)}.md"
-        filepath = os.path.join(OUTPUT_DIR, filename)
-
-        print(f"\nDownloading Ch.{i}: {title}")
-        html_content = fetch(ao3_url)
-        if not html_content:
-            print("  FAILED — skipping")
-            time.sleep(DELAY)
-            continue
-
-        chapter_html = extract_chapter_content(html_content)
-        if not chapter_html:
-            print("  WARNING: Could not extract content — skipping")
-            time.sleep(DELAY)
-            continue
-
-        notes_before = extract_author_notes(html_content, "before")
-        notes_after  = extract_author_notes(html_content, "after")
-        chapter_md   = html_to_markdown(chapter_html)
-
-        lines = [f"# {title}\n"]
-        lines.append(f"*Source: {ao3_url}*")
-        if ch.get("date"):
-            lines.append(f"*Published: {ch['date']}*")
-        lines.append("\n---\n")
-        if notes_before:
-            lines.append("**Author's Note:**\n")
-            lines.append(f"> {html_to_markdown(notes_before)}\n")
-            lines.append("---\n")
-        lines.append(chapter_md)
-        if notes_after:
-            lines.append("\n\n---\n")
-            lines.append("**Author's End Note:**\n")
-            lines.append(f"> {html_to_markdown(notes_after)}")
-
-        with open(filepath, "w", encoding="utf-8") as f:
-            f.write("\n".join(lines) + "\n")
-        print(f"  Saved: {filename} (~{len(chapter_md.split())} words)")
+        filepath = os.path.join(OUTPUT_DIR, chapter_filename(i, ch))
+        print(f"\nDownloading Ch.{i}: {ch['title']}")
+        write_chapter(i, ch, filepath)
         time.sleep(DELAY)
 
     chapter_list = ", ".join(
@@ -423,72 +440,22 @@ def main():
         if end_num and i > end_num:
             break
 
-        title = chapter["title"]
-        ao3_url = chapter["ao3_url"]
-        filename = f"{i:04d}_{sanitize_filename(title)}.md"
-        filepath = os.path.join(OUTPUT_DIR, filename)
+        filepath = os.path.join(OUTPUT_DIR, chapter_filename(i, chapter))
 
         if os.path.exists(filepath) and not redownload:
             size = os.path.getsize(filepath)
             if size > 500:  # skip if file looks valid
-                print(f"[{i}/{total}] Skip (exists, {size} bytes): {title}")
+                print(f"[{i}/{total}] Skip (exists, {size} bytes): {chapter['title']}")
                 success += 1
                 continue
 
-        print(f"[{i}/{total}] {title}")
-        print(f"  URL: {ao3_url}")
+        print(f"[{i}/{total}] {chapter['title']}")
+        print(f"  URL: {chapter['ao3_url']}")
 
-        html_content = fetch(ao3_url)
-        if not html_content:
-            print(f"  FAILED")
+        if write_chapter(i, chapter, filepath):
+            success += 1
+        else:
             failed.append(i)
-            time.sleep(DELAY)
-            continue
-
-        # Extract content
-        chapter_html = extract_chapter_content(html_content)
-        if not chapter_html:
-            print(f"  WARNING: Could not extract chapter content")
-            failed.append(i)
-            time.sleep(DELAY)
-            continue
-
-        # Extract notes
-        notes_before = extract_author_notes(html_content, "before")
-        notes_after = extract_author_notes(html_content, "after")
-
-        # Convert to markdown
-        chapter_md = html_to_markdown(chapter_html)
-        notes_before_md = html_to_markdown(notes_before) if notes_before else None
-        notes_after_md = html_to_markdown(notes_after) if notes_after else None
-
-        # Build the output
-        lines = [f"# {title}\n"]
-        lines.append(f"*Source: {ao3_url}*")
-        if chapter.get("date"):
-            lines.append(f"*Published: {chapter['date']}*")
-        if chapter.get("sb_url"):
-            lines.append(f"*SpaceBattles: {chapter['sb_url']}*")
-        lines.append("\n---\n")
-
-        if notes_before_md:
-            lines.append("**Author's Note:**\n")
-            lines.append(f"> {notes_before_md}\n")
-            lines.append("---\n")
-
-        lines.append(chapter_md)
-
-        if notes_after_md:
-            lines.append("\n\n---\n")
-            lines.append("**Author's End Note:**\n")
-            lines.append(f"> {notes_after_md}")
-
-        with open(filepath, "w", encoding="utf-8") as f:
-            f.write("\n".join(lines) + "\n")
-
-        word_count = len(chapter_md.split())
-        print(f"  Saved: {filename} (~{word_count} words)")
-        success += 1
 
         time.sleep(DELAY)
 
