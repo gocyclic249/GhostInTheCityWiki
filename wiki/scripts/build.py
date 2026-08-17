@@ -8,6 +8,8 @@ Usage:
   python3 scripts/build.py --upload               # push changed files to Neocities
   python3 scripts/build.py --upload --dry-run     # show what would change
   python3 scripts/build.py --all                  # build + upload
+  python3 scripts/build.py --restore-media        # pull missing media back from Neocities
+  python3 scripts/build.py --restore-media --dry-run
 """
 
 import json
@@ -99,6 +101,18 @@ def cmd_build():
 
 def cmd_upload(dry_run=False):
     print("Uploading to Neocities...")
+    mod = _load_upload()
+    mod.run_upload(dry_run=dry_run)
+
+
+def cmd_restore_media(dry_run=False):
+    print("Restoring media from Neocities...")
+    mod = _load_upload()
+    mod.restore_media(mod.get_api_key(), dry_run=dry_run)
+
+
+def _load_upload():
+    """Load upload.py by path — it is a script, not an importable package."""
     import importlib.util
     spec = importlib.util.spec_from_file_location(
         "upload",
@@ -106,7 +120,7 @@ def cmd_upload(dry_run=False):
     )
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
-    mod.run_upload(dry_run=dry_run)
+    return mod
 
 
 # ── main ───────────────────────────────────────────────────────────────────
@@ -122,6 +136,9 @@ def main():
 
     if "--status" in args:
         cmd_status()
+
+    if "--restore-media" in args:
+        cmd_restore_media(dry_run=dry_run)
 
     if "--build" in args or "--all" in args:
         cmd_build()
