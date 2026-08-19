@@ -10,6 +10,11 @@ Usage:
   python3 scrape.py --from N          # start from chapter N
   python3 scrape.py --from N --to M   # download chapters N to M
   python3 scrape.py --redownload      # force re-download of all chapters
+  python3 scrape.py --restore         # re-download missing/damaged chapters
+  python3 scrape.py --restore --from 100   # bound the restore range
+
+chapters/ is gitignored (story text is not redistributed), so AO3 is the store
+of record: --restore rebuilds the directory on a new machine.
 """
 
 import urllib.request
@@ -305,6 +310,83 @@ def get_chapter_index():
     return index
 
 
+MIN_CHAPTER_BYTES = 500
+
+
+def classify_chapter(filepath):
+    """Classify a chapter file as present, missing, or suspect.
+
+    Suspect means the file exists but looks like a truncated or failed
+    download — too small, or missing the markdown title line write_chapter
+    always emits.
+    """
+    if not filepath:
+        raise ValueError("filepath must be non-empty")
+    if not os.path.exists(filepath):
+        return "missing"
+    if os.path.getsize(filepath) <= MIN_CHAPTER_BYTES:
+        return "suspect"
+    with open(filepath, encoding="utf-8") as f:
+        first_line = f.readline()
+    if not first_line.startswith("# "):
+        return "suspect"
+    return "present"
+
+
+def chapter_filename(chapter_num, chapter):
+    """The on-disk filename for a chapter: 0042_42._Chapter_42.md"""
+    if chapter_num < 1:
+        raise ValueError(f"chapter_num must be >= 1, got {chapter_num}")
+    title = chapter.get("title", "")
+    if not title:
+        raise ValueError(f"chapter {chapter_num} has no title")
+    return f"{chapter_num:04d}_{sanitize_filename(title)}.md"
+
+
+def write_chapter(chapter_num, chapter, filepath):
+    """Fetch one chapter from AO3 and write it as markdown. True on success."""
+    if not filepath:
+        raise ValueError("filepath must be non-empty")
+    title = chapter["title"]
+    ao3_url = chapter["ao3_url"]
+
+    html_content = fetch(ao3_url)
+    if not html_content:
+        print("  FAILED — could not fetch", file=sys.stderr)
+        return False
+
+    chapter_html = extract_chapter_content(html_content)
+    if not chapter_html:
+        print("  WARNING: could not extract chapter content", file=sys.stderr)
+        return False
+
+    notes_before = extract_author_notes(html_content, "before")
+    notes_after = extract_author_notes(html_content, "after")
+    chapter_md = html_to_markdown(chapter_html)
+
+    lines = [f"# {title}\n"]
+    lines.append(f"*Source: {ao3_url}*")
+    if chapter.get("date"):
+        lines.append(f"*Published: {chapter['date']}*")
+    if chapter.get("sb_url"):
+        lines.append(f"*SpaceBattles: {chapter['sb_url']}*")
+    lines.append("\n---\n")
+    if notes_before:
+        lines.append("**Author's Note:**\n")
+        lines.append(f"> {html_to_markdown(notes_before)}\n")
+        lines.append("---\n")
+    lines.append(chapter_md)
+    if notes_after:
+        lines.append("\n\n---\n")
+        lines.append("**Author's End Note:**\n")
+        lines.append(f"> {html_to_markdown(notes_after)}")
+
+    with open(filepath, "w", encoding="utf-8") as f:
+        f.write("\n".join(lines) + "\n")
+    print(f"  Saved: {os.path.basename(filepath)} (~{len(chapter_md.split())} words)")
+    return True
+
+
 def cmd_update():
     """Check AO3 for new chapters, download any that are missing."""
     existing = get_chapter_index()
@@ -331,46 +413,9 @@ def cmd_update():
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     for ch in new_chapters:
         i = next(j + 1 for j, c in enumerate(updated) if c["chapter_id"] == ch["chapter_id"])
-        title = ch["title"]
-        ao3_url = ch["ao3_url"]
-        filename = f"{i:04d}_{sanitize_filename(title)}.md"
-        filepath = os.path.join(OUTPUT_DIR, filename)
-
-        print(f"\nDownloading Ch.{i}: {title}")
-        html_content = fetch(ao3_url)
-        if not html_content:
-            print("  FAILED — skipping")
-            time.sleep(DELAY)
-            continue
-
-        chapter_html = extract_chapter_content(html_content)
-        if not chapter_html:
-            print("  WARNING: Could not extract content — skipping")
-            time.sleep(DELAY)
-            continue
-
-        notes_before = extract_author_notes(html_content, "before")
-        notes_after  = extract_author_notes(html_content, "after")
-        chapter_md   = html_to_markdown(chapter_html)
-
-        lines = [f"# {title}\n"]
-        lines.append(f"*Source: {ao3_url}*")
-        if ch.get("date"):
-            lines.append(f"*Published: {ch['date']}*")
-        lines.append("\n---\n")
-        if notes_before:
-            lines.append("**Author's Note:**\n")
-            lines.append(f"> {html_to_markdown(notes_before)}\n")
-            lines.append("---\n")
-        lines.append(chapter_md)
-        if notes_after:
-            lines.append("\n\n---\n")
-            lines.append("**Author's End Note:**\n")
-            lines.append(f"> {html_to_markdown(notes_after)}")
-
-        with open(filepath, "w", encoding="utf-8") as f:
-            f.write("\n".join(lines) + "\n")
-        print(f"  Saved: {filename} (~{len(chapter_md.split())} words)")
+        filepath = os.path.join(OUTPUT_DIR, chapter_filename(i, ch))
+        print(f"\nDownloading Ch.{i}: {ch['title']}")
+        write_chapter(i, ch, filepath)
         time.sleep(DELAY)
 
     chapter_list = ", ".join(
@@ -382,6 +427,56 @@ def cmd_update():
     print("  2. Run: python3 wiki/scripts/build.py --all")
 
 
+def cmd_restore(start_num=1, end_num=None):
+    """Re-download every missing or damaged chapter. Returns the failure count.
+
+    chapters/ is gitignored, so a new machine starts empty. AO3 is the store of
+    record — this rebuilds the directory without ever storing story text in git.
+    """
+    if start_num < 1:
+        raise ValueError(f"start_num must be >= 1, got {start_num}")
+    index = get_chapter_index()
+    if not index:
+        print("ERROR: no chapter index. Run scrape.py --update first.", file=sys.stderr)
+        return 1
+
+    os.makedirs(OUTPUT_DIR, exist_ok=True)
+
+    todo = []
+    present = 0
+    for i, chapter in enumerate(index, start=1):
+        if i < start_num or (end_num and i > end_num):
+            continue
+        filepath = os.path.join(OUTPUT_DIR, chapter_filename(i, chapter))
+        state = classify_chapter(filepath)
+        if state == "present":
+            present += 1
+        else:
+            todo.append((i, chapter, filepath, state))
+
+    scope = f"{start_num}-{end_num}" if end_num else f"{start_num}-{len(index)}"
+    print(f"Index: {len(index)} chapters. Range {scope}: "
+          f"{present} present, {len(todo)} to restore.")
+    if not todo:
+        print("Nothing to restore.")
+        return 0
+
+    failed = []
+    for n, (i, chapter, filepath, state) in enumerate(todo, start=1):
+        label = "re-fetching damaged" if state == "suspect" else "fetching missing"
+        print(f"[{n}/{len(todo)}] Ch.{i} ({label}): {chapter['title']}")
+        if not write_chapter(i, chapter, filepath):
+            failed.append(i)
+        time.sleep(DELAY)
+
+    print(f"\nRestored {len(todo) - len(failed)}/{len(todo)} chapters.")
+    if failed:
+        print(f"Failed: {failed}", file=sys.stderr)
+        print(f"Retry with: python3 scrape.py --restore --from {min(failed)}",
+              file=sys.stderr)
+    return len(failed)
+
+
 def sanitize_filename(s):
     s = re.sub(r'[^\w\s\-\.]', '', s)
     s = re.sub(r'\s+', '_', s.strip())
@@ -389,14 +484,6 @@ def sanitize_filename(s):
 
 
 def main():
-    if "--update" in sys.argv:
-        cmd_update()
-        return
-
-    os.makedirs(OUTPUT_DIR, exist_ok=True)
-
-    # Parse args
-    redownload = "--redownload" in sys.argv
     start_num = 1
     if "--from" in sys.argv:
         idx = sys.argv.index("--from")
@@ -407,6 +494,17 @@ def main():
         idx = sys.argv.index("--to")
         if idx + 1 < len(sys.argv):
             end_num = int(sys.argv[idx + 1])
+
+    if "--update" in sys.argv:
+        cmd_update()
+        return 0
+
+    if "--restore" in sys.argv:
+        return 0 if cmd_restore(start_num, end_num) == 0 else 1
+
+    os.makedirs(OUTPUT_DIR, exist_ok=True)
+
+    redownload = "--redownload" in sys.argv
 
     index = get_chapter_index()
     total = len(index)
@@ -423,72 +521,22 @@ def main():
         if end_num and i > end_num:
             break
 
-        title = chapter["title"]
-        ao3_url = chapter["ao3_url"]
-        filename = f"{i:04d}_{sanitize_filename(title)}.md"
-        filepath = os.path.join(OUTPUT_DIR, filename)
+        filepath = os.path.join(OUTPUT_DIR, chapter_filename(i, chapter))
 
         if os.path.exists(filepath) and not redownload:
             size = os.path.getsize(filepath)
             if size > 500:  # skip if file looks valid
-                print(f"[{i}/{total}] Skip (exists, {size} bytes): {title}")
+                print(f"[{i}/{total}] Skip (exists, {size} bytes): {chapter['title']}")
                 success += 1
                 continue
 
-        print(f"[{i}/{total}] {title}")
-        print(f"  URL: {ao3_url}")
+        print(f"[{i}/{total}] {chapter['title']}")
+        print(f"  URL: {chapter['ao3_url']}")
 
-        html_content = fetch(ao3_url)
-        if not html_content:
-            print(f"  FAILED")
+        if write_chapter(i, chapter, filepath):
+            success += 1
+        else:
             failed.append(i)
-            time.sleep(DELAY)
-            continue
-
-        # Extract content
-        chapter_html = extract_chapter_content(html_content)
-        if not chapter_html:
-            print(f"  WARNING: Could not extract chapter content")
-            failed.append(i)
-            time.sleep(DELAY)
-            continue
-
-        # Extract notes
-        notes_before = extract_author_notes(html_content, "before")
-        notes_after = extract_author_notes(html_content, "after")
-
-        # Convert to markdown
-        chapter_md = html_to_markdown(chapter_html)
-        notes_before_md = html_to_markdown(notes_before) if notes_before else None
-        notes_after_md = html_to_markdown(notes_after) if notes_after else None
-
-        # Build the output
-        lines = [f"# {title}\n"]
-        lines.append(f"*Source: {ao3_url}*")
-        if chapter.get("date"):
-            lines.append(f"*Published: {chapter['date']}*")
-        if chapter.get("sb_url"):
-            lines.append(f"*SpaceBattles: {chapter['sb_url']}*")
-        lines.append("\n---\n")
-
-        if notes_before_md:
-            lines.append("**Author's Note:**\n")
-            lines.append(f"> {notes_before_md}\n")
-            lines.append("---\n")
-
-        lines.append(chapter_md)
-
-        if notes_after_md:
-            lines.append("\n\n---\n")
-            lines.append("**Author's End Note:**\n")
-            lines.append(f"> {notes_after_md}")
-
-        with open(filepath, "w", encoding="utf-8") as f:
-            f.write("\n".join(lines) + "\n")
-
-        word_count = len(chapter_md.split())
-        print(f"  Saved: {filename} (~{word_count} words)")
-        success += 1
 
         time.sleep(DELAY)
 
@@ -497,7 +545,8 @@ def main():
         print(f"Failed chapters: {failed}")
         print("Re-run with --from N to retry from a specific chapter.")
     print(f"Output directory: {OUTPUT_DIR}")
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

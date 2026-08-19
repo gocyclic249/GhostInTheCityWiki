@@ -18,6 +18,7 @@ Usage:
   python3 scrape_media.py --unmark-manual POST_ID  # clear the manual flag after dropping a replacement
   python3 scrape_media.py --grab-sb                # download SB attachments via gallery-dl + cookies
   python3 scrape_media.py --status                 # show index stats
+  python3 scrape_media.py --force                  # write index even if it would shrink
 
 Manual image workflow: see docs/manual-images.md for the full procedure
 (when an imgur URL dies, when SB shows its logo placeholder, when the
@@ -42,6 +43,9 @@ import sys
 import requests
 from bs4 import BeautifulSoup
 
+from lib.image_utils import is_skip_url
+from lib.safe_index import write_index_atomic, write_index_guarded
+
 # ── Config ────────────────────────────────────────────────────────────────
 
 SB_BASE = "https://forums.spacebattles.com"
@@ -65,16 +69,20 @@ GALLERY_DL = os.path.expanduser("~/.local/gallery-dl-venv/bin/gallery-dl")
 if not os.path.exists(GALLERY_DL):
     GALLERY_DL = "gallery-dl"  # hope it's on PATH
 
-# Tavily is optional — only needed for post content extraction (image finding)
+# Tavily is optional — only needed for post content extraction (image finding).
+# get_tavily_key() calls sys.exit(1) when the key is missing, which raises
+# SystemExit (a BaseException, not an Exception) and would escape this guard
+# and kill the whole script at import time. So check the environment directly
+# first and only call get_tavily_key() when we already know it will succeed.
 try:
     from lib.tavily_utils import tavily_extract, get_tavily_key
+    if not os.environ.get("TAVILY_API_KEY"):
+        raise RuntimeError("TAVILY_API_KEY not set")
     get_tavily_key()
     HAS_TAVILY = True
 except Exception:
     HAS_TAVILY = False
     print("  Note: Tavily unavailable, using direct HTTP for all fetches.")
-
-from lib.image_utils import is_skip_url
 
 DELAY = 1.0
 
@@ -628,8 +636,7 @@ def download_media(index, start_num=1, end_num=None, redownload=False, retry_emp
         success += 1
 
     # Save updated index with image metadata
-    with open(INDEX_PATH, "w", encoding="utf-8") as f:
-        json.dump(index, f, indent=2, ensure_ascii=False)
+    write_index_atomic(INDEX_PATH, index)
     print(f"  Updated index at {INDEX_PATH}")
 
     print(f"\nDone! {success} posts processed, {skipped} skipped, {total_images} images downloaded.")
@@ -658,7 +665,8 @@ def sanitize_filename(s):
 
 # ── Commands ──────────────────────────────────────────────────────────────
 
-def cmd_build_index():
+def cmd_build_index(force=False):
+    """Refresh the media index. Returns the merged entries, or None if refused."""
     entries = fetch_threadmark_index()
 
     # Merge with existing index so we don't clobber images/artist/context
@@ -679,9 +687,9 @@ def cmd_build_index():
             merged_count += 1
         print(f"  Preserved data for {merged_count} existing entries")
 
-    with open(INDEX_PATH, "w", encoding="utf-8") as f:
-        json.dump(entries, f, indent=2, ensure_ascii=False)
-    print(f"  Saved index to {INDEX_PATH}")
+    if not write_index_guarded(INDEX_PATH, entries, force=force):
+        return None
+    print(f"  Saved index to {INDEX_PATH} ({len(entries)} entries)")
     return entries
 
 
@@ -802,8 +810,7 @@ def cmd_mark_manual(post_id, count=1, source="manual"):
             stamp(img)
         print(f"  Flagged {len(images)} image(s) on post {post_id} ({title})")
 
-    with open(INDEX_PATH, "w", encoding="utf-8") as f:
-        json.dump(index, f, indent=2, ensure_ascii=False)
+    write_index_atomic(INDEX_PATH, index)
     print(f"  Drop replacement file(s) at: wiki/build/media/{post_id}_*.{{ext}}")
     print(f"  Then run: python3 scrape_media.py --unmark-manual {post_id}")
 
@@ -852,8 +859,7 @@ def cmd_unmark_manual(post_id):
         cleared += 1
 
     if cleared:
-        with open(INDEX_PATH, "w", encoding="utf-8") as f:
-            json.dump(index, f, indent=2, ensure_ascii=False)
+        write_index_atomic(INDEX_PATH, index)
     print(f"  Cleared {cleared} flag(s), skipped {skipped} (file missing).")
 
 
@@ -1016,8 +1022,7 @@ def cmd_grab_sb(cookies_path=None):
             failed += 1
 
     # Save updated index
-    with open(INDEX_PATH, "w", encoding="utf-8") as f:
-        json.dump(index, f, indent=2, ensure_ascii=False)
+    write_index_atomic(INDEX_PATH, index)
 
     print(f"\nDone! {success} downloaded, {failed} failed.")
     if failed:
@@ -1065,10 +1070,13 @@ def cmd_status():
         print("  Run --show-manual for details")
 
 
-def cmd_download(start_num=1, end_num=None, redownload=False, retry_empty=False):
+def cmd_download(start_num=1, end_num=None, redownload=False, retry_empty=False, force=False):
     # Always refresh the threadmark index first so new posts are picked up.
     # cmd_build_index merges with existing data, preserving images/artist/context.
-    index = cmd_build_index()
+    index = cmd_build_index(force=force)
+    if index is None:
+        print("  Aborting download: the index refresh was refused.", file=sys.stderr)
+        return 2
     print(f"Loaded index with {len(index)} media entries.")
 
     with_urls = sum(1 for e in index if e.get("sb_url"))
@@ -1078,6 +1086,7 @@ def cmd_download(start_num=1, end_num=None, redownload=False, retry_empty=False)
         print(f"  {empty} entries have no images — retrying those")
 
     download_media(index, start_num, end_num, redownload, retry_empty)
+    return 0
 
 
 # ── Entry point ───────────────────────────────────────────────────────────
@@ -1087,15 +1096,15 @@ def main():
 
     if "--help" in args or "-h" in args:
         print(__doc__)
-        return
+        return 0
 
     if "--status" in args:
         cmd_status()
-        return
+        return 0
 
     if "--show-manual" in args or "--list-manual" in args:
         cmd_show_manual()
-        return
+        return 0
 
     if "--mark-manual" in args:
         idx = args.index("--mark-manual")
@@ -1109,7 +1118,7 @@ def main():
             if ci + 1 < len(args):
                 count = int(args[ci + 1])
         cmd_mark_manual(post_id, count=count)
-        return
+        return 0
 
     if "--unmark-manual" in args:
         idx = args.index("--unmark-manual")
@@ -1117,7 +1126,7 @@ def main():
             print("ERROR: --unmark-manual requires a POST_ID argument")
             sys.exit(1)
         cmd_unmark_manual(args[idx + 1])
-        return
+        return 0
 
     if "--grab-sb" in args:
         cookies = COOKIES_PATH
@@ -1126,11 +1135,10 @@ def main():
             if ci + 1 < len(args):
                 cookies = args[ci + 1]
         cmd_grab_sb(cookies)
-        return
+        return 0
 
     if "--index-only" in args:
-        cmd_build_index()
-        return
+        return 0 if cmd_build_index(force="--force" in args) is not None else 2
 
     redownload = "--redownload" in args
     retry_empty = "--retry-empty" in args
@@ -1147,9 +1155,10 @@ def main():
         if idx + 1 < len(args):
             end_num = int(args[idx + 1])
 
-    cmd_download(start_num=start_num, end_num=end_num, redownload=redownload,
-                 retry_empty=retry_empty)
+    return cmd_download(start_num=start_num, end_num=end_num,
+                        redownload=redownload, retry_empty=retry_empty,
+                        force="--force" in args)
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
