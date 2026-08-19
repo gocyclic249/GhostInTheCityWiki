@@ -290,11 +290,65 @@ python3 scrape.py --restore --from 200 --to 246  # or bound the range
 ```
 
 Media cannot be re-scraped from its original sources — many are dead imgur links,
-expired Discord CDN URLs, or Cloudflare-blocked attachments — so Neocities holds
-the only complete copy. Each download is checked against the SHA1 the Neocities
+expired Discord CDN URLs, or Cloudflare-blocked attachments — so Neocities is the
+live store of record. Each download is checked against the SHA1 the Neocities
 API reports and discarded unless it is really an image, so a 404 page can never
 land as a broken file. `upload.py` also refuses to delete anything under
 `media/`, even when the local copy is missing.
+
+Neocities alone is not enough, though. If a bad local file is uploaded over the
+Neocities original, the good copy is gone — restoring from Neocities just pulls
+the bad file back. Two fallbacks cover that case:
+
+- **`media-archive/`** — encrypted volumes of the whole media tree, tracked in
+  git. See [Encrypted Media Archive](#encrypted-media-archive) below.
+- **Git history, commit `577f2a7`** — media was tracked until commit `072e2cd`.
+  That older commit still holds 121 images as real blobs:
+  ```bash
+  git show 577f2a7:wiki/build/media/<name> > wiki/build/media/<name>
+  ```
+  It predates the untracking, so it does not cover anything added since.
+
+Some images are gone from every store. As of 2026-08-19, eleven images referenced
+by `photomode.html` exist nowhere — their SpaceBattles posts were deleted upstream
+and they postdate `577f2a7`: `91754121_{1,2,3}.png`, `91765497_{1,2,3}.png`,
+`91788975_{1,2,3,4}.png`, and `92611121_1.jpg`.
+
+### Encrypted Media Archive
+
+The artists asked not to have their work sitting in a public repo, but the art
+still needs to survive independently of Neocities. `media-archive/` squares that
+circle: it holds the full media tree as **AES-256 encrypted zip volumes**, tracked
+in git. Without the passphrase the blobs are noise, so nothing is scrapable.
+
+```bash
+python3 wiki/scripts/pack_media.py --status    # compare media/ to the archive (no passphrase)
+python3 wiki/scripts/pack_media.py --pack      # rebuild the volumes (prompts for a passphrase)
+python3 wiki/scripts/pack_media.py --verify    # sha256 every entry against the manifest
+python3 wiki/scripts/pack_media.py --extract   # restore media/ from the volumes
+```
+
+Repack whenever `--status` reports `STALE`, which happens after any
+`scrape_media.py` run that adds images. Always `--verify` afterwards — that is
+what proves the archive can actually be restored.
+
+**Passphrase handling.** The script prompts via `getpass`, or reads
+`MEDIA_ARCHIVE_PASSPHRASE` for non-interactive runs. It is never accepted as a
+command-line argument, so it stays out of shell history and `ps`. Use a long
+random passphrase from a password manager: these blobs go into a public repo, and
+**git history is permanent — a weak or leaked passphrase cannot be walked back**
+by deleting the file later.
+
+**What is and is not hidden.** WinZip AES encrypts file contents, not the zip
+central directory, so the post-ID filenames are readable in a tracked volume. That
+leaks nothing new, since `media_index.json` already maps those IDs to their
+SpaceBattles URLs and artist names in the clear.
+
+The set splits into volumes capped at 45 MiB (`--max-part-bytes`) — currently 3
+parts totalling ~94 MiB. GitHub hard-rejects any file over 100 MiB and warns above
+50 MiB, and a single archive would already be at 94 MiB with no headroom. Files
+are assigned in sorted-name order, so new art usually rewrites only the last
+volume rather than every blob.
 
 `scrape.py --restore` re-downloads chapters that are missing and re-fetches ones
 that look damaged (under 500 bytes, or missing their title line).

@@ -17,3 +17,8 @@ wiki/build/media/
 *.webp
 *.svg
 *.avif
+
+# Encrypted media archive IS tracked (AES-256 volumes, see CLAUDE.md).
+# Negated explicitly so a future *.zip rule cannot silently drop the backup.
+!media-archive/
+!media-archive/*.zip
