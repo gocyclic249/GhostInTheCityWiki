@@ -18,6 +18,7 @@ import time
 import requests
 from bs4 import BeautifulSoup
 
+from lib.cf_session import CloudflareChallenge, build_headers, raise_if_challenged
 from lib.safe_index import write_index_guarded
 
 # ── Config ────────────────────────────────────────────────────────────────
@@ -31,10 +32,8 @@ PER_PAGE = 25
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 INDEX_PATH = os.path.join(BASE_DIR, "sidestories_index.json")
 
-HEADERS = {
-    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
-                  "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-}
+# Carries the browser-borrowed Cloudflare cookie (see lib/cf_session.py).
+HEADERS = build_headers()
 DELAY = 1.0  # seconds between requests
 
 
@@ -47,6 +46,7 @@ def fetch_page(page_num):
     for attempt in range(3):
         try:
             r = requests.get(url, headers=HEADERS, timeout=30)
+            raise_if_challenged(r, url)  # actionable error; retrying won't help
             r.raise_for_status()
             break
         except requests.RequestException as e:
@@ -183,7 +183,12 @@ def main():
         cmd_status()
         return 0
 
-    return 0 if cmd_build_index(force="--force" in args) is not None else 2
+    try:
+        ok = cmd_build_index(force="--force" in args) is not None
+    except CloudflareChallenge as e:
+        print(f"\n{e}", file=sys.stderr)
+        return 3
+    return 0 if ok else 2
 
 
 if __name__ == "__main__":
