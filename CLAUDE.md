@@ -82,7 +82,18 @@ Story text and fan art are deliberately kept out of git — chapter text is not 
 | `wiki/build/media/` | Neocities | `python3 wiki/scripts/upload.py --restore-media` |
 | `chapters/*.md` | AO3 | `python3 scrape.py --restore` |
 
-Media cannot use the AO3-style re-scrape path: its original sources include dead imgur URLs, expired Discord CDN links, Cloudflare-blocked SB attachments, and hand-placed manual replacements. Neocities holds the only complete copy. Chapters are the reverse — AO3 always has them, and republishing them on Neocities would be the redistribution the project avoids.
+Media cannot use the AO3-style re-scrape path: its original sources include dead imgur URLs, expired Discord CDN links, Cloudflare-blocked SB attachments, and hand-placed manual replacements. Neocities is the live store of record. Chapters are the reverse — AO3 always has them, and republishing them on Neocities would be the redistribution the project avoids.
+
+**Two media fallbacks exist behind Neocities.** Neither is complete, and both matter when a bad local file has already been pushed over the Neocities original — at that point Neocities is no longer a recovery source.
+
+1. **`media-archive/media-archive.part*.zip`** — AES-256 encrypted volumes holding the full `wiki/build/media/` tree, committed to git so the art is durable without being scrapable. Rebuild or extract with `wiki/scripts/pack_media.py` (see "Encrypted Media Archive" below).
+2. **Git history, commit `577f2a7`** — media was tracked until `072e2cd` ("Remove chapters, sidestories, and media from git tracking"). That commit still holds **121 images** as real blobs:
+   ```sh
+   git show 577f2a7:wiki/build/media/<name> > wiki/build/media/<name>
+   ```
+   It predates the untracking, so it does **not** cover anything added since.
+
+Some images are gone from every store. As of 2026-08-19 these 11 are referenced by `photomode.html` but exist nowhere — their SpaceBattles posts were deleted upstream, and they postdate `577f2a7`: `91754121_{1,2,3}.png`, `91765497_{1,2,3}.png`, `91788975_{1,2,3,4}.png`, `92611121_1.jpg`.
 
 Guarantees the tooling now enforces:
 
@@ -91,6 +102,23 @@ Guarantees the tooling now enforces:
 - **`scrape.py --restore`** re-downloads missing chapters and re-fetches damaged ones (under 500 bytes, or missing the `# ` title line), bounded by `--from` / `--to`.
 
 Run `python3 -m unittest discover -s tests -v` after touching any of this — it needs no environment variables. After deploying, verify the deployed files match the local build; stale deployed files have caused bugs before.
+
+### Encrypted Media Archive
+
+`wiki/build/media/` is gitignored, but `media-archive/` is **tracked**. It holds the same images as AES-256 encrypted zip volumes, so the art rides along in git without being readable by anyone who clones or scrapes the repo.
+
+```bash
+python3 wiki/scripts/pack_media.py --status    # compare media/ to the archive (no passphrase)
+python3 wiki/scripts/pack_media.py --pack      # rebuild volumes (prompts for passphrase)
+python3 wiki/scripts/pack_media.py --verify    # sha256 every entry against the manifest
+python3 wiki/scripts/pack_media.py --extract   # restore media/ from the volumes
+```
+
+- **Volumes, not one file.** GitHub hard-rejects anything over 100 MiB and warns above 50 MiB; the media set is ~94 MiB. Files are packed in sorted-name order into volumes capped at 45 MiB (`--max-part-bytes`), currently 3 parts. Sorted order means new art usually rewrites only the last volume rather than every blob.
+- **The passphrase is never stored.** `pack_media.py` prompts via `getpass`, or reads `MEDIA_ARCHIVE_PASSPHRASE` for non-interactive runs. It is never an argv value, so it stays out of shell history and `ps`. Keep it in a password manager — **git history is permanent, so a weak or leaked passphrase cannot be walked back.**
+- **Filenames are not encrypted.** WinZip AES encrypts entry contents, not the central directory, so the post-ID filenames are visible in a tracked volume. That leaks nothing new — `media_index.json` already maps those IDs to their SB URLs and artists in the clear.
+- `manifest.json` sits beside the volumes with a sha256 per file. `--verify` is what proves the archive is actually restorable; run it after every `--pack`.
+- Repack whenever `--status` reports `STALE`, i.e. after any `scrape_media.py` run that adds images.
 
 ## Repo Layout Notes
 

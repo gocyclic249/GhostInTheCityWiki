@@ -15,3 +15,7 @@ lxml
 # Only needed if you run the manual recovery scripts.
 # selenium
 selenium==4.44.0  # added by depgen 2026-05-23
+
+# Encrypted media archive (wiki/scripts/pack_media.py). AES-256 zip volumes
+# committed to git so the fan art survives independently of Neocities.
+pyzipper

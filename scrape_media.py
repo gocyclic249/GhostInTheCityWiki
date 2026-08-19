@@ -43,6 +43,7 @@ import sys
 import requests
 from bs4 import BeautifulSoup
 
+from lib.cf_session import CloudflareChallenge, build_headers, raise_if_challenged
 from lib.image_utils import is_skip_url
 from lib.safe_index import write_index_atomic, write_index_guarded
 
@@ -59,10 +60,8 @@ IMAGE_DIR  = os.path.join(BASE_DIR, "wiki", "build", "media")
 INDEX_PATH = os.path.join(BASE_DIR, "media_index.json")
 COOKIES_PATH = os.path.join(BASE_DIR, "cookies-sb.txt")
 
-HEADERS = {
-    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
-                  "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-}
+# Carries the browser-borrowed Cloudflare cookie (see lib/cf_session.py).
+HEADERS = build_headers()
 
 # gallery-dl binary — check venv first, fall back to system
 GALLERY_DL = os.path.expanduser("~/.local/gallery-dl-venv/bin/gallery-dl")
@@ -96,6 +95,7 @@ def fetch_index_page(page_num):
     for attempt in range(3):
         try:
             r = requests.get(url, headers=HEADERS, timeout=30)
+            raise_if_challenged(r, url)  # actionable error; retrying won't help
             r.raise_for_status()
             break
         except requests.RequestException as e:
@@ -353,6 +353,7 @@ def fetch_post_content_direct(url, post_id):
     """Fetch a SpaceBattles post via direct HTTP and extract images from HTML."""
     try:
         r = requests.get(url, headers=HEADERS, timeout=30)
+        raise_if_challenged(r, url)  # actionable error; retrying won't help
         r.raise_for_status()
     except requests.RequestException as e:
         print(f"  Request failed: {e}")
@@ -1161,4 +1162,8 @@ def main():
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    try:
+        sys.exit(main())
+    except CloudflareChallenge as e:
+        print(f"\n{e}", file=sys.stderr)
+        sys.exit(3)
